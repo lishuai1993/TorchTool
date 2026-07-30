@@ -23,6 +23,10 @@ final class WindowManager: @unchecked Sendable {
     private var lastRaisedAXTitle: [pid_t: String] = [:]
     private var lastRaisedAXIndex: [pid_t: Int] = [:]
 
+    /// Guard flag to prevent event tap's async `windowDidInteract` from
+    /// resetting the cursor during programmatic window activation.
+    private var isActivating = false
+
     private init() {}
 
     // MARK: - Window enumeration
@@ -93,6 +97,9 @@ final class WindowManager: @unchecked Sendable {
 
     /// Activate (bring to front) a window.
     func activateWindow(_ windowID: CGWindowID) {
+        isActivating = true
+        defer { isActivating = false }
+
         guard let info = windows[windowID] else {
             logDebug("WindowManager: activateWindow - window \(windowID) not found")
             return
@@ -215,7 +222,8 @@ final class WindowManager: @unchecked Sendable {
             options: .listenOnly,
             eventsOfInterest: eventMask,
             callback: { (_, type, event, _) -> Unmanaged<CGEvent>? in
-                if let frontID = WindowManager.shared.frontmostWindowID {
+                if let frontID = WindowManager.shared.frontmostWindowID,
+                   !WindowManager.shared.isActivating {
                     DispatchQueue.main.async {
                         WindowManager.shared.orderingEngine.windowDidInteract(frontID)
                         WindowManager.shared.onInteraction?(frontID)
