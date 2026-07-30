@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Centered Dock</title>
+    <style>
+        /* 页面基础重置 */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* 关键：垂直和水平居中 */
+            background-color: transparent; /* 背景设为透明，方便您截图或嵌入 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Dock 容器样式 */
+        .dock-container {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* 保持第一版的固定间距 */
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.4); /* 半透明白色背景 */
+            backdrop-filter: blur(15px); /* 毛玻璃效果 */
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* 轻微阴影增加立体感 */
+        }
+
+        /* 单个应用图标样式 */
+        .app-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 平滑过渡动画 */
+            position: relative;
+            background: #fff; /* 默认白色底，防止透明图标看不清 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 悬停交互：简单的自身放大 */
+        .app-icon:hover {
+            transform: scale(1.2); /* 放大比例 */
+            z-index: 10; /* 确保放大时盖住旁边的元素 */
+        }
+
+        /* --- 以下为模拟原图图标的 CSS (您可以替换为真实 img 标签) --- */
+        
+        /* Finder */
+        .icon-finder { background: linear-gradient(to bottom, #1c8ef9 50%, #fff 50%); position: relative; overflow: hidden; }
+        .icon-finder::after { content: ""; position: absolute; width: 100%; height: 100%; border-left: 50% solid rgba(0,0,0,0.05); }
+        
+        /* Chrome */
+        .icon-chrome { background: radial-gradient(circle at center, #4285F4 30%, #fff 32%, #fff 38%, #34A853 40%, #FBBC05 60%, #EA4335 80%); }
+        
+        /* Terminal */
+        .icon-terminal { background: #1e1e1e; color: white; font-family: monospace; font-weight: bold; }
+        
+        /* Settings */
+        .icon-settings { background: #ccc; background: conic-gradient(from 0deg, #999, #eee, #999); position: relative; }
+        .icon-settings::before { content: "⚙️"; font-size: 32px; }
+
+        /* 通用图片占位符样式 */
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Dock 栏主体 -->
+    <div class="dock-container">
+        <!-- 这里的图标使用了 CSS 模拟或 Emoji，您可以直接替换 src 属性为真实的图片链接 -->
+        
+        <!-- Finder -->
+        <div class="app-icon icon-finder" title="Finder"></div>
+        
+        <!-- Chrome -->
+        <div class="app-icon icon-chrome" title="Chrome"></div>
+        
+        <!-- Terminal -->
+        <div class="app-icon icon-terminal" title="Terminal">&gt;_</div>
+        
+        <!-- 青山 (模拟绿色山脉) -->
+        <div class="app-icon" style="background: #e8f5e9;" title="青山">⛰️</div>
+        
+        <!-- Settings -->
+        <div class="app-icon icon-settings" title="Settings">
+             <!-- 模拟右上角的通知红点 -->
+             <div style="position:absolute; top:-5px; right:-5px; width:16px; height:16px; background:red; border-radius:50%; color:white; font-size:10px; display:flex; align-items:center; justify-content:center; border:2px solid white;">2</div>
+        </div>
+        
+        <!-- Obsidian/Other App (紫色) -->
+        <div class="app-icon" style="background: #2d2b55;" title="App">💎</div>
+        
+        <!-- App Store -->
+        <div class="app-icon" style="background: #1c7ef5;" title="App Store">🅰️</div>
+        
+        <!-- QQ/Cat App -->
+        <div class="app-icon" style="background: #6a5acd;" title="QQ">🐱</div>
+        
+        <!-- Clock -->
+        <div class="app-icon" style="background: #000; color: white;" title="Clock">🕒</div>
+        
+        <!-- Z App -->
+        <div class="app-icon" style="background: #2c3e50; color: white; font-weight: bold;" title="Z">Z</div>
+        
+        <!-- WeChat -->
+        <div class="app-icon" style="background: #07c160;" title="WeChat">💬</div>
+        
+        <!-- Youdao/Red App -->
+        <div class="app-icon" style="background: #f00; color: white; font-weight: bold;" title="Youdao">yd</div>
+    </div>
+
+</body>
+</html>

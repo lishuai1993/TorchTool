@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>WindowSwitcher</string>
+    <key>CFBundleDisplayName</key>
+    <string>WindowSwitcher</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.windowswitcher.app</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleExecutable</key>
+    <string>WindowSwitcher</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>WindowSwitcher 需要屏幕录制权限来采集窗口缩略图。截图仅用于本地显示，不会上传或存储。</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>WindowSwitcher 需要辅助功能权限来切换窗口和监听交互事件。</string>
+</dict>
+</plist>

@@ -1,0 +1,141 @@
+import Foundation
+import Combine
+
+final class AppSettings: ObservableObject {
+    static let shared = AppSettings()
+
+    private let defaults = UserDefaults.standard
+
+    // MARK: - Thumbnail settings
+    @Published var thumbnailHeight: CGFloat {
+        didSet { defaults.set(thumbnailHeight, forKey: Keys.thumbnailHeight) }
+    }
+    @Published var thumbnailMaxWidth: CGFloat {
+        didSet { defaults.set(thumbnailMaxWidth, forKey: Keys.thumbnailMaxWidth) }
+    }
+    @Published var thumbnailCornerRadius: CGFloat {
+        didSet { defaults.set(thumbnailCornerRadius, forKey: Keys.thumbnailCornerRadius) }
+    }
+    @Published var thumbnailSpacing: CGFloat {
+        didSet { defaults.set(thumbnailSpacing, forKey: Keys.thumbnailSpacing) }
+    }
+    @Published var maxVisibleCount: Int {
+        didSet { defaults.set(maxVisibleCount, forKey: Keys.maxVisibleCount) }
+    }
+    @Published var focusScale: CGFloat {
+        didSet { defaults.set(focusScale, forKey: Keys.focusScale) }
+    }
+    @Published var animationDuration: TimeInterval {
+        didSet { defaults.set(animationDuration, forKey: Keys.animationDuration) }
+    }
+
+    // MARK: - Mode settings
+    @Published var immersiveModeEnabled: Bool {
+        didSet { defaults.set(immersiveModeEnabled, forKey: Keys.immersiveModeEnabled) }
+    }
+    @Published var quickSwitchModeEnabled: Bool {
+        didSet { defaults.set(quickSwitchModeEnabled, forKey: Keys.quickSwitchModeEnabled) }
+    }
+    @Published var quickSwitchHintEnabled: Bool {
+        didSet { defaults.set(quickSwitchHintEnabled, forKey: Keys.quickSwitchHintEnabled) }
+    }
+
+    // MARK: - Gesture settings
+    @Published var sensitivityLevel: Int {
+        didSet { defaults.set(sensitivityLevel, forKey: Keys.sensitivityLevel) }
+    }
+
+    // MARK: - Service
+    @Published var serviceEnabled: Bool {
+        didSet { defaults.set(serviceEnabled, forKey: Keys.serviceEnabled) }
+    }
+
+    // MARK: - Computed sensitivity multipliers
+    var tapMaxDuration: TimeInterval {
+        switch sensitivityLevel {
+        case 0: return 0.28
+        case 1: return 0.20
+        case 2: return 0.15
+        default: return 0.20
+        }
+    }
+
+    var tapMaxDisplacement: Float {
+        switch sensitivityLevel {
+        case 0: return 0.06
+        case 1: return 0.05
+        case 2: return 0.04
+        default: return 0.05
+        }
+    }
+
+    var swipeMinDisplacement: Float {
+        switch sensitivityLevel {
+        case 0: return 0.12
+        case 1: return 0.08
+        case 2: return 0.05
+        default: return 0.08
+        }
+    }
+
+    private init() {
+        defaults.register(defaults: [
+            Keys.thumbnailHeight: Constants.defaultThumbnailHeight,
+            Keys.thumbnailMaxWidth: Constants.defaultThumbnailMaxWidth,
+            Keys.thumbnailCornerRadius: Constants.defaultThumbnailCornerRadius,
+            Keys.thumbnailSpacing: Constants.defaultThumbnailSpacing,
+            Keys.maxVisibleCount: Constants.defaultMaxVisibleCount,
+            Keys.focusScale: Constants.defaultFocusScale,
+            Keys.animationDuration: Constants.defaultAnimationDuration,
+            Keys.immersiveModeEnabled: Constants.defaultImmersiveModeEnabled,
+            Keys.quickSwitchModeEnabled: Constants.defaultQuickSwitchModeEnabled,
+            Keys.quickSwitchHintEnabled: Constants.defaultQuickSwitchHintEnabled,
+            Keys.sensitivityLevel: Constants.defaultSensitivityLevel,
+            Keys.serviceEnabled: true,
+        ])
+
+        _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
+        _thumbnailMaxWidth = .init(initialValue: defaults.double(forKey: Keys.thumbnailMaxWidth))
+        _thumbnailCornerRadius = .init(initialValue: defaults.double(forKey: Keys.thumbnailCornerRadius))
+        _thumbnailSpacing = .init(initialValue: defaults.double(forKey: Keys.thumbnailSpacing))
+        _maxVisibleCount = .init(initialValue: defaults.integer(forKey: Keys.maxVisibleCount))
+        _focusScale = .init(initialValue: defaults.double(forKey: Keys.focusScale))
+        _animationDuration = .init(initialValue: defaults.double(forKey: Keys.animationDuration))
+        _immersiveModeEnabled = .init(initialValue: defaults.bool(forKey: Keys.immersiveModeEnabled))
+        _quickSwitchModeEnabled = .init(initialValue: defaults.bool(forKey: Keys.quickSwitchModeEnabled))
+        _quickSwitchHintEnabled = .init(initialValue: defaults.bool(forKey: Keys.quickSwitchHintEnabled))
+        _sensitivityLevel = .init(initialValue: defaults.integer(forKey: Keys.sensitivityLevel))
+        _serviceEnabled = .init(initialValue: defaults.bool(forKey: Keys.serviceEnabled))
+    }
+
+    func resetToDefaults() {
+        thumbnailHeight = Constants.defaultThumbnailHeight
+        thumbnailMaxWidth = Constants.defaultThumbnailMaxWidth
+        thumbnailCornerRadius = Constants.defaultThumbnailCornerRadius
+        thumbnailSpacing = Constants.defaultThumbnailSpacing
+        maxVisibleCount = Constants.defaultMaxVisibleCount
+        focusScale = Constants.defaultFocusScale
+        animationDuration = Constants.defaultAnimationDuration
+        immersiveModeEnabled = Constants.defaultImmersiveModeEnabled
+        quickSwitchModeEnabled = Constants.defaultQuickSwitchModeEnabled
+        quickSwitchHintEnabled = Constants.defaultQuickSwitchHintEnabled
+        sensitivityLevel = Constants.defaultSensitivityLevel
+        serviceEnabled = true
+    }
+}
+
+// MARK: - Keys
+private enum Keys {
+    static let thumbnailHeight = "thumbnailHeight"
+    static let thumbnailMaxWidth = "thumbnailMaxWidth"
+    static let thumbnailCornerRadius = "thumbnailCornerRadius"
+    static let thumbnailSpacing = "thumbnailSpacing"
+    static let maxVisibleCount = "maxVisibleCount"
+    static let focusScale = "focusScale"
+    static let animationDuration = "animationDuration"
+    static let immersiveModeEnabled = "immersiveModeEnabled"
+    static let quickSwitchModeEnabled = "quickSwitchModeEnabled"
+    static let quickSwitchHintEnabled = "quickSwitchHintEnabled"
+    static let sensitivityLevel = "sensitivityLevel"
+    static let serviceEnabled = "serviceEnabled"
+}
