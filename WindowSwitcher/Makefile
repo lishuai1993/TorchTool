@@ -98,6 +98,35 @@ $(BUILD_DIR)/WindowManager/%.o: Sources/WindowManager/%.c
 	clang -c $< -o $@ -isysroot $(SDK) -target $(TARGET) -O2
 
 # ──────────────────────────────────────────────────
+# Unit tests
+# ──────────────────────────────────────────────────
+
+TEST_SOURCES := Tests/TestRunner.swift \
+                Sources/WindowManager/LRUOrderingEngine.swift \
+                Sources/WindowManager/ActivationHistory.swift \
+                Sources/WindowManager/ActivationSuppressor.swift \
+                Sources/WindowManager/WindowInfo.swift \
+                Sources/Common/Logger.swift \
+                Sources/Common/Constants.swift
+
+.PHONY: test
+test: $(BUILD_DIR)/WindowSwitcherTests
+	@$(BUILD_DIR)/WindowSwitcherTests; EXIT_CODE=$$?; \
+	echo ""; \
+	echo "Test exit code: $$EXIT_CODE"; \
+	exit $$EXIT_CODE
+
+$(BUILD_DIR)/WindowSwitcherTests: $(TEST_SOURCES)
+	@echo "==> Compiling unit tests..."
+	@mkdir -p $(BUILD_DIR)
+	swiftc \
+		$(TEST_SOURCES) \
+		-framework AppKit -framework CoreGraphics \
+		-sdk $(SDK) \
+		-target $(TARGET) \
+		-o $(BUILD_DIR)/WindowSwitcherTests
+
+# ──────────────────────────────────────────────────
 # Install (for development)
 # ──────────────────────────────────────────────────
 

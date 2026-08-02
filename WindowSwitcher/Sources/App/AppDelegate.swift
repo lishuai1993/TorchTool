@@ -55,6 +55,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowManager.onInteraction = { windowID in
             logDebug("onInteraction fired for window \(windowID)")
         }
+        windowManager.onTrackpadActivity = { [weak self] in
+            self?.gestureEngine.noteTrackpadActivity()
+        }
         gestureEngine.onGesture = { [weak self] event in
             self?.handleGesture(event)
         }
@@ -64,6 +67,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logDebug("Step 6: Setting up settings observer...")
         setupSettingsObserver()
         logDebug("Step 6: OK")
+
+        // Step 6.5: Session observers — re-register the MultitouchSupport
+        // device after lock/unlock or sleep/wake interrupts its contact stream.
+        logDebug("Step 6.5: Setting up session observers...")
+        setupSessionObservers()
+        logDebug("Step 6.5: OK")
 
         // Step 7: Check permissions and alert if needed
         logDebug("Step 7: Checking permissions...")
@@ -75,6 +84,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logDebug("Initial LRU order:\n\(windowManager.orderingEngine.dumpLRU())")
         logAppZOrder()
         checkOrderConsistency()
+
+        // Step 9: Diagnostic self-test — activate a background app without a
+        // gesture to reproduce activate() behavior in the real process context.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            logDebug("SELF-TEST: trigger start")
+            self.windowManager.selfTestActivation()
+        }
 
         logDebug("=== applicationDidFinishLaunching END (SUCCESS) ===")
     }
@@ -210,6 +226,59 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupSettingsObserver() {
         // Reserved for future dynamic settings updates.
         // Sensitivity is currently handled within the NSEvent-based GestureEngine.
+    }
+
+    // MARK: - Session observers (MT stream recovery)
+
+    private var sessionObservers: [NSObjectProtocol] = []
+    private var lastSessionRestartDate: Date?
+
+    /// The MultitouchSupport contact stream is killed by lock/unlock, sleep/wake
+    /// and session changes. Re-register the gesture engine device after the
+    /// session becomes active again so gestures keep working.
+    private func setupSessionObservers() {
+        let center = NSWorkspace.shared.notificationCenter
+        sessionObservers.append(center.addObserver(
+            forName: NSWorkspace.sessionDidBecomeActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            logDebug("Session observers: session became active — scheduling MT restart")
+            self?.scheduleGestureRestart()
+        })
+        sessionObservers.append(center.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            logDebug("Session observers: system woke — scheduling MT restart")
+            self?.scheduleGestureRestart()
+        })
+        sessionObservers.append(center.addObserver(
+            forName: NSWorkspace.screensDidWakeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            logDebug("Session observers: screens woke — scheduling MT restart")
+            self?.scheduleGestureRestart()
+        })
+        // Lock/resign is logged only for diagnostics; recovery happens on resume.
+        sessionObservers.append(center.addObserver(
+            forName: NSWorkspace.sessionDidResignActiveNotification,
+            object: nil, queue: .main
+        ) { _ in
+            logDebug("Session observers: session resigned (lock/sleep/FUS)")
+        })
+    }
+
+    private func scheduleGestureRestart() {
+        let now = Date()
+        if let last = lastSessionRestartDate, now.timeIntervalSince(last) < 3.0 {
+            logDebug("Session observers: restart already scheduled recently, skipping")
+            return
+        }
+        lastSessionRestartDate = now
+        // Let the session / display settle before re-registering the device.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.gestureEngine.restart()
+        }
     }
 
     // MARK: - Permission check

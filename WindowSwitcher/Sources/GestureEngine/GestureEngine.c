@@ -381,10 +381,9 @@ void gesture_engine_stop(void) {
         mtDevice = NULL;
     }
 
-    if (stateLockInited) {
-        pthread_mutex_destroy(&stateLock);
-        stateLockInited = false;
-    }
+    // NOTE: stateLock is intentionally left initialized. Destroying it here
+    // races with a contact-frame callback already past its engineRunning check
+    // that is about to lock stateLock — use-after-destroy on restart.
 
     pMTDeviceStart  = NULL;
     pMTDeviceStop   = NULL;
@@ -399,6 +398,10 @@ void gesture_engine_stop(void) {
 
 bool gesture_engine_is_running(void) {
     return engineRunning;
+}
+
+int gesture_engine_callback_count(void) {
+    return callbackCallCount;
 }
 
 // ──────────────────────────────────────────────────
@@ -430,7 +433,12 @@ static void processContactData(int deviceIndex, void *data,
     (void)deviceIndex;
     (void)frame;
 
-    if (!userCallback || !engineRunning) return;
+    // Guard the userCallback/engineRunning read so a stop/start from the main
+    // thread can't tear it mid-restart. The state machine below re-locks.
+    pthread_mutex_lock(&stateLock);
+    bool streamAlive = engineRunning && (userCallback != NULL);
+    pthread_mutex_unlock(&stateLock);
+    if (!streamAlive) return;
     if (count <= 0 || !data) return;
 
     const uint8_t *contacts = (const uint8_t *)data;

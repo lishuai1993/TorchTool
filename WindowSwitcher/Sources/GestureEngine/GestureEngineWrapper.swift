@@ -19,6 +19,21 @@ final class GestureEngine: @unchecked Sendable {
     private var touchTimer: Timer?
     private var swipeInProgress = false
 
+    // Watchdog state — detects when the MT contact stream has stalled and
+    // re-registers the device (stream is killed by lock / session / wake).
+    // MT callbacks fire only while the trackpad is touched, so a frozen count
+    // alone is ambiguous (idle vs stall). We only restart when the count has
+    // been frozen WHILE the user is actively providing input (event tap).
+    private var watchdogTimer: Timer?
+    private var lastCallbackCount: Int = 0
+    private var freezeInterval: TimeInterval = 0
+    private var lastInputDate: Date?
+    private var nextRestartAllowedAt: Date?
+    private let watchdogPeriod: TimeInterval = 2.0
+    private let freezeThreshold: TimeInterval = 10.0
+    private let inputActivityWindow: TimeInterval = 8.0
+    private let restartCooldown: TimeInterval = 60.0
+
     private init() {}
 
     /// Start using MultitouchSupport (C engine, more precise but may crash
@@ -38,7 +53,34 @@ final class GestureEngine: @unchecked Sendable {
         logDebug("GestureEngine: starting C engine (MultitouchSupport)...")
         let logPath = "/Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt"
         gesture_engine_set_log_path(logPath)
-        let result = gesture_engine_start { cType, progress in
+        let result = gesture_engine_start(makeCallback())
+        if result == 0 {
+            isRunning = true
+            logDebug("GestureEngine: C engine started OK (result=\(result))")
+        } else {
+            logDebug("GestureEngine: C engine FAILED (result=\(result))")
+        }
+        startWatchdog()
+        return result == 0
+    }
+
+    /// Re-register the MultitouchSupport device callback. Called after the
+    /// contact stream is interrupted (lock/unlock, sleep/wake, session change)
+    /// and by the watchdog when a stall is detected.
+    func restart() {
+        logDebug("GestureEngine: restart() — re-registering MT device")
+        gesture_engine_stop()
+        let result = gesture_engine_start(makeCallback())
+        isRunning = result == 0
+        // Re-baseline the heartbeat so the watchdog doesn't immediately
+        // see a stale freeze from before the restart.
+        lastCallbackCount = Int(gesture_engine_callback_count())
+        freezeInterval = 0
+        logDebug("GestureEngine: restart() done (result=\(result))")
+    }
+
+    private func makeCallback() -> GestureCallback {
+        { cType, progress in
             let event: GestureEvent
             switch cType {
             case GestureThreeFingerTap:
@@ -59,13 +101,59 @@ final class GestureEngine: @unchecked Sendable {
                 GestureEngine.shared.onGesture?(event)
             }
         }
-        if result == 0 {
-            isRunning = true
-            logDebug("GestureEngine: C engine started OK (result=\(result))")
-        } else {
-            logDebug("GestureEngine: C engine FAILED (result=\(result))")
+    }
+
+    // MARK: - Watchdog
+
+    /// Called on trackpad scroll/swipe events (2-finger scroll and 3-finger
+    /// swipe both generate scrollWheel). Used by the watchdog to distinguish
+    /// "trackpad in use but stream dead" from idle/typing (where a frozen count
+    /// is expected and must NOT trigger a restart).
+    func noteTrackpadActivity() {
+        lastInputDate = Date()
+    }
+
+    private func startWatchdog() {
+        watchdogTimer?.invalidate()
+        lastCallbackCount = Int(gesture_engine_callback_count())
+        freezeInterval = 0
+        watchdogTimer = Timer.scheduledTimer(withTimeInterval: watchdogPeriod, repeats: true) { [weak self] _ in
+            self?.watchdogTick()
         }
-        return result == 0
+    }
+
+    private func watchdogTick() {
+        let count = Int(gesture_engine_callback_count())
+        if count != lastCallbackCount {
+            lastCallbackCount = count
+            freezeInterval = 0
+            return
+        }
+
+        freezeInterval += watchdogPeriod
+        guard freezeInterval >= freezeThreshold else { return }
+
+        let now = Date()
+        let hasRecentInput = lastInputDate.map { now.timeIntervalSince($0) < inputActivityWindow } ?? false
+        if hasRecentInput {
+            restartIfCooldownAllows()
+        } else {
+            // Idle, not a stall — a frozen count is expected when the trackpad
+            // is untouched. Reset so a long idle doesn't restart the moment
+            // input resumes; if the stream is truly dead, the first touch will
+            // re-accumulate and restart.
+            freezeInterval = 0
+        }
+    }
+
+    private func restartIfCooldownAllows() {
+        let now = Date()
+        if let next = nextRestartAllowedAt, now < next {
+            return
+        }
+        nextRestartAllowedAt = now.addingTimeInterval(restartCooldown)
+        logDebug("GestureEngine: watchdog — contact stream stalled while active, restarting")
+        restart()
     }
 
     /// Start using NSEvent global monitor (fallback — may not capture
@@ -92,9 +180,16 @@ final class GestureEngine: @unchecked Sendable {
             NSEvent.removeMonitor(monitor)
             self.monitor = nil
         }
+        stopWatchdog()
+        gesture_engine_stop()
         isRunning = false
         onGesture = nil
         logDebug("GestureEngine: stopped")
+    }
+
+    private func stopWatchdog() {
+        watchdogTimer?.invalidate()
+        watchdogTimer = nil
     }
 
     // MARK: - Event handling

@@ -5,6 +5,8 @@ final class WindowManager: @unchecked Sendable {
     static let shared = WindowManager()
 
     let orderingEngine = LRUOrderingEngine()
+    let activationHistory = ActivationHistory()
+    let activationSuppressor = ActivationSuppressor()
 
     /// Current snapshot of visible windows, keyed by CGWindowID.
     private(set) var windows: [CGWindowID: WindowInfo] = [:]
@@ -18,16 +20,37 @@ final class WindowManager: @unchecked Sendable {
     /// Callback invoked when a window receives substantial interaction.
     var onInteraction: ((CGWindowID) -> Void)?
 
+    /// Callback invoked on trackpad scroll/swipe events. Used ONLY as a
+    /// "trackpad is in use" signal for the gesture-engine watchdog — it must
+    /// NOT go through windowDidInteract (a swipe would reset the LRU cursor).
+    var onTrackpadActivity: (() -> Void)?
+
     /// Tracks the last raised AX window per PID for round-robin cycling
     /// across multiple windows of the same app.
     private var lastRaisedAXTitle: [pid_t: String] = [:]
     private var lastRaisedAXIndex: [pid_t: Int] = [:]
 
-    /// Guard flag to prevent event tap's async `windowDidInteract` from
-    /// resetting the cursor during programmatic window activation.
+    /// Guard flag to prevent event tap / activation notification from
+    /// reordering the list during programmatic window activation.
     private var isActivating = false
 
-    private init() {}
+    private init() {
+        activationHistory.onAppActivated = { [weak self] pid in
+            guard let self, !self.isActivating else { return }
+            // Suppress the notification caused by our own programmatic
+            // app.activate() (delivered asynchronously after isActivating reset).
+            if self.activationSuppressor.shouldSuppress(pid: pid) {
+                logDebug("ActivationHistory: suppressed programmatic activation pid=\(pid)")
+                return
+            }
+            // Real user activation (Cmd+Tab, Dock click) — reorder the list.
+            if let topWindowID = self.orderingEngine.orderedIDs.first(where: { id in
+                self.windows[id]?.ownerPid == pid
+            }) {
+                self.orderingEngine.moveToFront(topWindowID)
+            }
+        }
+    }
 
     // MARK: - Window enumeration
 
@@ -118,6 +141,8 @@ final class WindowManager: @unchecked Sendable {
             return
         }
         let needsActivate = !app.isActive
+        let frontmostBefore = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
+        logDebug("ACTIVATE-DIAG: [\(info.ownerName)] pid=\(app.processIdentifier) bid=\(app.bundleIdentifier ?? "nil") isActive=\(app.isActive) needsActivate=\(needsActivate) frontmostBefore=\(frontmostBefore) window=\(windowID)")
 
         // Step 2: Raise the specific window via Accessibility API.
         // Do this BEFORE activation so the app comes to front already showing
@@ -189,7 +214,20 @@ final class WindowManager: @unchecked Sendable {
         // Done AFTER raising so the correct window is shown immediately,
         // avoiding a flash of a different window appearing first.
         if needsActivate {
-            app.activate()
+            logDebug("ACTIVATE-DIAG: calling app.activate() for [\(info.ownerName)] pid=\(app.processIdentifier)")
+            activationSuppressor.recordActivation(pid: app.processIdentifier)
+            let activateResult = app.activate()
+            logDebug("ACTIVATE-DIAG: app.activate() returned \(activateResult) for [\(info.ownerName)]")
+            // Ground-truth: did the app actually become frontmost?
+            let pid = app.processIdentifier
+            let name = info.ownerName
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                let frontmostAfter = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
+                let activeNow = NSRunningApplication(processIdentifier: pid)?.isActive ?? false
+                logDebug("ACTIVATE-DIAG: after 300ms frontmost=\(frontmostAfter) [\(name)] isActiveNow=\(activeNow)")
+            }
+        } else {
+            logDebug("ACTIVATE-DIAG: skipping app.activate() (already active or needsActivate=false) for [\(info.ownerName)]")
         }
 
         orderingEngine.userDidSelectWindow(windowID)
@@ -198,6 +236,9 @@ final class WindowManager: @unchecked Sendable {
     // MARK: - Interaction event tap
 
     func startInteractionMonitoring() -> Bool {
+        // Start activation history tracking (no permission required)
+        activationHistory.start()
+
         // Check Accessibility permission first
         let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue(): false]
         let trusted = AXIsProcessTrustedWithOptions(options)
@@ -214,6 +255,10 @@ final class WindowManager: @unchecked Sendable {
             (1 << CGEventType.keyDown.rawValue) |
             (1 << CGEventType.scrollWheel.rawValue)
         )
+        // scrollWheel is handled SEPARATELY below: macOS converts three-finger
+        // trackpad swipes into scroll events, which must NOT trigger
+        // windowDidInteract (it would reset the LRU cursor). Scroll events only
+        // signal the gesture-engine watchdog that the trackpad is in use.
 
         logDebug("WindowManager: creating CGEvent tap...")
         let tap = CGEvent.tapCreate(
@@ -222,9 +267,15 @@ final class WindowManager: @unchecked Sendable {
             options: .listenOnly,
             eventsOfInterest: eventMask,
             callback: { (_, type, event, _) -> Unmanaged<CGEvent>? in
-                if let frontID = WindowManager.shared.frontmostWindowID,
-                   !WindowManager.shared.isActivating {
+                if type == .scrollWheel {
+                    // Trackpad scroll / swipe — watchdog signal only. Do NOT
+                    // call windowDidInteract (would reset the LRU cursor).
+                    WindowManager.shared.onTrackpadActivity?()
+                    return Unmanaged.passUnretained(event)
+                }
+                if let frontID = WindowManager.shared.frontmostWindowID {
                     DispatchQueue.main.async {
+                        guard !WindowManager.shared.isActivating else { return }
                         WindowManager.shared.orderingEngine.windowDidInteract(frontID)
                         WindowManager.shared.onInteraction?(frontID)
                     }
@@ -252,10 +303,48 @@ final class WindowManager: @unchecked Sendable {
     }
 
     func stopInteractionMonitoring() {
+        activationHistory.stop()
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: false)
             eventTap = nil
             logDebug("WindowManager: event tap stopped")
+        }
+    }
+
+    /// Diagnostic self-test: replicate the EXACT gesture quickSwitch path
+    /// (refreshWindows → advanceCursor → activateWindow) to verify whether a
+    /// real swipe would actually switch windows in this process context.
+    func selfTestActivation() {
+        let initialFrontmost = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
+        logDebug("SELF-TEST: initial frontmost=\(initialFrontmost)")
+
+        // Step 1: refresh (same as quickSwitch)
+        let windowList = refreshWindows()
+        guard windowList.count > 1 else {
+            logDebug("SELF-TEST: only \(windowList.count) windows, abort")
+            return
+        }
+        logDebug("SELF-TEST: refreshWindows → \(windowList.count) windows")
+        logDebug("SELF-TEST: LRU before:\n\(orderingEngine.dumpLRU())")
+
+        // Step 2: advance cursor to the RIGHT (same as .threeFingerSwipeLeft)
+        guard let target = orderingEngine.advanceCursor(directionRight: true) else {
+            logDebug("SELF-TEST: advanceCursor → nil, abort")
+            return
+        }
+        let targetName = orderingEngine.windowNames[target] ?? "?"
+        logDebug("SELF-TEST: advanceCursor → [\(targetName)] window=\(target)")
+
+        // Step 3: activate (same as quickSwitch)
+        activateWindow(target)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            let frontmost = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
+            let targetPid = self.windows[target]?.ownerPid
+            let activeNow = targetPid.flatMap { NSRunningApplication(processIdentifier: $0)?.isActive } ?? false
+            let verdict = frontmost == targetName || activeNow
+                ? "QUICKSWITCH-WORKS" : "QUICKSWITCH-FAILS"
+            logDebug("SELF-TEST: after 600ms frontmost=\(frontmost) [\(targetName)] isActive=\(activeNow) → \(verdict)")
         }
     }
 

@@ -19,6 +19,10 @@ int gesture_engine_start_safe(void);  // starts device without registering callb
 void gesture_engine_stop(void);
 bool gesture_engine_is_running(void);
 
+// Number of contact-frame callbacks received since the engine started.
+// Used as a heartbeat to detect when the MT contact stream has stalled.
+int gesture_engine_callback_count(void);
+
 // Set log file path for C engine debug output (written in addition to stderr).
 void gesture_engine_set_log_path(const char *path);
 

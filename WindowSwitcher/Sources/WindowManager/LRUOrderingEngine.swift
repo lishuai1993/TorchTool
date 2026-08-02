@@ -97,6 +97,17 @@ final class LRUOrderingEngine {
         focusedWindowID = id
     }
 
+    /// Move a window to the front of the list in response to an external app
+    /// activation event (Cmd+Tab, Dock click).  Unlike `windowDidInteract`,
+    /// this does NOT record an interaction timestamp — it only reorders.
+    func moveToFront(_ id: CGWindowID) {
+        guard let idx = orderedIDs.firstIndex(of: id), idx > 0 else { return }
+        orderedIDs.remove(at: idx)
+        orderedIDs.insert(id, at: 0)
+        currentIndex = 0
+        logDebug("LRU: moveToFront [\(windowNames[id] ?? "?")] from [\(idx)] → [0]")
+    }
+
     /// Call when a "substantial interaction" (click, key, scroll) occurs in a window.
     /// Moves the window to the front of the LRU list and resets cursor to 0.
     func windowDidInteract(_ id: CGWindowID) {
