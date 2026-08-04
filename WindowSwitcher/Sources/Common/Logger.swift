@@ -53,6 +53,15 @@ final class Logger {
     func flush() {
         queue.sync {}
     }
+
+    /// Truncate the log file in place. Used on service start so each run starts
+    /// from a clean log. Non-atomic so the file inode is preserved — the C
+    /// engine holds an open FILE* on the same path, and replacing the inode
+    /// would orphan its writes.
+    func clearLog() {
+        queue.sync {}   // drain pending writes first
+        try? "".write(to: fileURL, atomically: false, encoding: .utf8)
+    }
 }
 
 /// Convenience global function

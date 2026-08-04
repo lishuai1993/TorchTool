@@ -13,7 +13,7 @@ final class GestureEngine: @unchecked Sendable {
     var onGesture: ((GestureEvent) -> Void)?
 
     private var monitor: Any?
-    private var isRunning = false
+    private(set) var isRunning = false
 
     // Tap detection state
     private var touchTimer: Timer?

@@ -26,6 +26,10 @@ int gesture_engine_callback_count(void);
 // Set log file path for C engine debug output (written in addition to stderr).
 void gesture_engine_set_log_path(const char *path);
 
+// Truncate the C engine log file (reopens in "w" mode). Called on service start
+// so each run starts from a clean log.
+void gesture_engine_reset_log(void);
+
 // Configure sensitivity thresholds before calling gesture_engine_start.
 // Values are in normalized coordinates [0,1] and seconds.
 void gesture_engine_set_sensitivity(float tapDuration, float tapDisp,

@@ -7,6 +7,14 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private var statusItem: NSStatusItem?
     private var settingsWindow: NSWindow?
 
+    /// The menu is created once and its items are rebuilt on every open.
+    private let menu: NSMenu = {
+        let m = NSMenu()
+        m.minimumWidth = 220
+        m.autoenablesItems = false
+        return m
+    }()
+
     private override init() {
         super.init()
     }
@@ -40,10 +48,18 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     // MARK: - Menu
 
+    /// Assign the menu to the status item once. Only called from setup().
     private func buildMenu() {
-        let menu = NSMenu()
         menu.delegate = self
-        menu.minimumWidth = 220
+        rebuildMenuItems()
+        statusItem?.menu = menu
+    }
+
+    /// Remove all items and re-add with current states. Called on every menuWillOpen
+    /// so the enable/disable and check states always match reality.
+    private func rebuildMenuItems() {
+        menu.removeAllItems()
+        let running = AppDelegate.shared.serviceIsRunning
 
         // Header
         let headerItem = NSMenuItem()
@@ -52,73 +68,87 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(headerItem)
         menu.addItem(.separator())
 
-        // Service toggle
-        let toggleItem = NSMenuItem(
-            title: "启用服务",
-            action: #selector(toggleService),
-            keyEquivalent: ""
-        )
-        toggleItem.target = self
-        toggleItem.state = AppSettings.shared.serviceEnabled ? .on : .off
-        menu.addItem(toggleItem)
+        // Service controls
+        let startItem = NSMenuItem(title: "启动服务", action: #selector(startServiceAction), keyEquivalent: "")
+        startItem.target = self
+        startItem.isEnabled = !running
+        menu.addItem(startItem)
+
+        let stopItem = NSMenuItem(title: "停止服务", action: #selector(stopServiceAction), keyEquivalent: "")
+        stopItem.target = self
+        stopItem.isEnabled = running
+        menu.addItem(stopItem)
+
+        let restartItem = NSMenuItem(title: "重启服务", action: #selector(restartServiceAction), keyEquivalent: "")
+        restartItem.target = self
+        restartItem.isEnabled = running
+        menu.addItem(restartItem)
+
         menu.addItem(.separator())
 
         // Mode toggles
-        let immersiveItem = NSMenuItem(
-            title: "沉浸式预览模式",
-            action: #selector(toggleImmersiveMode),
-            keyEquivalent: ""
-        )
+        let immersiveItem = NSMenuItem(title: "沉浸式预览模式", action: #selector(toggleImmersiveMode), keyEquivalent: "")
         immersiveItem.target = self
         immersiveItem.state = AppSettings.shared.immersiveModeEnabled ? .on : .off
         menu.addItem(immersiveItem)
 
-        let quickSwitchItem = NSMenuItem(
-            title: "快捷切换模式",
-            action: #selector(toggleQuickSwitchMode),
-            keyEquivalent: ""
-        )
+        let quickSwitchItem = NSMenuItem(title: "快捷切换模式", action: #selector(toggleQuickSwitchMode), keyEquivalent: "")
         quickSwitchItem.target = self
         quickSwitchItem.state = AppSettings.shared.quickSwitchModeEnabled ? .on : .off
         menu.addItem(quickSwitchItem)
 
         menu.addItem(.separator())
 
-        // Settings
-        menu.addItem(NSMenuItem(
-            title: "显示设置...",
-            action: #selector(openSettings),
-            keyEquivalent: ","
-        ).withTarget(self))
+        menu.addItem(NSMenuItem(title: "显示设置...", action: #selector(openSettings), keyEquivalent: ",").withTarget(self))
         menu.addItem(.separator())
 
-        // Quit
-        menu.addItem(NSMenuItem(
-            title: "退出",
-            action: #selector(quitApp),
-            keyEquivalent: "q"
-        ).withTarget(self))
+        menu.addItem(NSMenuItem(title: "退出", action: #selector(quitApp), keyEquivalent: "q").withTarget(self))
 
-        statusItem?.menu = menu
+        updateIconAppearance()
     }
 
     func menuWillOpen(_ menu: NSMenu) {
-        // Refresh menu item states
-        buildMenu()
+        rebuildMenuItems()
+    }
+
+    /// Update only the button image color — called from actions for immediate feedback.
+    /// Running: default template (system light/dark). Stopped: RGB(164,164,194).
+    private func updateIconAppearance() {
+        let running = AppDelegate.shared.serviceIsRunning
+        if running {
+            let img = NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "WindowSwitcher")
+            img?.isTemplate = true
+            statusItem?.button?.image = img
+        } else {
+            let color = NSColor(red: 164.0 / 255.0, green: 164.0 / 255.0, blue: 194.0 / 255.0, alpha: 1.0)
+            if let tpl = NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: nil) {
+                let colored = NSImage(size: tpl.size)
+                colored.lockFocus()
+                color.set()
+                NSRect(origin: .zero, size: tpl.size).fill()
+                tpl.draw(in: NSRect(origin: .zero, size: tpl.size), from: .zero, operation: .destinationIn, fraction: 1.0)
+                colored.unlockFocus()
+                colored.isTemplate = false
+                statusItem?.button?.image = colored
+            }
+        }
     }
 
     // MARK: - Actions
 
-    @objc private func toggleService() {
-        let newValue = !AppSettings.shared.serviceEnabled
-        AppSettings.shared.serviceEnabled = newValue
-        if newValue {
-            _ = GestureEngine.shared.start()
-            AppDelegate.shared.startAllServices()
-        } else {
-            GestureEngine.shared.stop()
-            AppDelegate.shared.stopAllServices()
-        }
+    @objc private func startServiceAction() {
+        AppDelegate.shared.startService()
+        updateIconAppearance()
+    }
+
+    @objc private func stopServiceAction() {
+        AppDelegate.shared.stopService()
+        updateIconAppearance()
+    }
+
+    @objc private func restartServiceAction() {
+        AppDelegate.shared.restartService()
+        updateIconAppearance()
     }
 
     @objc private func toggleImmersiveMode() {

@@ -7,12 +7,14 @@
 #include <pthread.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <limits.h>
 
 // ──────────────────────────────────────────────────
 // Dual-output logging (stderr + optional log file)
 // ──────────────────────────────────────────────────
 
 static FILE *logFile = NULL;
+static char logPath[PATH_MAX] = "";
 
 // NOTE: ws_log is defined before gesture_engine_set_log_path
 // because the setter calls ws_log.
@@ -31,12 +33,30 @@ static void ws_log(const char *fmt, ...) {
 }
 
 void gesture_engine_set_log_path(const char *path) {
+    if (path) {
+        strncpy(logPath, path, sizeof(logPath) - 1);
+        logPath[sizeof(logPath) - 1] = '\0';
+    }
     if (logFile) fclose(logFile);
     logFile = fopen(path, "a");
     if (logFile) {
         ws_log("[WS] C engine logging to: %s\n", path);
     } else {
         ws_log("[WS] WARNING: could not open log file: %s\n", path);
+    }
+}
+
+// Reopen the C engine log file in "w" mode to truncate it. Called when the
+// service starts so each run starts from a clean log. Keeps the same file
+// path so the FILE* always points at the current log.
+void gesture_engine_reset_log(void) {
+    if (logPath[0] == '\0') return;
+    if (logFile) fclose(logFile);
+    logFile = fopen(logPath, "w");
+    if (logFile) {
+        ws_log("[WS] C engine log reset at: %s\n", logPath);
+    } else {
+        ws_log("[WS] WARNING: could not reset log file: %s\n", logPath);
     }
 }
 

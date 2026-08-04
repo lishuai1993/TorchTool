@@ -18,6 +18,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         logDebug("=== applicationDidFinishLaunching BEGIN ===")
 
+        // Step 0: Ensure only one instance is running.
+        logDebug("Step 0: Ensuring single instance...")
+        ensureSingleInstance()
+
         // Step 1: Set activation policy to accessory FIRST.
         // NSApp launches with .regular policy, which briefly makes it frontmost
         // and disturbs the z-order. Setting .accessory immediately relinquishes
@@ -52,15 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Step 5: Wire callbacks
         logDebug("Step 5: Wiring callbacks...")
-        windowManager.onInteraction = { windowID in
-            logDebug("onInteraction fired for window \(windowID)")
-        }
-        windowManager.onTrackpadActivity = { [weak self] in
-            self?.gestureEngine.noteTrackpadActivity()
-        }
-        gestureEngine.onGesture = { [weak self] event in
-            self?.handleGesture(event)
-        }
+        wireCallbacks()
         logDebug("Step 5: Callbacks wired OK")
 
         // Step 6: Settings observer
@@ -101,17 +97,122 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowManager.stopInteractionMonitoring()
     }
 
-    // MARK: - Service start/stop
+    // MARK: - Service lifecycle
 
-    func startAllServices() {
-        logDebug("startAllServices called")
-        _ = windowManager.startInteractionMonitoring()
+    /// Whether the gesture service is currently running (drives menu enable/disable).
+    var serviceIsRunning: Bool {
+        gestureEngine.isRunning
     }
 
-    func stopAllServices() {
-        logDebug("stopAllServices called")
+    /// Start the full service: clear the log, start gesture detection, start
+    /// interaction monitoring, then (re)wire callbacks. GestureEngine.stop()
+    /// nils onGesture, so callbacks must be re-wired on every start.
+    func startService() {
+        logDebug("startService called")
+
+        // 0. Ensure only one instance is running.
+        ensureSingleInstance()
+
+        // 1. Clear the log first so this run starts clean (no historical noise).
+        Logger.shared.clearLog()
+        gesture_engine_reset_log()
+        logDebug("=== 服务启动 ===")
+
+        // 2. Start gesture engine (MT first, fall back to NSEvent).
+        let gestureOK = gestureEngine.startFull()
+        if gestureOK {
+            logDebug("startService: gesture engine started OK")
+        } else {
+            logDebug("startService: MT engine failed, falling back to NSEvent...")
+            _ = gestureEngine.start()
+        }
+
+        // 3. Start interaction monitoring (requires Accessibility permission).
+        let monitorOK = windowManager.startInteractionMonitoring()
+        if monitorOK {
+            logDebug("startService: interaction monitoring started OK")
+        } else {
+            logDebug("startService: interaction monitoring skipped (no Accessibility permission or other error)")
+        }
+
+        // 4. Re-wire callbacks (onGesture was cleared by stop()).
+        wireCallbacks()
+    }
+
+    /// Stop the gesture engine, interaction monitoring, and any visible overlay.
+    func stopService() {
+        logDebug("stopService called")
+        gestureEngine.stop()
         windowManager.stopInteractionMonitoring()
         overlayController.hide()
+    }
+
+    /// Restart the service: stop then start (clears the log again).
+    func restartService() {
+        logDebug("restartService called")
+        stopService()
+        startService()
+    }
+
+    private func wireCallbacks() {
+        windowManager.onInteraction = { windowID in
+            logDebug("onInteraction fired for window \(windowID)")
+        }
+        windowManager.onTrackpadActivity = { [weak self] in
+            self?.gestureEngine.noteTrackpadActivity()
+        }
+        gestureEngine.onGesture = { [weak self] event in
+            self?.handleGesture(event)
+        }
+    }
+
+    // MARK: - Single instance enforcement
+
+    /// Check for other WindowSwitcher instances via pgrep. If found, show an
+    /// alert (kill command auto-copied to clipboard), auto-dismiss after 5s or
+    /// via ESC/OK, then terminate. Safe to call on the main thread only.
+    private func ensureSingleInstance() {
+        let myPID = ProcessInfo.processInfo.processIdentifier
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep")
+        task.arguments = ["-x", "WindowSwitcher"]
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = FileHandle.nullDevice
+        do {
+            try task.run()
+            task.waitUntilExit()
+        } catch {
+            return // can't check — proceed
+        }
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        guard let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !output.isEmpty else { return }
+
+        let otherPIDs = output.split(separator: "\n")
+            .compactMap { pid_t($0.trimmingCharacters(in: .whitespaces)) }
+            .filter { $0 != myPID }
+        guard !otherPIDs.isEmpty else { return }
+
+        let cmd = "kill -9 " + otherPIDs.map(String.init).joined(separator: " ")
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(cmd, forType: .string)
+
+        logDebug("ensureSingleInstance: found other instances pids=\(otherPIDs), alerting user")
+
+        let alert = NSAlert()
+        alert.messageText = "已有正在运行的实例"
+        alert.informativeText = "可通过 \(cmd) 命令清理该进程\n\n该命令已自动复制到剪贴板中"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "确定")
+        NSApp.activate(ignoringOtherApps: true)
+        // Auto-dismiss after 5s. DispatchQueue fires during the modal run loop.
+        let dismissWork = DispatchWorkItem { NSApp.stopModal(withCode: .cancel) }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: dismissWork)
+        alert.runModal()
+        dismissWork.cancel()
+        NSApplication.shared.terminate(nil)
     }
 
     // MARK: - Gesture dispatch

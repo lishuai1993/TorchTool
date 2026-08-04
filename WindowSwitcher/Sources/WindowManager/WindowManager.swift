@@ -25,10 +25,11 @@ final class WindowManager: @unchecked Sendable {
     /// NOT go through windowDidInteract (a swipe would reset the LRU cursor).
     var onTrackpadActivity: (() -> Void)?
 
-    /// Tracks the last raised AX window per PID for round-robin cycling
-    /// across multiple windows of the same app.
-    private var lastRaisedAXTitle: [pid_t: String] = [:]
-    private var lastRaisedAXIndex: [pid_t: Int] = [:]
+    /// Per-app z-ordered window list (CGWindowID + frame) from the most recent
+    /// refresh, in CGWindowList order (frontmost first). Used to correlate a
+    /// target CGWindowID to the matching AX element by z-order rank, since
+    /// AX kAXWindows order mirrors the window-server z-order.
+    private var appZOrder: [pid_t: [(id: CGWindowID, frame: CGRect)]] = [:]
 
     /// Guard flag to prevent event tap / activation notification from
     /// reordering the list during programmatic window activation.
@@ -48,6 +49,11 @@ final class WindowManager: @unchecked Sendable {
                 self.windows[id]?.ownerPid == pid
             }) {
                 self.orderingEngine.moveToFront(topWindowID)
+            }
+            // Refresh the frontmost-window cache so the event tap's
+            // windowDidInteract reorders the window the user is ACTUALLY in.
+            if let front = self.frontmostWindow(for: pid) {
+                self.frontmostWindowID = front
             }
         }
     }
@@ -74,6 +80,19 @@ final class WindowManager: @unchecked Sendable {
             newWindows[info.id] = info
             orderedIDs.append(info.id)
         }
+
+        // Cache the per-app z-order snapshot (frontmost first) for correlating
+        // a target CGWindowID to its AX element by rank.
+        var zOrderByPid: [pid_t: [(id: CGWindowID, frame: CGRect)]] = [:]
+        for id in orderedIDs {
+            guard let info = newWindows[id] else { continue }
+            zOrderByPid[info.ownerPid, default: []].append((id, info.frame))
+        }
+        appZOrder = zOrderByPid
+
+        // Backfill real titles from AX for apps whose CGWindowList title is
+        // empty (e.g. Chrome), correlated by frame / z-order rank.
+        backfillTitles(&newWindows)
 
         windows = newWindows
         orderingEngine.sync(windowIDs: orderedIDs)
@@ -153,8 +172,8 @@ final class WindowManager: @unchecked Sendable {
         if copyResult == .success, let axWindows = windowList as? [AXUIElement] {
             logDebug("AX: \(info.ownerName) has \(axWindows.count) AX windows, target=[\(info.windowTitle)] frame=\(info.frame)")
 
-            // Collect all matching AX windows first.
-            var matchingIndices: [(index: Int, title: String)] = []
+            // Collect all AX windows with (index, title, frame) in AX order.
+            var axWindowsInfo: [(index: Int, title: String, frame: CGRect)] = []
             for (idx, axWindow) in axWindows.enumerated() {
                 var axTitle: CFTypeRef?
                 AXUIElementCopyAttributeValue(axWindow, kAXTitleAttribute as CFString, &axTitle)
@@ -168,41 +187,24 @@ final class WindowManager: @unchecked Sendable {
                 if let posVal = axPos { AXValueGetValue(posVal as! AXValue, .cgPoint, &axFrame.origin) }
                 if let sizeVal = axSize { AXValueGetValue(sizeVal as! AXValue, .cgSize, &axFrame.size) }
 
-                let titleMatch = title == info.windowTitle && !info.windowTitle.isEmpty
-                let frameMatch = abs(axFrame.origin.x - info.frame.origin.x) < 10 &&
-                                 abs(axFrame.origin.y - info.frame.origin.y) < 10 &&
-                                 abs(axFrame.size.width - info.frame.size.width) < 10 &&
-                                 abs(axFrame.size.height - info.frame.size.height) < 10
-
-                logDebug("AX:   [\(idx)][\(title)] frame=\(axFrame) titleMatch=\(titleMatch) frameMatch=\(frameMatch)")
-
-                if titleMatch || frameMatch {
-                    matchingIndices.append((idx, title))
-                }
+                logDebug("AX:   [\(idx)][\(title)] frame=\(axFrame)")
+                axWindowsInfo.append((idx, title, axFrame))
             }
 
-            if !matchingIndices.isEmpty {
-                let lastTitle = lastRaisedAXTitle[info.ownerPid]
-                let lastIdx = lastRaisedAXIndex[info.ownerPid]
-                logDebug("AX: \(matchingIndices.count) matches, lastRaised(title=\"\(lastTitle ?? "nil")\", idx=\(lastIdx.map(String.init) ?? "nil"))")
+            // Select the AX element that corresponds to the EXACT target window:
+            // frame group first, then z-order rank within the group.
+            let selected = selectAXWindow(
+                for: windowID,
+                pid: info.ownerPid,
+                frame: info.frame,
+                title: info.windowTitle,
+                axWindows: axWindowsInfo
+            )
 
-                var selected = matchingIndices[0]
-                if matchingIndices.count > 1 {
-                    if let lt = lastTitle, let alt = matchingIndices.first(where: { $0.title != lt }) {
-                        selected = alt
-                        logDebug("AX: title-based pick → idx=\(selected.index)")
-                    } else if let li = lastIdx, let alt = matchingIndices.first(where: { $0.index != li }) {
-                        selected = alt
-                        logDebug("AX: index-based fallback → idx=\(selected.index)")
-                    } else {
-                        logDebug("AX: first match → idx=\(selected.index)")
-                    }
-                }
-
-                AXUIElementPerformAction(axWindows[selected.index], kAXRaiseAction as CFString)
-                lastRaisedAXTitle[info.ownerPid] = selected.title
-                lastRaisedAXIndex[info.ownerPid] = selected.index
-                logDebug("AX: raised [\(info.ownerName)] idx=\(selected.index) title=\"\(selected.title)\"")
+            if let sel = selected, sel.index >= 0 && sel.index < axWindows.count {
+                AXUIElementPerformAction(axWindows[sel.index], kAXRaiseAction as CFString)
+                logDebug("AX: raised [\(info.ownerName)] idx=\(sel.index) title=\"\(sel.title)\"")
+                scheduleMappingCheck(pid: info.ownerPid, expectedTitle: sel.title, windowID: windowID)
             } else {
                 logDebug("AX: NO MATCH for [\(info.ownerName) — \(info.windowTitle)]")
             }
@@ -229,6 +231,10 @@ final class WindowManager: @unchecked Sendable {
         } else {
             logDebug("ACTIVATE-DIAG: skipping app.activate() (already active or needsActivate=false) for [\(info.ownerName)]")
         }
+
+        // Keep the event tap's windowDidInteract pointing at the real frontmost
+        // window so editing after a gesture reorders the correct window.
+        frontmostWindowID = windowID
 
         orderingEngine.userDidSelectWindow(windowID)
     }
@@ -356,6 +362,138 @@ final class WindowManager: @unchecked Sendable {
     }
 
     // MARK: - Private
+
+    /// Whether two rects describe the same on-screen window frame (with tolerance).
+    private func frameMatches(_ a: CGRect, _ b: CGRect) -> Bool {
+        abs(a.origin.x - b.origin.x) < 10 &&
+        abs(a.origin.y - b.origin.y) < 10 &&
+        abs(a.size.width - b.size.width) < 10 &&
+        abs(a.size.height - b.size.height) < 10
+    }
+
+    /// Selects the AX window corresponding to `targetID` among the app's AX
+    /// windows. Prefers a unique frame match; when several windows share the
+    /// target's frame, disambiguates by z-order rank (AX kAXWindows order
+    /// mirrors the window-server z-order), then by title, then by first match.
+    private func selectAXWindow(
+        for targetID: CGWindowID,
+        pid: pid_t,
+        frame: CGRect,
+        title: String,
+        axWindows: [(index: Int, title: String, frame: CGRect)]
+    ) -> (index: Int, title: String)? {
+        let sameFrame = axWindows
+            .filter { frameMatches($0.frame, frame) }
+            .map { (index: $0.index, title: $0.title) }
+        if !sameFrame.isEmpty {
+            if sameFrame.count == 1 {
+                return sameFrame[0]
+            }
+            // Multiple same-frame candidates → z-order rank correlation.
+            let zOrder = appZOrder[pid] ?? []
+            let sameFrameCG = zOrder.filter { frameMatches($0.frame, frame) }
+            if let rank = sameFrameCG.firstIndex(where: { $0.id == targetID }),
+               rank < sameFrame.count {
+                return sameFrame[rank]
+            }
+            // Rank correlation unavailable → title match, then first.
+            if !title.isEmpty, let t = sameFrame.first(where: { $0.title == title }) {
+                return t
+            }
+            return sameFrame[0]
+        }
+        // No frame match at all → title match, then first AX window.
+        if !title.isEmpty, let t = axWindows.first(where: { $0.title == title }) {
+            return (index: t.index, title: t.title)
+        }
+        return axWindows.first.map { (index: $0.index, title: $0.title) }
+    }
+
+    /// Fills real window titles from the Accessibility API into apps whose
+    /// CGWindowList title is empty (e.g. Chrome). Correlates AX windows to CG
+    /// windows by frame, and by z-order rank when frames collide.
+    private func backfillTitles(_ dict: inout [CGWindowID: WindowInfo]) {
+        let emptyPids = Set(dict.values.filter { $0.windowTitle.isEmpty }.map { $0.ownerPid })
+        guard !emptyPids.isEmpty else { return }
+
+        for pid in emptyPids {
+            let app = AXUIElementCreateApplication(pid)
+            var list: CFTypeRef?
+            let r = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &list)
+            guard r == .success, let axWindows = list as? [AXUIElement] else { continue }
+
+            var axInfo: [(index: Int, title: String, frame: CGRect)] = []
+            for (idx, w) in axWindows.enumerated() {
+                var t: CFTypeRef?
+                AXUIElementCopyAttributeValue(w, kAXTitleAttribute as CFString, &t)
+                let title = (t as? String) ?? ""
+                var pos: CFTypeRef?, size: CFTypeRef?
+                var frame = CGRect.zero
+                AXUIElementCopyAttributeValue(w, kAXPositionAttribute as CFString, &pos)
+                AXUIElementCopyAttributeValue(w, kAXSizeAttribute as CFString, &size)
+                if let pv = pos { AXValueGetValue(pv as! AXValue, .cgPoint, &frame.origin) }
+                if let sv = size { AXValueGetValue(sv as! AXValue, .cgSize, &frame.size) }
+                axInfo.append((idx, title, frame))
+            }
+            guard !axInfo.isEmpty else { continue }
+
+            let zOrder = appZOrder[pid] ?? []
+            for key in dict.keys where dict[key]?.ownerPid == pid && (dict[key]?.windowTitle.isEmpty ?? true) {
+                guard let info = dict[key] else { continue }
+                let sameFrameAX = axInfo.filter { frameMatches($0.frame, info.frame) }
+                var newTitle = ""
+                if sameFrameAX.count == 1 {
+                    newTitle = sameFrameAX[0].title
+                } else if sameFrameAX.count > 1 {
+                    let sameFrameCG = zOrder.filter { frameMatches($0.frame, info.frame) }
+                    if let rank = sameFrameCG.firstIndex(where: { $0.id == info.id }),
+                       rank < sameFrameAX.count {
+                        newTitle = sameFrameAX[rank].title
+                    } else {
+                        newTitle = sameFrameAX[0].title
+                    }
+                }
+                if !newTitle.isEmpty {
+                    dict[key] = info.withTitle(newTitle)
+                }
+            }
+        }
+    }
+
+    /// Post-activation diagnostic: verify the app's focused AX window matches
+    /// the AX element we raised, to surface apps whose AX order breaks the
+    /// z-order-rank correlation.
+    private func scheduleMappingCheck(pid: pid_t, expectedTitle: String, windowID: CGWindowID) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let app = AXUIElementCreateApplication(pid)
+            var f: CFTypeRef?
+            let r = AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &f)
+            guard r == .success, let fw = f else { return }
+            var t: CFTypeRef?
+            AXUIElementCopyAttributeValue(fw as! AXUIElement, kAXTitleAttribute as CFString, &t)
+            let focused = (t as? String) ?? ""
+            if focused != expectedTitle {
+                logDebug("MAPPING-MISMATCH: window=\(windowID) expected=\"\(expectedTitle)\" focused=\"\(focused)\"")
+            } else {
+                logDebug("MAPPING-OK: window=\(windowID) focused=\"\(focused)\"")
+            }
+        }
+    }
+
+    /// Returns the topmost on-screen window of an app from a fresh snapshot.
+    private func frontmostWindow(for pid: pid_t) -> CGWindowID? {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
+                as? [[String: Any]] else { return nil }
+        for dict in list {
+            guard let ownerPID = dict[kCGWindowOwnerPID as String] as? pid_t, ownerPID == pid,
+                  let layer = dict[kCGWindowLayer as String] as? Int, layer == 0,
+                  let num = dict[kCGWindowNumber as String] as? Int
+            else { continue }
+            return CGWindowID(num)
+        }
+        return nil
+    }
 
     private func parseWindow(_ dict: [String: Any]) -> WindowInfo? {
         guard let windowID = dict[kCGWindowNumber as String] as? Int,
