@@ -8,6 +8,12 @@ SDK            := $(shell xcrun --show-sdk-path --sdk macosx)
 ARCH           := $(shell uname -m)
 TARGET         := $(ARCH)-apple-macos14.0
 
+# ── Signing ──────────────────────────────────────────
+# Override to switch identities:
+#   make SIGN_IDENTITY="-"                               → ad-hoc (TCC breaks on code change)
+#   make SIGN_IDENTITY="WindowSwitcher Signing"           → self-signed cert
+SIGN_IDENTITY  ?= Apple Development: 1807819314@qq.com (84298355F8)
+
 SWIFT_SOURCES  := $(shell find Sources -name '*.swift')
 C_SOURCES      := Sources/GestureEngine/GestureEngine.c \
                   Sources/WindowManager/WindowCapture.c
@@ -56,14 +62,20 @@ test-order: $(APP_BUNDLE)
 # ──────────────────────────────────────────────────
 
 $(APP_BUNDLE): $(BUILD_DIR)/$(APP_NAME) Resources/Info.plist
-	@echo "==> Creating app bundle..."
-	rm -rf $(APP_BUNDLE)
-	mkdir -p $(APP_BUNDLE)/Contents/MacOS
-	mkdir -p $(APP_BUNDLE)/Contents/Resources
-	cp $(BUILD_DIR)/$(APP_NAME) $(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)
-	cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist
-	@echo "==> Ad-hoc code signing..."
-	codesign --force --deep --sign - --entitlements Resources/WindowSwitcher.entitlements $(APP_BUNDLE) 2>/dev/null || true
+	@if [ ! -d "$(APP_BUNDLE)" ]; then \
+		echo "==> Creating app bundle (first time)..."; \
+		rm -rf $(APP_BUNDLE); \
+		mkdir -p $(APP_BUNDLE)/Contents/MacOS; \
+		mkdir -p $(APP_BUNDLE)/Contents/Resources; \
+		cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist; \
+	fi
+	@echo "==> Updating binary in bundle..."
+	@cp $(BUILD_DIR)/$(APP_NAME) $(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)
+	@echo "==> Signing $(APP_BUNDLE) with identity: $(SIGN_IDENTITY)..."
+	codesign --force --sign "$(SIGN_IDENTITY)" \
+		--entitlements Resources/WindowSwitcher.entitlements \
+		--timestamp=none \
+		$(APP_BUNDLE)
 	@echo "==> Done: $(APP_BUNDLE)"
 
 # ──────────────────────────────────────────────────
@@ -126,6 +138,25 @@ $(BUILD_DIR)/WindowSwitcherTests: $(TEST_SOURCES)
 		-target $(TARGET) \
 		-o $(BUILD_DIR)/WindowSwitcherTests
 
+
+# ──────────────────────────────────────────────────
+# Code signing diagnostics
+# ──────────────────────────────────────────────────
+
+.PHONY: sign-check tcc-reset
+
+sign-check: $(APP_BUNDLE)
+	@echo "=== Code Signature Info ==="
+	@codesign -dvvv $(APP_BUNDLE) 2>&1
+	@echo ""
+	@echo "=== Designated Requirement ==="
+	@codesign -d --requirements - $(APP_BUNDLE) 2>&1 | grep "designated" || echo "(not found)"
+
+tcc-reset:
+	@echo "==> Resetting TCC permissions for com.windowswitcher.app..."
+	-tccutil reset Accessibility com.windowswitcher.app
+	-tccutil reset ScreenCapture com.windowswitcher.app
+	@echo "==> Done. Re-run 'make run' and grant permissions when prompted."
 # ──────────────────────────────────────────────────
 # Install (for development)
 # ──────────────────────────────────────────────────

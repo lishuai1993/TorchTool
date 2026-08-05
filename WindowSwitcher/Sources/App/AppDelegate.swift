@@ -385,7 +385,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Permission check
 
     private func checkPermissions() {
-        let axOptions: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue(): false]
+        let axOptions: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue(): true]
         let axTrusted = AXIsProcessTrustedWithOptions(axOptions)
         logDebug("Permission check: Accessibility = \(axTrusted)")
 

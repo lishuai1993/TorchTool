@@ -42,3 +42,4 @@ enum Constants {
     static let multitouchFrameworkPath =
         "/System/Library/PrivateFrameworks/MultitouchSupport.framework/MultitouchSupport"
 }
+

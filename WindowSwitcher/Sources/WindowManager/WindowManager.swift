@@ -7,6 +7,7 @@ final class WindowManager: @unchecked Sendable {
     let orderingEngine = LRUOrderingEngine()
     let activationHistory = ActivationHistory()
     let activationSuppressor = ActivationSuppressor()
+    let axFocusObserver = AXFocusObserver()
 
     /// Current snapshot of visible windows, keyed by CGWindowID.
     private(set) var windows: [CGWindowID: WindowInfo] = [:]
@@ -55,6 +56,12 @@ final class WindowManager: @unchecked Sendable {
             if let front = self.frontmostWindow(for: pid) {
                 self.frontmostWindowID = front
             }
+            // Start observing same-app focused-window changes for the new app.
+            self.axFocusObserver.startObserving(pid: pid)
+        }
+
+        axFocusObserver.onFocusChanged = { [weak self] pid in
+            self?.handleAXFocusChange(pid: pid)
         }
     }
 
@@ -309,6 +316,7 @@ final class WindowManager: @unchecked Sendable {
     }
 
     func stopInteractionMonitoring() {
+        axFocusObserver.stopObserving()
         activationHistory.stop()
         if let tap = eventTap {
             CGEvent.tapEnable(tap: tap, enable: false)
@@ -362,6 +370,134 @@ final class WindowManager: @unchecked Sendable {
     }
 
     // MARK: - Private
+
+    /// Called by AXFocusObserver when the focused AX window changes within the
+    /// same app. Queries the AX focused window's title & frame, matches it to
+    /// a known CGWindowID, and updates frontmostWindowID + LRU ordering.
+    private func handleAXFocusChange(pid: pid_t) {
+        guard !isActivating else {
+            logDebug("AXFocusChange: suppressed (isActivating)")
+            return
+        }
+
+        let app = AXUIElementCreateApplication(pid)
+        var focusedWindow: CFTypeRef?
+        let r = AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &focusedWindow)
+        guard r == .success, let fw = focusedWindow else {
+            logDebug("AXFocusChange: no focused window for pid=\(pid), err=\(r.rawValue)")
+            return
+        }
+        let axWindow = fw as! AXUIElement
+
+        var axTitleVal: CFTypeRef?
+        AXUIElementCopyAttributeValue(axWindow, kAXTitleAttribute as CFString, &axTitleVal)
+        let axTitle = (axTitleVal as? String) ?? ""
+
+        var axPos: CFTypeRef?, axSize: CFTypeRef?
+        var axFrame = CGRect.zero
+        AXUIElementCopyAttributeValue(axWindow, kAXPositionAttribute as CFString, &axPos)
+        AXUIElementCopyAttributeValue(axWindow, kAXSizeAttribute as CFString, &axSize)
+        if let pv = axPos { AXValueGetValue(pv as! AXValue, .cgPoint, &axFrame.origin) }
+        if let sv = axSize { AXValueGetValue(sv as! AXValue, .cgSize, &axFrame.size) }
+
+        logDebug("AXFocusChange: pid=\(pid) title=\"\(axTitle)\" frame=\(axFrame)")
+
+        guard let matchedID = matchAXToCGWindowID(pid: pid, title: axTitle, frame: axFrame) else {
+            logDebug("AXFocusChange: NO MATCH for pid=\(pid) title=\"\(axTitle)\"")
+            return
+        }
+
+        guard matchedID != frontmostWindowID else {
+            logDebug("AXFocusChange: same window \(matchedID), no-op")
+            return
+        }
+
+        let oldID = frontmostWindowID
+        frontmostWindowID = matchedID
+        orderingEngine.windowDidInteract(matchedID)
+        onInteraction?(matchedID)
+        let oldName = oldID.flatMap { orderingEngine.windowNames[$0] } ?? "?"
+        let newName = orderingEngine.windowNames[matchedID] ?? "?"
+        logDebug("AXFocusChange: frontmostWindowID \(String(describing: oldID))(\(oldName)) → \(matchedID)(\(newName))")
+    }
+
+    /// Matches an AX focused window (by title + frame) to a known CGWindowID
+    /// in the current window snapshot. Uses frame match for simple cases,
+    /// then z-order rank correlation when multiple CG windows share the same
+    /// frame (e.g. Chrome tabs).
+    private func matchAXToCGWindowID(pid: pid_t, title: String, frame: CGRect) -> CGWindowID? {
+        // Step 1: frame match (covers most apps)
+        let candidates = windows.filter { $0.value.ownerPid == pid && self.frameMatches($0.value.frame, frame) }
+
+        if candidates.isEmpty {
+            // No CG window shares this frame — try title match across all
+            // windows for this PID.
+            if !title.isEmpty, let m = windows.first(where: {
+                $0.value.ownerPid == pid && $0.value.windowTitle == title
+            }) {
+                logDebug("AXFocusChange: match by title only (no frame match)")
+                return m.key
+            }
+            return nil
+        }
+
+        if candidates.count == 1 {
+            return candidates.first!.key
+        }
+
+        // Step 2: multiple same-frame CG windows → z-order rank correlation.
+        // AX kAXWindows order mirrors window-server z-order, so the focused
+        // window's rank among same-frame AX windows maps to the same rank
+        // among same-frame CG windows.
+        let zOrder = appZOrder[pid] ?? []
+        let sameFrameCG = zOrder.filter { self.frameMatches($0.frame, frame) }
+
+        // Enumerate AX windows to find the focused one's rank among same-frame
+        var sameFrameAXTitles: [String] = []
+        let app = AXUIElementCreateApplication(pid)
+        var axList: CFTypeRef?
+        if AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &axList) == .success,
+           let axWindows = axList as? [AXUIElement] {
+            for axWin in axWindows {
+                var axT: CFTypeRef?
+                AXUIElementCopyAttributeValue(axWin, kAXTitleAttribute as CFString, &axT)
+                let t = (axT as? String) ?? ""
+                var axP: CFTypeRef?, axS: CFTypeRef?
+                var axF = CGRect.zero
+                AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &axP)
+                AXUIElementCopyAttributeValue(axWin, kAXSizeAttribute as CFString, &axS)
+                if let pv = axP { AXValueGetValue(pv as! AXValue, .cgPoint, &axF.origin) }
+                if let sv = axS { AXValueGetValue(sv as! AXValue, .cgSize, &axF.size) }
+                if self.frameMatches(axF, frame) {
+                    sameFrameAXTitles.append(t)
+                }
+            }
+        }
+
+        logDebug("AXFocusChange: sameFrameAX=\(sameFrameAXTitles.count) sameFrameCG=\(sameFrameCG.count)")
+
+        // Step 2: match by title among same-frame CG windows.
+        // AX kAXWindows order mirrors MRU (most recently used), while CG
+        // z-order mirrors stacking order — they differ, so rank correlation
+        // is unreliable. Title matching is deterministic.
+        if !title.isEmpty, let m = sameFrameCG.first(where: { w in
+            let cgTitle = windows[CGWindowID(w.id)]?.windowTitle ?? ""
+            return cgTitle == title || title.hasPrefix(cgTitle) || cgTitle.hasPrefix(title)
+        }) {
+            logDebug("AXFocusChange: title match → CG id=\(m.id)")
+            return CGWindowID(m.id)
+        }
+
+        // Step 3: fallbacks — candidate title match, then first frame match
+        if !title.isEmpty, let m = candidates.first(where: {
+            $0.value.windowTitle == title || title.hasPrefix($0.value.windowTitle) || $0.value.windowTitle.hasPrefix(title)
+        }) {
+            logDebug("AXFocusChange: fallback title match")
+            return m.key
+        }
+        logDebug("AXFocusChange: fallback first frame match")
+        return candidates.first!.key
+    }
 
     /// Whether two rects describe the same on-screen window frame (with tolerance).
     private func frameMatches(_ a: CGRect, _ b: CGRect) -> Bool {
