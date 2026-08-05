@@ -39,6 +39,9 @@ final class AppSettings: ObservableObject {
     @Published var quickSwitchHintEnabled: Bool {
         didSet { defaults.set(quickSwitchHintEnabled, forKey: Keys.quickSwitchHintEnabled) }
     }
+    @Published var cyclicScrollEnabled: Bool {
+        didSet { defaults.set(cyclicScrollEnabled, forKey: Keys.cyclicScrollEnabled) }
+    }
 
     // MARK: - Gesture settings
     @Published var sensitivityLevel: Int {
@@ -90,6 +93,7 @@ final class AppSettings: ObservableObject {
             Keys.immersiveModeEnabled: Constants.defaultImmersiveModeEnabled,
             Keys.quickSwitchModeEnabled: Constants.defaultQuickSwitchModeEnabled,
             Keys.quickSwitchHintEnabled: Constants.defaultQuickSwitchHintEnabled,
+            Keys.cyclicScrollEnabled: true,
             Keys.sensitivityLevel: Constants.defaultSensitivityLevel,
             Keys.serviceEnabled: true,
         ])
@@ -104,6 +108,7 @@ final class AppSettings: ObservableObject {
         _immersiveModeEnabled = .init(initialValue: defaults.bool(forKey: Keys.immersiveModeEnabled))
         _quickSwitchModeEnabled = .init(initialValue: defaults.bool(forKey: Keys.quickSwitchModeEnabled))
         _quickSwitchHintEnabled = .init(initialValue: defaults.bool(forKey: Keys.quickSwitchHintEnabled))
+        _cyclicScrollEnabled = .init(initialValue: defaults.bool(forKey: Keys.cyclicScrollEnabled))
         _sensitivityLevel = .init(initialValue: defaults.integer(forKey: Keys.sensitivityLevel))
         _serviceEnabled = .init(initialValue: defaults.bool(forKey: Keys.serviceEnabled))
     }
@@ -119,6 +124,7 @@ final class AppSettings: ObservableObject {
         immersiveModeEnabled = Constants.defaultImmersiveModeEnabled
         quickSwitchModeEnabled = Constants.defaultQuickSwitchModeEnabled
         quickSwitchHintEnabled = Constants.defaultQuickSwitchHintEnabled
+        cyclicScrollEnabled = true
         sensitivityLevel = Constants.defaultSensitivityLevel
         serviceEnabled = true
     }
@@ -136,6 +142,7 @@ private enum Keys {
     static let immersiveModeEnabled = "immersiveModeEnabled"
     static let quickSwitchModeEnabled = "quickSwitchModeEnabled"
     static let quickSwitchHintEnabled = "quickSwitchHintEnabled"
+    static let cyclicScrollEnabled = "cyclicScrollEnabled"
     static let sensitivityLevel = "sensitivityLevel"
     static let serviceEnabled = "serviceEnabled"
 }

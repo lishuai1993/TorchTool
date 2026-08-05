@@ -97,6 +97,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         quickSwitchItem.state = AppSettings.shared.quickSwitchModeEnabled ? .on : .off
         menu.addItem(quickSwitchItem)
 
+        let cyclicItem = NSMenuItem(title: "循环滚动", action: #selector(toggleCyclicScroll), keyEquivalent: "")
+        cyclicItem.target = self
+        cyclicItem.state = AppSettings.shared.cyclicScrollEnabled ? .on : .off
+        menu.addItem(cyclicItem)
+
         menu.addItem(.separator())
 
         menu.addItem(NSMenuItem(title: "显示设置...", action: #selector(openSettings), keyEquivalent: ",").withTarget(self))
@@ -113,7 +118,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     /// Update only the button image color — called from actions for immediate feedback.
     /// Running: default template (system light/dark). Stopped: RGB(164,164,194).
-    private func updateIconAppearance() {
+    func updateIconAppearance() {
         let running = AppDelegate.shared.serviceIsRunning
         if running {
             let img = NSImage(systemSymbolName: "rectangle.3.group", accessibilityDescription: "WindowSwitcher")
@@ -157,6 +162,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func toggleQuickSwitchMode() {
         AppSettings.shared.quickSwitchModeEnabled.toggle()
+    }
+
+    @objc private func toggleCyclicScroll() {
+        AppSettings.shared.cyclicScrollEnabled.toggle()
     }
 
     @objc private func openSettings() {

@@ -153,6 +153,7 @@ static float   swipeMinDuration    = 0.05;
 // Diagnostics
 static volatile int callbackCallCount = 0;
 static volatile int callbackErrorCount = 0;
+static int gestureSessionID = 0;  // increments each IDLE→TRACKING, for correlating C/Swift logs
 
 // ──────────────────────────────────────────────────
 // Helpers: read fields from raw contact data
@@ -497,6 +498,7 @@ static void processContactData(int deviceIndex, void *data,
     case GS_IDLE:
         if (fingerCount == 3) {
             gState = GS_TRACKING;
+            gestureSessionID++;
             touchStartTime = timestamp;
             settlingEndTime = timestamp + SETTLING_DURATION;
             touchStartCentroidX = centroidX;
@@ -506,7 +508,8 @@ static void processContactData(int deviceIndex, void *data,
             lastCentroidX = centroidX;
             maxPostSettleDisp = 0;
             activeFingerCount = fingerCount;
-            ws_log("[WS] STATE: IDLE -> TRACKING (%d fingers)\n", fingerCount);
+            ws_log("[WS-DBG] STATE: IDLE -> TRACKING [session=%d] (%d fingers)\n",
+                   gestureSessionID, fingerCount);
         }
         break;
 
@@ -520,14 +523,17 @@ static void processContactData(int deviceIndex, void *data,
             // Use post-settle displacement for tap detection
             if (elapsed <= tapMaxDurationSec && maxPostSettleDisp < tapMaxDisplacement) {
                 userCallback(GestureThreeFingerTap, 0);
-                ws_log("[WS] GESTURE: Three-finger tap (%.0fms, postSettleDisp=%.4f)\n",
-                        elapsed * 1000, maxPostSettleDisp);
-            } else if (elapsed > tapMaxDurationSec) {
-                ws_log("[WS] STATE: TRACKING -> IDLE (lift after %.0fms > %.0fms)\n",
-                        elapsed * 1000, tapMaxDurationSec * 1000);
+                ws_log("[WS-DBG] GESTURE: Three-finger tap [session=%d] (%.0fms, postSettleDisp=%.4f)\n",
+                       gestureSessionID, elapsed * 1000, maxPostSettleDisp);
             } else {
-                ws_log("[WS] STATE: TRACKING -> IDLE (postSettleDisp=%.4f >= %.4f)\n",
-                        maxPostSettleDisp, tapMaxDisplacement);
+                userCallback(GestureEnd, 0);
+                if (elapsed > tapMaxDurationSec) {
+                    ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (lift after %.0fms > %.0fms) GestureEnd fired\n",
+                           gestureSessionID, elapsed * 1000, tapMaxDurationSec * 1000);
+                } else {
+                    ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (postSettleDisp=%.4f >= %.4f) GestureEnd fired\n",
+                           gestureSessionID, maxPostSettleDisp, tapMaxDisplacement);
+                }
             }
             gState = GS_IDLE;
             swipeActionFired = false;
@@ -548,15 +554,19 @@ static void processContactData(int deviceIndex, void *data,
                 swipeActionFired = true;
                 if (dispX > 0) {
                     userCallback(GestureThreeFingerSwipeRight, 1.0);
-                    ws_log("[WS] GESTURE: Three-finger swipe RIGHT (disp=%.4f)\n", dispX);
+                    ws_log("[WS-DBG] GESTURE: Three-finger swipe RIGHT [session=%d] (disp=%.4f)\n",
+                           gestureSessionID, dispX);
                 } else {
                     userCallback(GestureThreeFingerSwipeLeft, 1.0);
-                    ws_log("[WS] GESTURE: Three-finger swipe LEFT (disp=%.4f)\n", dispX);
+                    ws_log("[WS-DBG] GESTURE: Three-finger swipe LEFT [session=%d] (disp=%.4f)\n",
+                           gestureSessionID, dispX);
                 }
                 touchStartCentroidX = centroidX;
                 touchStartCentroidY = centroidY;
             } else if (fabsf(dispX) > swipeMinDisplacement * 0.3) {
-                float progress = fminf(fabsf(dispX) / swipeMinDisplacement, 1.0f);
+                float progress = dispX / swipeMinDisplacement;
+                if (progress > 1.0f) progress = 1.0f;
+                if (progress < -1.0f) progress = -1.0f;
                 userCallback(GestureSwipeUpdate, progress);
             }
         }
@@ -565,13 +575,15 @@ static void processContactData(int deviceIndex, void *data,
     }
 
     case GS_SWIPING:
-        if (fingerCount < 2) {
-            ws_log("[WS] STATE: SWIPING -> IDLE (lift)\n");
+        if (fingerCount < 3) {
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (lift, fingerCount=%d) GestureEnd fired\n",
+                   gestureSessionID, fingerCount);
             gState = GS_IDLE;
             swipeActionFired = false;
-        } else if (!swipeActionFired) {
-            float dispX = centroidX - touchStartCentroidX;
-            float progress = fminf(fabsf(dispX) / swipeMinDisplacement, 1.0f);
+        } else {
+            float dispX = centroidX - settledCentroidX;
+            float progress = dispX / swipeMinDisplacement;
             userCallback(GestureSwipeUpdate, progress);
         }
         break;

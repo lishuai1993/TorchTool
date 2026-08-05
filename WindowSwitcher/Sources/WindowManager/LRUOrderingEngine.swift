@@ -130,6 +130,16 @@ final class LRUOrderingEngine {
 
     // MARK: - Relative navigation
 
+    /// Read-only check: is the cursor at the boundary for the given direction?
+    func isAtBoundary(directionRight: Bool) -> Bool {
+        guard !orderedIDs.isEmpty else { return true }
+        if directionRight {
+            return currentIndex + 1 >= orderedIDs.count
+        } else {
+            return currentIndex - 1 < 0
+        }
+    }
+
     /// Returns the window ID that is "to the left" (more recent) relative to `id`.
     func moreRecent(than id: CGWindowID) -> CGWindowID? {
         guard let idx = orderedIDs.firstIndex(of: id), idx > 0 else { return nil }
@@ -144,15 +154,23 @@ final class LRUOrderingEngine {
     }
 
     /// Advances the cursor in the given direction and returns the target window.
-    /// The cursor always reflects "where we are" in the LRU list.
-    /// After a window is activated (userDidSelectWindow), cursor resets to 0.
-    func advanceCursor(directionRight: Bool) -> CGWindowID? {
+    /// When `cyclic` is false and the cursor is at the boundary, returns nil
+    /// (wall-bump) without moving the cursor.
+    func advanceCursor(directionRight: Bool, cyclic: Bool = true) -> CGWindowID? {
         guard !orderedIDs.isEmpty else { return nil }
         let oldIndex = currentIndex
         if directionRight {
-            currentIndex = currentIndex + 1 >= orderedIDs.count ? 0 : currentIndex + 1
+            if currentIndex + 1 >= orderedIDs.count {
+                if cyclic { currentIndex = 0 } else { return nil }
+            } else {
+                currentIndex = currentIndex + 1
+            }
         } else {
-            currentIndex = currentIndex - 1 < 0 ? orderedIDs.count - 1 : currentIndex - 1
+            if currentIndex - 1 < 0 {
+                if cyclic { currentIndex = orderedIDs.count - 1 } else { return nil }
+            } else {
+                currentIndex = currentIndex - 1
+            }
         }
         let targetID = orderedIDs[currentIndex]
         logDebug("LRU: cursor [\(oldIndex)]→[\(currentIndex)] \(directionRight ? "→" : "←") \(windowNames[targetID] ?? "?")")

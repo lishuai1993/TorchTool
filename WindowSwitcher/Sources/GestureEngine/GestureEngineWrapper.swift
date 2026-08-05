@@ -4,7 +4,8 @@ enum GestureEvent {
     case threeFingerTap
     case threeFingerSwipeLeft
     case threeFingerSwipeRight
-    case swipeUpdate(progress: Float)
+    case swipeUpdate(progress: Float)  // signed: positive=right, negative=left
+    case gestureEnd
 }
 
 final class GestureEngine: @unchecked Sendable {
@@ -94,6 +95,8 @@ final class GestureEngine: @unchecked Sendable {
                 logDebug("GestureEngine(C): SWIPE RIGHT detected")
             case GestureSwipeUpdate:
                 event = .swipeUpdate(progress: progress)
+            case GestureEnd:
+                event = .gestureEnd
             default:
                 return
             }
