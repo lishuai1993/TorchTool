@@ -48,6 +48,17 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(sensitivityLevel, forKey: Keys.sensitivityLevel) }
     }
 
+    // MARK: - Elastic drag
+    @Published var elasticDragEnabled: Bool {
+        didSet { defaults.set(elasticDragEnabled, forKey: Keys.elasticDragEnabled) }
+    }
+    @Published var hintShakeEnabled: Bool {
+        didSet { defaults.set(hintShakeEnabled, forKey: Keys.hintShakeEnabled) }
+    }
+    @Published var elasticDragMaxDisplacement: Int {
+        didSet { defaults.set(elasticDragMaxDisplacement, forKey: Keys.elasticDragMaxDisplacement) }
+    }
+
     // MARK: - Service
     @Published var serviceEnabled: Bool {
         didSet { defaults.set(serviceEnabled, forKey: Keys.serviceEnabled) }
@@ -96,6 +107,9 @@ final class AppSettings: ObservableObject {
             Keys.cyclicScrollEnabled: true,
             Keys.sensitivityLevel: Constants.defaultSensitivityLevel,
             Keys.serviceEnabled: true,
+            Keys.elasticDragEnabled: Constants.defaultElasticDragEnabled,
+            Keys.hintShakeEnabled: Constants.defaultHintShakeEnabled,
+            Keys.elasticDragMaxDisplacement: Constants.defaultElasticDragMaxDisplacement,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -111,6 +125,9 @@ final class AppSettings: ObservableObject {
         _cyclicScrollEnabled = .init(initialValue: defaults.bool(forKey: Keys.cyclicScrollEnabled))
         _sensitivityLevel = .init(initialValue: defaults.integer(forKey: Keys.sensitivityLevel))
         _serviceEnabled = .init(initialValue: defaults.bool(forKey: Keys.serviceEnabled))
+        _elasticDragEnabled = .init(initialValue: defaults.bool(forKey: Keys.elasticDragEnabled))
+        _hintShakeEnabled = .init(initialValue: defaults.bool(forKey: Keys.hintShakeEnabled))
+        _elasticDragMaxDisplacement = .init(initialValue: defaults.integer(forKey: Keys.elasticDragMaxDisplacement))
     }
 
     func resetToDefaults() {
@@ -127,6 +144,9 @@ final class AppSettings: ObservableObject {
         cyclicScrollEnabled = true
         sensitivityLevel = Constants.defaultSensitivityLevel
         serviceEnabled = true
+        elasticDragEnabled = Constants.defaultElasticDragEnabled
+        hintShakeEnabled = Constants.defaultHintShakeEnabled
+        elasticDragMaxDisplacement = Constants.defaultElasticDragMaxDisplacement
     }
 }
 
@@ -145,4 +165,7 @@ private enum Keys {
     static let cyclicScrollEnabled = "cyclicScrollEnabled"
     static let sensitivityLevel = "sensitivityLevel"
     static let serviceEnabled = "serviceEnabled"
+    static let elasticDragEnabled = "elasticDragEnabled"
+    static let hintShakeEnabled = "hintShakeEnabled"
+    static let elasticDragMaxDisplacement = "elasticDragMaxDisplacement"
 }

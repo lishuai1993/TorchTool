@@ -325,43 +325,6 @@ final class WindowManager: @unchecked Sendable {
         }
     }
 
-    /// Diagnostic self-test: replicate the EXACT gesture quickSwitch path
-    /// (refreshWindows → advanceCursor → activateWindow) to verify whether a
-    /// real swipe would actually switch windows in this process context.
-    func selfTestActivation() {
-        let initialFrontmost = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
-        logDebug("SELF-TEST: initial frontmost=\(initialFrontmost)")
-
-        // Step 1: refresh (same as quickSwitch)
-        let windowList = refreshWindows()
-        guard windowList.count > 1 else {
-            logDebug("SELF-TEST: only \(windowList.count) windows, abort")
-            return
-        }
-        logDebug("SELF-TEST: refreshWindows → \(windowList.count) windows")
-        logDebug("SELF-TEST: LRU before:\n\(orderingEngine.dumpLRU())")
-
-        // Step 2: advance cursor to the RIGHT (same as .threeFingerSwipeLeft)
-        guard let target = orderingEngine.advanceCursor(directionRight: true) else {
-            logDebug("SELF-TEST: advanceCursor → nil, abort")
-            return
-        }
-        let targetName = orderingEngine.windowNames[target] ?? "?"
-        logDebug("SELF-TEST: advanceCursor → [\(targetName)] window=\(target)")
-
-        // Step 3: activate (same as quickSwitch)
-        activateWindow(target)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            let frontmost = NSWorkspace.shared.frontmostApplication?.localizedName ?? "?"
-            let targetPid = self.windows[target]?.ownerPid
-            let activeNow = targetPid.flatMap { NSRunningApplication(processIdentifier: $0)?.isActive } ?? false
-            let verdict = frontmost == targetName || activeNow
-                ? "QUICKSWITCH-WORKS" : "QUICKSWITCH-FAILS"
-            logDebug("SELF-TEST: after 600ms frontmost=\(frontmost) [\(targetName)] isActive=\(activeNow) → \(verdict)")
-        }
-    }
-
     /// Clear the thumbnail cache.
     func clearThumbnailCache() {
         for key in windows.keys {

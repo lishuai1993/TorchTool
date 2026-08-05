@@ -32,6 +32,11 @@ enum Constants {
     static let defaultQuickSwitchHintEnabled: Bool = false
     static let defaultQuickSwitchHintDuration: TimeInterval = 1.5
 
+    // MARK: - Elastic drag defaults
+    static let defaultElasticDragEnabled: Bool = true
+    static let defaultHintShakeEnabled: Bool = true
+    static let defaultElasticDragMaxDisplacement: Int = 50
+
     // MARK: - Window filter
     static let excludedAppBundleIDs: Set<String> = [
         "com.apple.loginwindow",

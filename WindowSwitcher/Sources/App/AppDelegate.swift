@@ -82,13 +82,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logAppZOrder()
         checkOrderConsistency()
 
-        // Step 9: Diagnostic self-test — activate a background app without a
-        // gesture to reproduce activate() behavior in the real process context.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            logDebug("SELF-TEST: trigger start")
-            self.windowManager.selfTestActivation()
-        }
-
         logDebug("=== applicationDidFinishLaunching END (SUCCESS) ===")
     }
 
@@ -262,15 +255,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let dirRight = progress < 0
             if !elasticDragInProgress {
                 guard isAtBoundary(directionRight: dirRight) else { return }
-                logDebug("ElasticDrag: begin [session=\(elasticDragSessionID + 1)], progress=\(String(format: "%.3f", progress)), dirRight=\(dirRight)")
-                beginElasticDrag()
+                if settings.elasticDragEnabled {
+                    logDebug("ElasticDrag: begin [session=\(elasticDragSessionID + 1)], progress=\(String(format: "%.3f", progress)), dirRight=\(dirRight)")
+                    beginElasticDrag()
+                } else {
+                    atBoundaryWithoutDrag = true
+                }
             }
-            applyElasticDisplacement(progress: progress)
+            if settings.elasticDragEnabled {
+                applyElasticDisplacement(progress: progress)
+            }
 
         case .gestureEnd:
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDragInProgress), session=\(elasticDragSessionID)")
             if elasticDragInProgress {
                 finishElasticDrag()
+            } else if atBoundaryWithoutDrag {
+                atBoundaryWithoutDrag = false
+                logDebug("ElasticDrag: gestureEnd — showing hint at boundary (drag disabled)")
+                if let currentID = windowManager.frontmostWindowID {
+                    showQuickSwitchHint(for: currentID)
+                }
+                if AppSettings.shared.hintShakeEnabled, let hint = hintWindow {
+                    let hintOrigin = hint.frame.origin
+                    let offsets: [CGFloat] = [-8, 8, -6, 6, 0]
+                    var delay: Double = 0
+                    for offset in offsets {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                            hint.setFrameOrigin(NSPoint(x: hintOrigin.x + offset, y: hintOrigin.y))
+                        }
+                        delay += 0.06
+                    }
+                }
             } else {
                 logDebug("ElasticDrag: gestureEnd ignored — no drag in progress")
             }
@@ -404,11 +420,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let raw = CGFloat(progress) * 60.0
         let damped = raw / (1.0 + abs(raw) / 40.0)
-        let maxDisplacement: CGFloat = 50.0
-        let clamped = max(-maxDisplacement, min(maxDisplacement, damped))
+        let maxDisp = CGFloat(AppSettings.shared.elasticDragMaxDisplacement)
+        let clamped = max(-maxDisp, min(maxDisp, damped))
         var newPos = CGPoint(x: origin.x + clamped, y: origin.y)
-        // Clamp to ±50 px from the true original position
-        newPos.x = max(p0.x - maxDisplacement, min(p0.x + maxDisplacement, newPos.x))
+        // Clamp to ±maxDisp from the true original position
+        newPos.x = max(p0.x - maxDisp, min(p0.x + maxDisp, newPos.x))
         let val = AXValueCreate(.cgPoint, &newPos)!
         AXUIElementSetAttributeValue(axWin, kAXPositionAttribute as CFString, val)
     }
@@ -435,7 +451,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Shake the hint window
-        if let hint = hintWindow {
+        if AppSettings.shared.hintShakeEnabled, let hint = hintWindow {
             let hintOrigin = hint.frame.origin
             let offsets: [CGFloat] = [-8, 8, -6, 6, 0]
             var delay: Double = 0
@@ -544,6 +560,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // All spring-back animations target this position (never drifts).
     // Cleared when the user successfully switches away from the boundary.
     private var cachedBoundaryOrigin: CGPoint?
+
+    // True when user swipes at boundary with elasticDragEnabled=false.
+    // On gestureEnd, show hint text + shake without window dragging.
+    private var atBoundaryWithoutDrag = false
 
     private func showQuickSwitchHint(for windowID: CGWindowID) {
         guard let info = windowManager.windows[windowID] else { return }
