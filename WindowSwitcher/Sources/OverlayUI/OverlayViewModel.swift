@@ -5,6 +5,16 @@ final class OverlayViewModel: ObservableObject {
     @Published var focusedIndex: Int = 0
     @Published var hoveredIndex: Int? = nil
 
+    /// Card global frames keyed by index, updated via GeometryReader.
+    /// Used by the mouse-move monitor for full-screen hover detection.
+    var cardFrames: [Int: CGRect] = [:]
+
+    /// Weak ref to backing NSScrollView for forwarding scrollWheel events.
+    weak var scrollView: NSScrollView?
+
+    /// Snap target — view scrolls to this index on finger lift.
+    @Published var snapToIndex: Int?
+
     var displayIndex: Int { hoveredIndex ?? focusedIndex }
 
     var isEmpty: Bool { windows.isEmpty }
@@ -13,12 +23,21 @@ final class OverlayViewModel: ObservableObject {
         self.windows = windows
         self.focusedIndex = 0
         self.hoveredIndex = nil
+        self.snapToIndex = nil
+        self.cardFrames = [:]
     }
 
     func hide() {
         windows = []
         focusedIndex = 0
         hoveredIndex = nil
+        snapToIndex = nil
+        cardFrames = [:]
+    }
+
+    /// Called from onHover when a card scrolls under the cursor.
+    func notifyScrollHover(at index: Int) {
+        hoveredIndex = index
     }
 
     @discardableResult
@@ -29,8 +48,10 @@ final class OverlayViewModel: ObservableObject {
         if newIndex >= windows.count {
             if cyclic {
                 focusedIndex = 0
+                logDebug("FOCUS-VM: moveRight cyclic wrap → 0")
                 return true
             } else {
+                logDebug("FOCUS-VM: moveRight boundary hit at \(focusedIndex)")
                 return false
             }
         }
@@ -46,8 +67,10 @@ final class OverlayViewModel: ObservableObject {
         if newIndex < 0 {
             if cyclic {
                 focusedIndex = windows.count - 1
+                logDebug("FOCUS-VM: moveLeft cyclic wrap → \(windows.count - 1)")
                 return true
             } else {
+                logDebug("FOCUS-VM: moveLeft boundary hit at 0")
                 return false
             }
         }

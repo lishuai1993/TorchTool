@@ -125,20 +125,26 @@ final class WindowManager: @unchecked Sendable {
         return orderedIDs.compactMap { newWindows[$0] }
     }
 
-    /// Capture a thumbnail for a single window.
-    func captureThumbnail(for windowID: CGWindowID) -> NSImage? {
-        if let cached = windows[windowID]?.thumbnail { return cached }
+    /// Thread-safe thumbnail setter — call from background completion on main thread.
+    func setThumbnail(_ image: NSImage, for windowID: CGWindowID) {
+        windows[windowID]?.thumbnail = image
+    }
 
+    /// Stateless raw capture — safe to call from any thread.
+    func captureRawImage(for windowID: CGWindowID) -> NSImage? {
         let cgImageUnmanaged = WindowSwitcher_CaptureWindowImage(windowID)
         guard let cgImage = cgImageUnmanaged?.takeRetainedValue() else {
             return nil
         }
-        let nsImage = NSImage(cgImage: cgImage, size: NSSize(
-            width: cgImage.width,
-            height: cgImage.height
-        ))
-        windows[windowID]?.thumbnail = nsImage
-        return nsImage
+        return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+    }
+
+    /// Capture a thumbnail for a single window (with cache check).
+    func captureThumbnail(for windowID: CGWindowID) -> NSImage? {
+        if let cached = windows[windowID]?.thumbnail { return cached }
+        guard let image = captureRawImage(for: windowID) else { return nil }
+        windows[windowID]?.thumbnail = image
+        return image
     }
 
     /// Preload thumbnails for the top N windows.
@@ -152,8 +158,6 @@ final class WindowManager: @unchecked Sendable {
         }
         logDebug("WindowManager: preloadThumbnails count=\(count) ids.count=\(ids.count) success=\(successCount)")
     }
-
-    /// Activate (bring to front) a window.
     func activateWindow(_ windowID: CGWindowID) {
         isActivating = true
         defer { isActivating = false }

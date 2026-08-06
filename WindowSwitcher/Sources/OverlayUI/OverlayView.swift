@@ -1,5 +1,34 @@
 import SwiftUI
 
+// MARK: - Card frame reporting (full-screen hover detection)
+
+struct CardFrameKey: PreferenceKey {
+    static var defaultValue: [Int: CGRect] = [:]
+    static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
+        value.merge(nextValue()) { _, new in new }
+    }
+}
+
+/// Finds the backing NSScrollView in the SwiftUI view hierarchy for forwarding
+/// scrollWheel events from full-screen trackpad scrolling.
+struct ScrollViewFinder: NSViewRepresentable {
+    let onFound: (NSScrollView?) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            var parent = view.superview
+            while parent != nil {
+                if let sv = parent as? NSScrollView { onFound(sv); break }
+                parent = parent?.superview
+            }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
 struct OverlayView: View {
     @ObservedObject var viewModel: OverlayViewModel
     @ObservedObject var settings = AppSettings.shared
@@ -37,22 +66,44 @@ struct OverlayView: View {
                                 height: settings.thumbnailHeight
                             )
                             .id(idx)
+                            .background(GeometryReader { geo in
+                                Color.clear
+                                    .preference(key: CardFrameKey.self,
+                                                value: [idx: geo.frame(in: .global)])
+                            })
+                            .onHover { hovering in
+                                if hovering {
+                                    viewModel.notifyScrollHover(at: idx)
+                                }
+                            }
                             .onTapGesture {
                                 viewModel.focusedIndex = idx
                                 onSelect?(window)
-                            }
-                            .onHover { hovering in
-                                viewModel.hoveredIndex = hovering ? idx : nil
                             }
                         }
                     }
                     .padding(.horizontal, 40)
                     .padding(.vertical, 16)
+                    .onPreferenceChange(CardFrameKey.self) { frames in
+                        if frames.count != viewModel.cardFrames.count {
+                            logDebug("CARD-FRAMES: updated, count=\(frames.count)")
+                        }
+                        viewModel.cardFrames = frames
+                    }
+                    .background(ScrollViewFinder { sv in
+                        viewModel.scrollView = sv
+                    })
                 }
                 .frame(maxWidth: .infinity)
                 .onChange(of: viewModel.focusedIndex) { _, newIdx in
-                    withAnimation(.easeOut(duration: settings.animationDuration)) {
+                    withAnimation(.interactiveSpring(response: 0.15, dampingFraction: 0.7)) {
                         proxy.scrollTo(newIdx, anchor: .center)
+                    }
+                }
+                .onChange(of: viewModel.snapToIndex) { _, newIdx in
+                    guard let idx = newIdx else { return }
+                    withAnimation(.interactiveSpring(response: 0.15, dampingFraction: 0.7)) {
+                        proxy.scrollTo(idx, anchor: .center)
                     }
                 }
             }

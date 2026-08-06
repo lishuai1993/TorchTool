@@ -217,6 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         switch event {
         case .threeFingerTap:
+            logDebug("GESTURE: threeFingerTap, overlayVisible=\(overlayController.isVisible)")
             windowManager.isGestureActive = false
             if elasticDragInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDragSessionID)], triggering spring-back")
@@ -232,10 +233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .threeFingerSwipeLeft:
             windowManager.isGestureActive = true
-            if overlayController.isVisible {
-                overlayController.moveFocusRight()
-                return
-            }
+            guard !overlayController.isVisible else { return }
             if elasticDragInProgress {
                 logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -248,10 +246,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .threeFingerSwipeRight:
             windowManager.isGestureActive = true
-            if overlayController.isVisible {
-                overlayController.moveFocusLeft()
-                return
-            }
+            guard !overlayController.isVisible else { return }
             if elasticDragInProgress {
                 logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -264,10 +259,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .swipeUpdate(let progress):
             windowManager.isGestureActive = true
-            if overlayController.isVisible {
-                overlayController.updateProgress(abs(progress))
-                return
-            }
+            guard !overlayController.isVisible else { return }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
             let dirRight = progress < 0
             if !elasticDragInProgress {
@@ -326,17 +318,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        windowManager.preloadThumbnails(count: windowList.count)
+        // Preload only visible windows synchronously, the rest in background
+        let visibleCount = min(AppSettings.shared.maxVisibleCount, windowList.count)
+        windowManager.preloadThumbnails(count: visibleCount)
         let t2 = CACurrentMediaTime()
-        logDebug("TIMING: [t=\(Int((t2 - t0) * 1000))ms] preloadThumbnails done (capture=\(Int((t2 - t1) * 1000))ms)")
+        let cachedCount = windowList.prefix(visibleCount).filter { $0.thumbnail != nil }.count
+        logDebug("TIMING: [t=\(Int((t2 - t0) * 1000))ms] preload visible done (capture=\(Int((t2 - t1) * 1000))ms, hit=\(cachedCount), miss=\(visibleCount - cachedCount))")
 
         let orderedIDs = windowManager.orderingEngine.orderedIDs
         let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
         let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
-        logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → ")), frontmostWindowID=\(windowManager.frontmostWindowID.map(String.init(describing:)) ?? "nil")")
+        logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → "))")
         overlayController.show(with: windowsWithThumbnails)
         let t3 = CACurrentMediaTime()
         logDebug("TIMING: [t=\(Int((t3 - t0) * 1000))ms] overlay shown (UI=\(Int((t3 - t2) * 1000))ms, total=\(Int((t3 - t0) * 1000))ms)")
+
+        // Background: capture remaining windows
+        let remaining = windowList.count - visibleCount
+        if remaining > 0 {
+            let remainingIDs = Array(orderedIDs.dropFirst(visibleCount))
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                guard let self else { return }
+                var captured: [(CGWindowID, NSImage)] = []
+                for id in remainingIDs {
+                    if let image = self.windowManager.captureRawImage(for: id) {
+                        captured.append((id, image))
+                    }
+                }
+                if !captured.isEmpty {
+                    DispatchQueue.main.async {
+                        for (id, image) in captured {
+                            self.windowManager.setThumbnail(image, for: id)
+                        }
+                        self.overlayController.refreshThumbnails()
+                        logDebug("TIMING: background preload complete, captured \(captured.count) thumbnails")
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Quick switch mode
