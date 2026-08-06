@@ -33,6 +33,6 @@ struct WindowInfo: Identifiable, Equatable {
     var thumbnail: NSImage?
 
     static func == (lhs: WindowInfo, rhs: WindowInfo) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.thumbnail === rhs.thumbnail
     }
 }

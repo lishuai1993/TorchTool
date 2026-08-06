@@ -1,19 +1,19 @@
-[2026-08-06 23:47:08.094] [Logger.swift:23] ══════════════════════════════════════
-[2026-08-06 23:47:08.101] [Logger.swift:24] WindowSwitcher logger initialized
-[2026-08-06 23:47:08.103] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
-[2026-08-06 23:47:08.103] [Logger.swift:26] PID: 21657
-[2026-08-06 23:47:08.103] [Logger.swift:27] ══════════════════════════════════════
-[2026-08-06 23:47:08.103] [main.swift:3] main.swift: entry point
-[2026-08-06 23:47:08.145] [main.swift:8] main.swift: starting run loop...
-[2026-08-06 23:47:08.161] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
-[2026-08-06 23:47:08.161] [AppDelegate.swift:22] Step 0: Ensuring single instance...
-[2026-08-06 23:47:08.228] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
-[2026-08-06 23:47:08.228] [AppDelegate.swift:31] Step 1: OK
-[2026-08-06 23:47:08.228] [AppDelegate.swift:34] Step 2: Setting up menu bar...
-[2026-08-06 23:47:08.259] [AppDelegate.swift:36] Step 2: Menu bar OK
+[2026-08-06 23:57:56.856] [Logger.swift:23] ══════════════════════════════════════
+[2026-08-06 23:57:56.862] [Logger.swift:24] WindowSwitcher logger initialized
+[2026-08-06 23:57:56.864] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
+[2026-08-06 23:57:56.864] [Logger.swift:26] PID: 23544
+[2026-08-06 23:57:56.864] [Logger.swift:27] ══════════════════════════════════════
+[2026-08-06 23:57:56.864] [main.swift:3] main.swift: entry point
+[2026-08-06 23:57:56.911] [main.swift:8] main.swift: starting run loop...
+[2026-08-06 23:57:56.921] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
+[2026-08-06 23:57:56.921] [AppDelegate.swift:22] Step 0: Ensuring single instance...
+[2026-08-06 23:57:56.987] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
+[2026-08-06 23:57:56.987] [AppDelegate.swift:31] Step 1: OK
+[2026-08-06 23:57:56.987] [AppDelegate.swift:34] Step 2: Setting up menu bar...
+[2026-08-06 23:57:57.015] [AppDelegate.swift:36] Step 2: Menu bar OK
 [WS] C engine logging to: /Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt
-[2026-08-06 23:47:08.259] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
-[2026-08-06 23:47:08.260] [GestureEngineWrapper.swift:54] GestureEngine: starting C engine (MultitouchSupport)...
+[2026-08-06 23:57:57.015] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
+[2026-08-06 23:57:57.015] [GestureEngineWrapper.swift:54] GestureEngine: starting C engine (MultitouchSupport)...
 [WS] Symbol resolution:
 [WS]   MTDeviceCreateDefault    => 0x193b9b338
 [WS]   MTDeviceCreateList       => 0x193b9ad48
@@ -23,31 +23,31 @@
 [WS]   MTRegisterContactFrameCallbackWithRefcon => 0x193baa740
 [WS]   MTUnregisterContactFrameCallback          => 0x193baa78c
 [WS]   MTUnregisterContactFrameCallbackWithRefcon => 0x0
-[WS] MTDeviceCreateDefault => 0x15c058a00
+[WS] MTDeviceCreateDefault => 0x145083800
 [WS] MTDeviceStop => -536870195 (0xe00002cd)
 [WS] Registering 6-param callback (WithRefcon)...
 [WS] MTRegisterContactFrameCallbackWithRefcon => 1 (0x1)
 [WS] Calling MTDeviceStart(mtDevice, 0)...
 [WS] MTDeviceStart => 0 (0x0)
 [WS] Gesture engine started (reg=1, start=0). Waiting for callbacks...
-[2026-08-06 23:47:08.261] [GestureEngineWrapper.swift:60] GestureEngine: C engine started OK (result=0)
-[2026-08-06 23:47:08.261] [AppDelegate.swift:42] Step 3: Gesture engine started OK
-[2026-08-06 23:47:08.261] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
-[2026-08-06 23:47:08.261] [ActivationHistory.swift:13] ActivationHistory: starting observation
-[2026-08-06 23:47:08.261] [ActivationHistory.swift:30] ActivationHistory: started OK
-[2026-08-06 23:47:08.262] [WindowManager.swift:292] WindowManager: NSEvent monitors registered OK
-[2026-08-06 23:47:08.262] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
-[2026-08-06 23:47:08.262] [AppDelegate.swift:59] Step 5: Wiring callbacks...
-[2026-08-06 23:47:08.262] [AppDelegate.swift:61] Step 5: Callbacks wired OK
-[2026-08-06 23:47:08.262] [AppDelegate.swift:64] Step 6: Setting up settings observer...
-[2026-08-06 23:47:08.262] [AppDelegate.swift:66] Step 6: OK
-[2026-08-06 23:47:08.262] [AppDelegate.swift:70] Step 6.5: Setting up session observers...
-[2026-08-06 23:47:08.262] [AppDelegate.swift:72] Step 6.5: OK
-[2026-08-06 23:47:08.262] [AppDelegate.swift:75] Step 7: Checking permissions...
-[2026-08-06 23:47:08.265] [AppDelegate.swift:735] Permission check: Accessibility = true
-[2026-08-06 23:47:08.274] [LRUOrderingEngine.swift:80] LRU: sync - added 18 windows at front
-[2026-08-06 23:47:08.274] [WindowManager.swift:124] WindowManager: refreshed 18 windows
-[2026-08-06 23:47:08.274] [AppDelegate.swift:81] Initial LRU order:
+[2026-08-06 23:57:57.016] [GestureEngineWrapper.swift:60] GestureEngine: C engine started OK (result=0)
+[2026-08-06 23:57:57.016] [AppDelegate.swift:42] Step 3: Gesture engine started OK
+[2026-08-06 23:57:57.017] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
+[2026-08-06 23:57:57.017] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-06 23:57:57.017] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-06 23:57:57.018] [WindowManager.swift:292] WindowManager: NSEvent monitors registered OK
+[2026-08-06 23:57:57.018] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
+[2026-08-06 23:57:57.018] [AppDelegate.swift:59] Step 5: Wiring callbacks...
+[2026-08-06 23:57:57.018] [AppDelegate.swift:61] Step 5: Callbacks wired OK
+[2026-08-06 23:57:57.018] [AppDelegate.swift:64] Step 6: Setting up settings observer...
+[2026-08-06 23:57:57.018] [AppDelegate.swift:66] Step 6: OK
+[2026-08-06 23:57:57.018] [AppDelegate.swift:70] Step 6.5: Setting up session observers...
+[2026-08-06 23:57:57.018] [AppDelegate.swift:72] Step 6.5: OK
+[2026-08-06 23:57:57.018] [AppDelegate.swift:75] Step 7: Checking permissions...
+[2026-08-06 23:57:57.022] [AppDelegate.swift:735] Permission check: Accessibility = true
+[2026-08-06 23:57:57.033] [LRUOrderingEngine.swift:80] LRU: sync - added 18 windows at front
+[2026-08-06 23:57:57.033] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-06 23:57:57.033] [AppDelegate.swift:81] Initial LRU order:
   [0] 终端 — WindowSwitcher — -zsh — 112×34 ← 游标
   [1] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
   [2] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
@@ -66,126 +66,466 @@
   [15] 活动监视器 — 活动监视器
   [16] CodeBuddy CN — 20260723112900
   [17] 时钟 — 时钟
-[2026-08-06 23:47:08.274] [AppDelegate.swift:778] App z-order v2 (from same snapshot), 14 apps:
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [0] 终端
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [1] Obsidian
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [2] 系统设置
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [3] Google Chrome
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [4] HibernateModeManager
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [5] 微信读书
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [6] 微信
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [7] 网易有道翻译
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [8] 访达
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [9] 坚果云
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [10] 青山
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [11] 活动监视器
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [12] CodeBuddy CN
-[2026-08-06 23:47:08.274] [AppDelegate.swift:780]   [13] 时钟
-[2026-08-06 23:47:08.274] [AppDelegate.swift:829] === ORDER CONSISTENCY CHECK ===
-[2026-08-06 23:47:08.274] [AppDelegate.swift:831] PASS
-[2026-08-06 23:47:08.274] [AppDelegate.swift:832]   app-order: 终端 → Obsidian → 系统设置 → Google Chrome → HibernateModeManager → 微信读书 → 微信 → 网易有道翻译 → 访达 → 坚果云 → 青山 → 活动监视器 → CodeBuddy CN → 时钟
-[2026-08-06 23:47:08.274] [AppDelegate.swift:833]   frontmost: match
-[2026-08-06 23:47:08.274] [AppDelegate.swift:834]   interleaving: none
-[2026-08-06 23:47:08.274] [AppDelegate.swift:841] === END ===
-[2026-08-06 23:47:08.274] [AppDelegate.swift:85] === applicationDidFinishLaunching END (SUCCESS) ===
+[2026-08-06 23:57:57.033] [AppDelegate.swift:778] App z-order v2 (from same snapshot), 14 apps:
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [0] 终端
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [1] Obsidian
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [2] 系统设置
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [3] Google Chrome
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [4] HibernateModeManager
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [5] 微信读书
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [6] 微信
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [7] 网易有道翻译
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [8] 访达
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [9] 坚果云
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [10] 青山
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [11] 活动监视器
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [12] CodeBuddy CN
+[2026-08-06 23:57:57.033] [AppDelegate.swift:780]   [13] 时钟
+[2026-08-06 23:57:57.033] [AppDelegate.swift:829] === ORDER CONSISTENCY CHECK ===
+[2026-08-06 23:57:57.033] [AppDelegate.swift:831] PASS
+[2026-08-06 23:57:57.033] [AppDelegate.swift:832]   app-order: 终端 → Obsidian → 系统设置 → Google Chrome → HibernateModeManager → 微信读书 → 微信 → 网易有道翻译 → 访达 → 坚果云 → 青山 → 活动监视器 → CodeBuddy CN → 时钟
+[2026-08-06 23:57:57.033] [AppDelegate.swift:833]   frontmost: match
+[2026-08-06 23:57:57.033] [AppDelegate.swift:834]   interleaving: none
+[2026-08-06 23:57:57.033] [AppDelegate.swift:841] === END ===
+[2026-08-06 23:57:57.033] [AppDelegate.swift:85] === applicationDidFinishLaunching END (SUCCESS) ===
 [WS-DBG] fingerCount: 0 -> 1 (count=1)
-[2026-08-06 23:47:10.261] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
-[2026-08-06 23:47:10.262] [AppDelegate.swift:154] onInteraction fired for window 17079
-[2026-08-06 23:47:10.693] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
-[2026-08-06 23:47:10.693] [AppDelegate.swift:154] onInteraction fired for window 17079
+[2026-08-06 23:57:58.365] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
+[2026-08-06 23:57:58.365] [AppDelegate.swift:154] onInteraction fired for window 17079
+[2026-08-06 23:57:58.748] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
+[2026-08-06 23:57:58.748] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS] CB6: count=3 frame=536
+[WS] CB6: count=3 frame=416
 [WS-DBG] fingerCount: 2 -> 3 (count=3)
 [WS-DBG] STATE: IDLE -> TRACKING [session=1] (3 fingers)
-[WS] CB6: count=3 frame=537
-[WS] CB6: count=3 frame=538
-[WS] CB6: count=3 frame=539
-[WS] CB6: count=3 frame=540
-[WS] CB6: count=3 frame=541
-[WS] CB6: count=3 frame=542
-[WS] CB6: count=3 frame=543
-[WS] CB6: count=3 frame=544
-[WS] CB6: count=3 frame=545
-[WS] CB6: count=3 frame=546
+[WS] CB6: count=3 frame=417
+[WS] CB6: count=3 frame=418
+[WS] CB6: count=3 frame=419
+[WS] CB6: count=3 frame=420
+[WS] CB6: count=3 frame=421
+[WS] CB6: count=3 frame=422
+[WS] CB6: count=3 frame=423
+[WS] CB6: count=3 frame=424
 [WS-DBG] fingerCount: 3 -> 2 (count=2)
-[2026-08-06 23:47:11.217] [AppDelegate.swift:397] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-06 23:47:11.217] [AppDelegate.swift:268] ElasticDrag: begin [session=1], progress=0.322, dirRight=false
-[2026-08-06 23:47:11.227] [AppDelegate.swift:443] ElasticDrag: cached boundary origin = (0.0, 38.0)
-[2026-08-06 23:47:11.227] [AppDelegate.swift:450] ElasticDrag: began [session=1], gen=1, dragRef=(0.0, 38.0), cachedOrigin=(0.0, 38.0), title=WindowSwitcher — -zsh — 112×34
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] GESTURE: Three-finger tap [session=1] (112ms, postSettleDisp=0.0395)
-[2026-08-06 23:47:11.241] [GestureEngineWrapper.swift:89] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-06 23:47:11.241] [AppDelegate.swift:220] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-06 23:47:11.241] [AppDelegate.swift:223] ElasticDrag: tap intercepted [session=1], triggering spring-back
-[2026-08-06 23:47:11.241] [AppDelegate.swift:494] ElasticDrag: finish [session=1], target=(0.0, 38.0)
-[2026-08-06 23:47:11.266] [AppDelegate.swift:524] ElasticDrag: spring-back [session=1, gen=1] from x=13.0 to x=0.0
-[2026-08-06 23:47:11.584] [AppDelegate.swift:543] ElasticDrag: spring-back DONE [session=1, gen=1], step=12, finalX=0.0, targetX=0.0, delta=0.0
-[WS] CB6: count=3 frame=631
+[WS-DBG] GESTURE: Three-finger tap [session=1] (112ms, postSettleDisp=0.0041)
+[2026-08-06 23:57:59.554] [GestureEngineWrapper.swift:89] GestureEngine(C): TAP detected, progress=0.0
+[2026-08-06 23:57:59.554] [AppDelegate.swift:220] GESTURE: threeFingerTap, overlayVisible=false
+[2026-08-06 23:57:59.554] [AppDelegate.swift:310] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-06 23:57:59.565] [LRUOrderingEngine.swift:69] LRU: sync - removed 1 windows
+[2026-08-06 23:57:59.566] [LRUOrderingEngine.swift:80] LRU: sync - added 1 windows at front
+[2026-08-06 23:57:59.566] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-06 23:57:59.566] [AppDelegate.swift:314] TIMING: [t=11ms] refreshWindows done, 18 windows
+[2026-08-06 23:57:59.808] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-06 23:57:59.808] [AppDelegate.swift:326] TIMING: [t=253ms] preload visible done (capture=241ms, hit=0, miss=11)
+[2026-08-06 23:57:59.808] [AppDelegate.swift:331] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]系统设置 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]HibernateModeManager → [8]微信读书 → [9]微信 → [10]微信 → [11]网易有道翻译 → [12]访达 → [13]坚果云 → [14]青山 → [15]活动监视器 → [16]CodeBuddy CN → [17]时钟
+[2026-08-06 23:57:59.821] [AppDelegate.swift:334] TIMING: [t=267ms] overlay shown (UI=13ms, total=267ms)
+[2026-08-06 23:57:59.822] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=23544
+[2026-08-06 23:57:59.823] [AXFocusObserver.swift:58] AXFocusObserver: started pid=23544
+[2026-08-06 23:57:59.837] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[2026-08-06 23:57:59.895] [AppDelegate.swift:354] TIMING: background preload complete, captured 7 thumbnails
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-06 23:58:40.256] [OverlayWindowController.swift:149] OVERLAY-SELECT: window=活动监视器 — 活动监视器
+[2026-08-06 23:58:40.257] [WindowManager.swift:184] ACTIVATE-DIAG: [活动监视器] pid=509 bid=com.apple.ActivityMonitor isActive=false needsActivate=true frontmostBefore=WindowSwitcher window=85
+[2026-08-06 23:58:40.272] [WindowManager.swift:193] AX: 活动监视器 has 1 AX windows, target=[活动监视器] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-06 23:58:40.272] [WindowManager.swift:210] AX:   [0][活动监视器 – 所有进程] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-06 23:58:40.273] [WindowManager.swift:226] AX: raised [活动监视器] idx=0 title="活动监视器 – 所有进程"
+[2026-08-06 23:58:40.273] [WindowManager.swift:239] ACTIVATE-DIAG: calling app.activate() for [活动监视器] pid=509
+[2026-08-06 23:58:40.276] [WindowManager.swift:242] ACTIVATE-DIAG: app.activate() returned true for [活动监视器]
+[2026-08-06 23:58:40.276] [LRUOrderingEngine.swift:139] LRU-SELECT: [活动监视器 — 活动监视器] cursor→15, order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — caffeinate ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索] (unchanged=true)
+[2026-08-06 23:58:40.276] [WindowManager.swift:258] ACTIVATE-DONE: window=活动监视器 — 活动监视器 idx=15 cursorAfter=15 orderedIDs[0]=终端 — TorchTool — ✳ macOS触控板手势自定义 — caffeinate ◂ claude — 112×34 isActivating=true
+[2026-08-06 23:58:40.276] [ActivationHistory.swift:27] ActivationHistory: app activated [活动监视器] pid=509
+[2026-08-06 23:58:40.276] [WindowManager.swift:48] ActivationHistory: suppressed programmatic activation pid=509
+[2026-08-06 23:58:40.587] [WindowManager.swift:553] MAPPING-OK: window=85 focused="活动监视器 – 所有进程"
+[2026-08-06 23:58:40.589] [WindowManager.swift:249] ACTIVATE-DIAG: after 300ms frontmost=活动监视器 [活动监视器] isActiveNow=true
+[WS] CB6: count=3 frame=4052
 [WS-DBG] fingerCount: 1 -> 3 (count=3)
 [WS-DBG] STATE: IDLE -> TRACKING [session=2] (3 fingers)
-[WS] CB6: count=3 frame=632
-[WS] CB6: count=3 frame=633
-[WS] CB6: count=3 frame=634
-[WS] CB6: count=3 frame=635
-[WS] CB6: count=3 frame=636
-[WS] CB6: count=3 frame=637
-[WS] CB6: count=3 frame=638
-[WS] CB6: count=3 frame=639
-[WS] CB6: count=3 frame=640
-[WS] CB6: count=3 frame=641
-[WS] CB6: count=3 frame=642
-[WS] CB6: count=3 frame=643
+[WS] CB6: count=3 frame=4053
+[WS] CB6: count=3 frame=4054
+[WS] CB6: count=3 frame=4055
+[WS] CB6: count=3 frame=4056
+[WS] CB6: count=3 frame=4057
+[WS] CB6: count=3 frame=4058
+[WS] CB6: count=3 frame=4059
+[WS-DBG] fingerCount: 3 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] GESTURE: Three-finger tap [session=2] (75ms, postSettleDisp=0.0000)
+[2026-08-06 23:58:42.445] [GestureEngineWrapper.swift:89] GestureEngine(C): TAP detected, progress=0.0
+[2026-08-06 23:58:42.446] [AppDelegate.swift:220] GESTURE: threeFingerTap, overlayVisible=false
+[2026-08-06 23:58:42.446] [AppDelegate.swift:310] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-06 23:58:42.456] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-06 23:58:42.456] [AppDelegate.swift:314] TIMING: [t=10ms] refreshWindows done, 18 windows
+[2026-08-06 23:58:42.556] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-06 23:58:42.556] [AppDelegate.swift:326] TIMING: [t=110ms] preload visible done (capture=99ms, hit=0, miss=11)
+[2026-08-06 23:58:42.556] [AppDelegate.swift:331] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]系统设置 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]HibernateModeManager → [8]微信读书 → [9]微信 → [10]微信 → [11]网易有道翻译 → [12]访达 → [13]坚果云 → [14]青山 → [15]活动监视器 → [16]CodeBuddy CN → [17]时钟
+[2026-08-06 23:58:42.562] [AppDelegate.swift:334] TIMING: [t=116ms] overlay shown (UI=5ms, total=116ms)
+[2026-08-06 23:58:42.562] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=23544
+[2026-08-06 23:58:42.563] [AXFocusObserver.swift:26] AXFocusObserver: already observing pid=23544
+[2026-08-06 23:58:42.573] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[2026-08-06 23:58:42.645] [AppDelegate.swift:354] TIMING: background preload complete, captured 7 thumbnails
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-06 23:58:47.086] [LRUOrderingEngine.swift:125] LRU-INTERACT: [活动监视器 — 活动监视器] idx=15→0, before=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索], after=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.087] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.136] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.136] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.152] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.153] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.176] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.176] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.186] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.186] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.204] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.204] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.219] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.219] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.237] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.237] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.253] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.253] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.269] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.269] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.269] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.269] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.272] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.272] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.289] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.289] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.306] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.306] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.322] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.322] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.339] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.339] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.356] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.356] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.372] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.372] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.390] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.390] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.406] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.406] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.422] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.422] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.439] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.439] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.455] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.455] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.472] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.473] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.489] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.489] [AppDelegate.swift:154] onInteraction fired for window 85
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-06 23:58:47.506] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.506] [AppDelegate.swift:154] onInteraction fired for window 85
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-06 23:58:47.510] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.510] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.552] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.553] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.572] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.573] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.586] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.586] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.603] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.603] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.620] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.620] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.642] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.642] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.658] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.658] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.674] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.674] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.686] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.686] [AppDelegate.swift:154] onInteraction fired for window 85
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-06 23:58:47.703] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.703] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.703] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.703] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.704] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.704] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.722] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.722] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.737] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.737] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.754] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.754] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.770] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.770] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.788] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.788] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.804] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.804] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.821] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.821] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.839] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.839] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.854] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.854] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.871] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.871] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.889] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.889] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.904] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.904] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.922] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.922] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.938] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.938] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.954] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.955] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.971] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.971] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:47.988] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:47.988] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.004] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.004] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.020] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.020] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.039] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.039] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.055] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.055] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.071] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.071] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.089] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.089] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.104] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.104] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.121] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.121] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.138] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.138] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.155] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.155] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.171] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.172] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.188] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.188] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.208] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.208] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.221] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.221] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.238] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.238] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.254] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.255] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.271] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.271] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.287] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.287] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.305] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.306] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.321] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.321] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.338] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.338] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.355] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.355] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.371] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.371] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.388] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.388] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.405] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.405] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.421] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.421] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.439] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.439] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.455] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.455] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.472] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.472] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.489] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.489] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.505] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.505] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.537] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.537] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.554] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.554] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.589] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.589] [AppDelegate.swift:154] onInteraction fired for window 85
+[2026-08-06 23:58:48.589] [LRUOrderingEngine.swift:127] LRU-INTERACT: [活动监视器 — 活动监视器] already at idx=0, no-op. order=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:48.589] [AppDelegate.swift:154] onInteraction fired for window 85
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS] CB6: count=3 frame=4446
+[WS-DBG] fingerCount: 2 -> 3 (count=3)
+[WS-DBG] STATE: IDLE -> TRACKING [session=3] (3 fingers)
+[WS] CB6: count=3 frame=4447
+[WS] CB6: count=3 frame=4448
+[WS] CB6: count=3 frame=4449
+[WS] CB6: count=3 frame=4450
+[WS] CB6: count=3 frame=4451
+[WS] CB6: count=3 frame=4452
+[WS] CB6: count=3 frame=4453
+[WS] CB6: count=3 frame=4454
+[WS] CB6: count=3 frame=4455
+[WS-DBG] fingerCount: 3 -> 2 (count=2)
+[WS] CB6: count=3 frame=4544
+[WS-DBG] fingerCount: 2 -> 3 (count=3)
+[WS] CB6: count=4 frame=4545
+[WS-DBG] fingerCount: 3 -> 4 (count=4)
+[WS] CB6: count=3 frame=4546
+[WS-DBG] fingerCount: 4 -> 3 (count=3)
+[WS] CB6: count=3 frame=4547
+[WS] CB6: count=3 frame=4548
+[WS] CB6: count=3 frame=4549
+[WS] CB6: count=3 frame=4550
+[WS] CB6: count=3 frame=4551
+[WS] CB6: count=3 frame=4552
+[WS] CB6: count=3 frame=4553
+[WS] CB6: count=3 frame=4554
+[WS] CB6: count=3 frame=4555
+[WS] CB6: count=3 frame=4556
+[WS] CB6: count=3 frame=4557
+[WS] CB6: count=3 frame=4558
+[WS] CB6: count=3 frame=4559
+[WS] CB6: count=3 frame=4560
+[WS] CB6: count=3 frame=4561
 [WS-DBG] fingerCount: 3 -> 1 (count=1)
-[WS-DBG] GESTURE: Three-finger tap [session=2] (104ms, postSettleDisp=0.0026)
-[2026-08-06 23:47:11.992] [GestureEngineWrapper.swift:89] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-06 23:47:11.992] [AppDelegate.swift:220] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-06 23:47:11.992] [AppDelegate.swift:310] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-06 23:47:12.000] [LRUOrderingEngine.swift:69] LRU: sync - removed 1 windows
-[2026-08-06 23:47:12.000] [LRUOrderingEngine.swift:80] LRU: sync - added 1 windows at front
-[2026-08-06 23:47:12.000] [WindowManager.swift:124] WindowManager: refreshed 18 windows
-[2026-08-06 23:47:12.000] [AppDelegate.swift:314] TIMING: [t=7ms] refreshWindows done, 18 windows
-[2026-08-06 23:47:12.241] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
-[2026-08-06 23:47:12.241] [AppDelegate.swift:326] TIMING: [t=248ms] preload visible done (capture=240ms, hit=0, miss=11)
-[2026-08-06 23:47:12.241] [AppDelegate.swift:331] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]系统设置 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]HibernateModeManager → [8]微信读书 → [9]微信 → [10]微信 → [11]网易有道翻译 → [12]访达 → [13]坚果云 → [14]青山 → [15]活动监视器 → [16]CodeBuddy CN → [17]时钟
-[2026-08-06 23:47:12.252] [AppDelegate.swift:334] TIMING: [t=259ms] overlay shown (UI=10ms, total=259ms)
-[2026-08-06 23:47:12.252] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=21657
-[2026-08-06 23:47:12.253] [AXFocusObserver.swift:58] AXFocusObserver: started pid=21657
-[2026-08-06 23:47:12.265] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-06 23:47:12.329] [AppDelegate.swift:354] TIMING: background preload complete, captured 7 thumbnails
+[WS-DBG] STATE: TRACKING -> IDLE [session=3] (lift after 936ms > 200ms) GestureEnd fired
+[2026-08-06 23:58:49.661] [AppDelegate.swift:280] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-06 23:58:49.661] [AppDelegate.swift:301] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS] CB6: count=3 frame=4659
+[WS-DBG] fingerCount: 1 -> 3 (count=3)
+[WS-DBG] STATE: IDLE -> TRACKING [session=4] (3 fingers)
+[WS] CB6: count=3 frame=4660
+[WS] CB6: count=3 frame=4661
+[WS] CB6: count=3 frame=4662
+[WS] CB6: count=3 frame=4663
+[WS] CB6: count=3 frame=4664
+[WS] CB6: count=3 frame=4665
+[WS] CB6: count=3 frame=4666
+[WS] CB6: count=3 frame=4667
+[WS] CB6: count=3 frame=4668
+[WS] CB6: count=3 frame=4669
+[WS] CB6: count=3 frame=4670
+[WS] CB6: count=3 frame=4671
+[WS] CB6: count=3 frame=4672
+[WS] CB6: count=3 frame=4673
+[WS] CB6: count=3 frame=4674
+[WS] CB6: count=3 frame=4675
+[WS-DBG] fingerCount: 3 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] GESTURE: Three-finger tap [session=4] (144ms, postSettleDisp=0.0287)
+[2026-08-06 23:58:50.580] [GestureEngineWrapper.swift:89] GestureEngine(C): TAP detected, progress=0.0
+[2026-08-06 23:58:50.581] [AppDelegate.swift:220] GESTURE: threeFingerTap, overlayVisible=false
+[2026-08-06 23:58:50.581] [AppDelegate.swift:310] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-06 23:58:50.589] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-06 23:58:50.589] [AppDelegate.swift:314] TIMING: [t=8ms] refreshWindows done, 18 windows
+[2026-08-06 23:58:50.663] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-06 23:58:50.663] [AppDelegate.swift:326] TIMING: [t=81ms] preload visible done (capture=73ms, hit=0, miss=11)
+[2026-08-06 23:58:50.663] [AppDelegate.swift:331] IMMERSIVE-SHOW: LRU order = [0]活动监视器 → [1]终端 → [2]Obsidian → [3]Obsidian → [4]系统设置 → [5]Google Chrome → [6]Google Chrome → [7]Google Chrome → [8]HibernateModeManager → [9]微信读书 → [10]微信 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
+[2026-08-06 23:58:50.666] [AppDelegate.swift:334] TIMING: [t=85ms] overlay shown (UI=3ms, total=85ms)
+[2026-08-06 23:58:50.673] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[2026-08-06 23:58:50.734] [AppDelegate.swift:354] TIMING: background preload complete, captured 7 thumbnails
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[2026-08-06 23:47:40.210] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
-[2026-08-06 23:47:40.210] [AppDelegate.swift:154] onInteraction fired for window 5828
-[2026-08-06 23:47:40.212] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-06 23:47:40.215] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-06 23:47:40.234] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[2026-08-06 23:47:44.342] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
-[2026-08-06 23:47:44.342] [AppDelegate.swift:154] onInteraction fired for window 5828
-[2026-08-06 23:47:44.778] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能 → Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索]
-[2026-08-06 23:47:44.779] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-06 23:58:55.682] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-06 23:58:55.693] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-06 23:58:55.716] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[2026-08-06 23:58:56.161] [LRUOrderingEngine.swift:125] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] idx=1→0, before=[活动监视器 — 活动监视器 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能], after=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:58:56.161] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-06 23:59:04.499] [ActivationHistory.swift:27] ActivationHistory: app activated [Obsidian] pid=57888
+[2026-08-06 23:59:04.524] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-06 23:59:04.550] [AXFocusObserver.swift:58] AXFocusObserver: started pid=57888
+[2026-08-06 23:59:05.105] [LRUOrderingEngine.swift:125] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] idx=2→0, before=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能], after=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:59:05.105] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-06 23:59:05.922] [LRUOrderingEngine.swift:127] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] already at idx=0, no-op. order=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-06 23:59:05.922] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-07 00:00:27.490] [LRUOrderingEngine.swift:127] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] already at idx=0, no-op. order=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:00:27.490] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-07 00:01:12.305] [LRUOrderingEngine.swift:127] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] already at idx=0, no-op. order=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:12.305] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-07 00:01:12.988] [LRUOrderingEngine.swift:127] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] already at idx=0, no-op. order=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:12.988] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-07 00:01:16.658] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
+[2026-08-07 00:01:16.658] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.659] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.659] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.659] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.659] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.664] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:16.664] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:17.411] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 00:01:17.459] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 00:01:17.459] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 00:01:17.509] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 00:01:17.511] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 00:01:17.574] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 00:01:17.768] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:17.768] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:17.769] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=false, isEnabled=false
+[2026-08-07 00:01:17.769] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:17.769] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:18.647] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:18.647] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:18.648] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=false, isEnabled=false
+[2026-08-07 00:01:18.648] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:18.648] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:18.715] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 00:01:18.764] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 00:01:20.041] [LRUOrderingEngine.swift:127] LRU-INTERACT: [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] already at idx=0, no-op. order=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:20.041] [AppDelegate.swift:154] onInteraction fired for window 14251
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.280] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.281] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.281] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 00:01:20.686] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-07 00:01:20.689] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-07 00:01:20.702] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[2026-08-07 00:01:21.405] [LRUOrderingEngine.swift:125] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] idx=1→0, before=[Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能], after=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:21.405] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 00:01:28.871] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:28.871] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 00:01:29.288] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 系统设置 — 辅助功能]
+[2026-08-07 00:01:29.288] [AppDelegate.swift:154] onInteraction fired for window 5828
