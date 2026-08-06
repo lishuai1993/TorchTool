@@ -125,20 +125,14 @@ final class WindowManager: @unchecked Sendable {
         return orderedIDs.compactMap { newWindows[$0] }
     }
 
-    /// Capture a thumbnail for a single window using ScreenCaptureKit.
-    func captureThumbnail(for windowID: CGWindowID) async -> NSImage? {
+    /// Capture a thumbnail for a single window.
+    func captureThumbnail(for windowID: CGWindowID) -> NSImage? {
         if let cached = windows[windowID]?.thumbnail { return cached }
 
-        guard let content = await WindowCaptureManager.shared.getShareableContent() else {
+        let cgImageUnmanaged = WindowSwitcher_CaptureWindowImage(windowID)
+        guard let cgImage = cgImageUnmanaged?.takeRetainedValue() else {
             return nil
         }
-
-        guard let cgImage = await WindowCaptureManager.shared.captureImage(
-            windowID: windowID, shareableContent: content
-        ) else {
-            return nil
-        }
-
         let nsImage = NSImage(cgImage: cgImage, size: NSSize(
             width: cgImage.width,
             height: cgImage.height
@@ -148,12 +142,11 @@ final class WindowManager: @unchecked Sendable {
     }
 
     /// Preload thumbnails for the top N windows.
-    func preloadThumbnails(count: Int) async {
-        WindowCaptureManager.shared.invalidateContentCache()
+    func preloadThumbnails(count: Int) {
         let ids = Array(orderingEngine.orderedIDs.prefix(count))
         var successCount = 0
         for id in ids {
-            if await captureThumbnail(for: id) != nil {
+            if captureThumbnail(for: id) != nil {
                 successCount += 1
             }
         }

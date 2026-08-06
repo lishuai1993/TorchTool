@@ -15,11 +15,12 @@ TARGET         := $(ARCH)-apple-macos14.0
 SIGN_IDENTITY  ?= Apple Development: 1807819314@qq.com (84298355F8)
 
 SWIFT_SOURCES  := $(shell find Sources -name '*.swift')
-C_SOURCES      := Sources/GestureEngine/GestureEngine.c
+C_SOURCES      := Sources/GestureEngine/GestureEngine.c \
+                  Sources/WindowManager/WindowCapture.c
 C_OBJECTS      := $(patsubst Sources/%.c,$(BUILD_DIR)/%.o,$(C_SOURCES))
 BRIDGING_HDR   := Sources/bridging-header.h
 
-FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics -framework ScreenCaptureKit
+FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics
 
 # ──────────────────────────────────────────────────
 # Top-level targets
@@ -30,7 +31,8 @@ FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics -
 all: $(APP_BUNDLE)
 
 clean:
-	rm -rf $(BUILD_DIR) $(APP_BUNDLE)
+	rm -rf $(BUILD_DIR)
+	@echo "==> Cleaned build artifacts (app bundle preserved for TCC identity)"
 
 run: $(APP_BUNDLE)
 	open $(APP_BUNDLE)

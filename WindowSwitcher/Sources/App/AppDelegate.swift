@@ -314,25 +314,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Immersive mode
 
     private func showImmersiveOverlay() {
-        logDebug("showImmersiveOverlay called")
+        let t0 = CACurrentMediaTime()
+        logDebug("TIMING: [t=0ms] showImmersiveOverlay called")
+
         let windowList = windowManager.refreshWindows()
+        let t1 = CACurrentMediaTime()
+        logDebug("TIMING: [t=\(Int((t1 - t0) * 1000))ms] refreshWindows done, \(windowList.count) windows")
+
         guard !windowList.isEmpty else {
             logDebug("showImmersiveOverlay: no windows found, aborting")
             return
         }
 
-        Task {
-            await windowManager.preloadThumbnails(count: windowList.count)
+        windowManager.preloadThumbnails(count: windowList.count)
+        let t2 = CACurrentMediaTime()
+        logDebug("TIMING: [t=\(Int((t2 - t0) * 1000))ms] preloadThumbnails done (capture=\(Int((t2 - t1) * 1000))ms)")
 
-            await MainActor.run {
-                let orderedIDs = windowManager.orderingEngine.orderedIDs
-                let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
-                let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
-                logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → ")), frontmostWindowID=\(windowManager.frontmostWindowID.map(String.init(describing:)) ?? "nil")")
-                overlayController.show(with: windowsWithThumbnails)
-                logDebug("showImmersiveOverlay: overlay shown with \(windowsWithThumbnails.count) windows")
-            }
-        }
+        let orderedIDs = windowManager.orderingEngine.orderedIDs
+        let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
+        let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
+        logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → ")), frontmostWindowID=\(windowManager.frontmostWindowID.map(String.init(describing:)) ?? "nil")")
+        overlayController.show(with: windowsWithThumbnails)
+        let t3 = CACurrentMediaTime()
+        logDebug("TIMING: [t=\(Int((t3 - t0) * 1000))ms] overlay shown (UI=\(Int((t3 - t2) * 1000))ms, total=\(Int((t3 - t0) * 1000))ms)")
     }
 
     // MARK: - Quick switch mode
