@@ -129,6 +129,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var elasticDragToggleView: MenuItemView?
     private weak var hintShakeToggleView: MenuItemView?
     private weak var displacementLabelView: MenuItemView?
+    private weak var threeFingerTapToggleView: MenuItemView?
+    private weak var threeFingerSwipeUpToggleView: MenuItemView?
 
     private let menu: NSMenu = {
         let m = NSMenu()
@@ -208,7 +210,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         // Mode toggles
-        let immersiveItem = makeToggleItem(title: "沉浸式预览模式",
+        let immersiveItem = makeToggleItem(title: "沉浸预览模式",
                                             isOn: AppSettings.shared.immersiveModeEnabled) {
             AppSettings.shared.immersiveModeEnabled.toggle()
             self.immersiveToggleView?.isOn = AppSettings.shared.immersiveModeEnabled
@@ -236,6 +238,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         // Elastic drag settings submenu
         buildElasticSubmenu()
+
+        // Activation submenu
+        buildActivationSubmenu()
 
         menu.addItem(.separator())
 
@@ -309,6 +314,32 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         // Parent — standard NSMenuItem for native submenu tracking (hover auto-open)
         let parentItem = NSMenuItem(title: "弹性拖拽设置", action: nil, keyEquivalent: "")
+        parentItem.submenu = sub
+        parentItem.image = menuIndentImage()
+        menu.addItem(parentItem)
+    }
+
+    private func buildActivationSubmenu() {
+        let sub = NSMenu()
+        sub.autoenablesItems = false
+
+        let tapToggle = makeToggleItem(title: "三指轻点",
+                                       isOn: AppSettings.shared.threeFingerTapEnabled) {
+            AppSettings.shared.threeFingerTapEnabled.toggle()
+            self.threeFingerTapToggleView?.isOn = AppSettings.shared.threeFingerTapEnabled
+        }
+        threeFingerTapToggleView = menuItemView(from: tapToggle)
+        sub.addItem(tapToggle)
+
+        let swipeUpToggle = makeToggleItem(title: "三指上扫",
+                                           isOn: AppSettings.shared.threeFingerSwipeUpEnabled) {
+            AppSettings.shared.threeFingerSwipeUpEnabled.toggle()
+            self.threeFingerSwipeUpToggleView?.isOn = AppSettings.shared.threeFingerSwipeUpEnabled
+        }
+        threeFingerSwipeUpToggleView = menuItemView(from: swipeUpToggle)
+        sub.addItem(swipeUpToggle)
+
+        let parentItem = NSMenuItem(title: "预览模式激活", action: nil, keyEquivalent: "")
         parentItem.submenu = sub
         parentItem.image = menuIndentImage()
         menu.addItem(parentItem)

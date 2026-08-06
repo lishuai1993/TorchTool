@@ -548,8 +548,36 @@ static void processContactData(int deviceIndex, void *data,
             float totalDisp = sqrtf(dispX * dispX + dispY * dispY);
             if (totalDisp > maxPostSettleDisp) maxPostSettleDisp = totalDisp;
 
-            // Only detect swipe if movement is sustained and in one direction
-            if (fabsf(dispX) >= swipeMinDisplacement && elapsed >= SETTLING_DURATION + swipeMinDuration) {
+            // Debug: log displacement values when there's significant vertical movement
+            // (rate-limited: once per 30 frames)
+            static int dbgFrame = 0;
+            if (fabsf(dispY) > swipeMinDisplacement * 0.2f || fabsf(dispX) > swipeMinDisplacement * 0.2f) {
+                if (++dbgFrame % 30 == 1) {
+                    ws_log("[WS-DBG] TRACK postSettle: dispX=%.4f dispY=%.4f |dX|=%.4f |dY|=%.4f "
+                           "swipeMinDisp=%.4f elapsed=%.0fms\n",
+                           dispX, dispY, fabsf(dispX), fabsf(dispY),
+                           swipeMinDisplacement, (timestamp - settlingEndTime) * 1000);
+                }
+            }
+
+            // Only detect swipe if movement is sustained and in one direction.
+            // Check vertical first — if the dominant axis is Y (up), fire swipe-up.
+            // Otherwise check horizontal for left/right.
+            if (dispY > swipeMinDisplacement && fabsf(dispY) > fabsf(dispX)
+                && elapsed >= SETTLING_DURATION + swipeMinDuration) {
+                gState = GS_SWIPING;
+                swipeActionFired = true;
+                userCallback(GestureThreeFingerSwipeUp, 1.0);
+                ws_log("[WS-DBG] GESTURE: Three-finger swipe UP [session=%d] (dispY=%.4f)\n",
+                       gestureSessionID, dispY);
+            } else if (dispY < -swipeMinDisplacement && fabsf(dispY) > fabsf(dispX)
+                       && elapsed >= SETTLING_DURATION + swipeMinDuration) {
+                gState = GS_SWIPING;
+                swipeActionFired = true;
+                userCallback(GestureThreeFingerSwipeDown, 1.0);
+                ws_log("[WS-DBG] GESTURE: Three-finger swipe DOWN [session=%d] (dispY=%.4f)\n",
+                       gestureSessionID, dispY);
+            } else if (fabsf(dispX) >= swipeMinDisplacement && elapsed >= SETTLING_DURATION + swipeMinDuration) {
                 gState = GS_SWIPING;
                 swipeActionFired = true;
                 if (dispX > 0) {

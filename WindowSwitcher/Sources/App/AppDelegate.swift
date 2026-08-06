@@ -228,8 +228,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 overlayController.selectFocused()
                 return
             }
-            guard settings.immersiveModeEnabled else { return }
+            guard settings.immersiveModeEnabled, settings.threeFingerTapEnabled else { return }
             showImmersiveOverlay()
+
+        case .threeFingerSwipeUp:
+            logDebug("GESTURE: threeFingerSwipeUp, overlayVisible=\(overlayController.isVisible)")
+            windowManager.isGestureActive = false
+            if elasticDragInProgress {
+                logDebug("ElasticDrag: swipeUp intercepted [session=\(elasticDragSessionID)], triggering spring-back")
+                finishElasticDrag()
+                return
+            }
+            if overlayController.isVisible { return }
+            guard settings.immersiveModeEnabled, settings.threeFingerSwipeUpEnabled else { return }
+            showImmersiveOverlay()
+
+        case .threeFingerSwipeDown:
+            logDebug("GESTURE: threeFingerSwipeDown, overlayVisible=\(overlayController.isVisible)")
+            windowManager.isGestureActive = false
+            if overlayController.isVisible {
+                overlayController.hide()
+                return
+            }
 
         case .threeFingerSwipeLeft:
             windowManager.isGestureActive = true

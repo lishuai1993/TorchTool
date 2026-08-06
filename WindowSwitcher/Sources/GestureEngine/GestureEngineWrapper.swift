@@ -4,6 +4,8 @@ enum GestureEvent {
     case threeFingerTap
     case threeFingerSwipeLeft
     case threeFingerSwipeRight
+    case threeFingerSwipeUp
+    case threeFingerSwipeDown
     case swipeUpdate(progress: Float)  // signed: positive=right, negative=left
     case gestureEnd
 }
@@ -45,12 +47,11 @@ final class GestureEngine: @unchecked Sendable {
             return true
         }
         let settings = AppSettings.shared
-        gesture_engine_set_sensitivity(
-            Float(settings.tapMaxDuration),
-            settings.tapMaxDisplacement,
-            settings.swipeMinDisplacement,
-            0.05
-        )
+        let tapMaxD = Float(settings.tapMaxDuration)
+        let tapMaxDisp = settings.tapMaxDisplacement
+        let swipeMinDisp = settings.swipeMinDisplacement
+        logDebug("GestureEngine: sensitivity — tapMaxDur=\(tapMaxD) tapMaxDisp=\(tapMaxDisp) swipeMinDisp=\(swipeMinDisp)")
+        gesture_engine_set_sensitivity(tapMaxD, tapMaxDisp, swipeMinDisp, 0.05)
         logDebug("GestureEngine: starting C engine (MultitouchSupport)...")
         let logPath = "/Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt"
         gesture_engine_set_log_path(logPath)
@@ -93,6 +94,12 @@ final class GestureEngine: @unchecked Sendable {
             case GestureThreeFingerSwipeRight:
                 event = .threeFingerSwipeRight
                 logDebug("GestureEngine(C): SWIPE RIGHT detected")
+            case GestureThreeFingerSwipeUp:
+                event = .threeFingerSwipeUp
+                logDebug("GestureEngine(C): SWIPE UP detected")
+            case GestureThreeFingerSwipeDown:
+                event = .threeFingerSwipeDown
+                logDebug("GestureEngine(C): SWIPE DOWN detected")
             case GestureSwipeUpdate:
                 event = .swipeUpdate(progress: progress)
             case GestureEnd:

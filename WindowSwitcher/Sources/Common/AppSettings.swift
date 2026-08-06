@@ -47,6 +47,14 @@ final class AppSettings: ObservableObject {
     @Published var sensitivityLevel: Int {
         didSet { defaults.set(sensitivityLevel, forKey: Keys.sensitivityLevel) }
     }
+    /// 三指轻点激活沉浸预览模式
+    @Published var threeFingerTapEnabled: Bool {
+        didSet { defaults.set(threeFingerTapEnabled, forKey: Keys.threeFingerTapEnabled) }
+    }
+    /// 三指上扫激活沉浸预览模式
+    @Published var threeFingerSwipeUpEnabled: Bool {
+        didSet { defaults.set(threeFingerSwipeUpEnabled, forKey: Keys.threeFingerSwipeUpEnabled) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -110,6 +118,8 @@ final class AppSettings: ObservableObject {
             Keys.elasticDragEnabled: Constants.defaultElasticDragEnabled,
             Keys.hintShakeEnabled: Constants.defaultHintShakeEnabled,
             Keys.elasticDragMaxDisplacement: Constants.defaultElasticDragMaxDisplacement,
+            Keys.threeFingerTapEnabled: true,
+            Keys.threeFingerSwipeUpEnabled: false,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -128,6 +138,8 @@ final class AppSettings: ObservableObject {
         _elasticDragEnabled = .init(initialValue: defaults.bool(forKey: Keys.elasticDragEnabled))
         _hintShakeEnabled = .init(initialValue: defaults.bool(forKey: Keys.hintShakeEnabled))
         _elasticDragMaxDisplacement = .init(initialValue: defaults.integer(forKey: Keys.elasticDragMaxDisplacement))
+        _threeFingerTapEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerTapEnabled))
+        _threeFingerSwipeUpEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerSwipeUpEnabled))
     }
 
     func resetToDefaults() {
@@ -147,6 +159,8 @@ final class AppSettings: ObservableObject {
         elasticDragEnabled = Constants.defaultElasticDragEnabled
         hintShakeEnabled = Constants.defaultHintShakeEnabled
         elasticDragMaxDisplacement = Constants.defaultElasticDragMaxDisplacement
+        threeFingerTapEnabled = true
+        threeFingerSwipeUpEnabled = false
     }
 }
 
@@ -164,6 +178,8 @@ private enum Keys {
     static let quickSwitchHintEnabled = "quickSwitchHintEnabled"
     static let cyclicScrollEnabled = "cyclicScrollEnabled"
     static let sensitivityLevel = "sensitivityLevel"
+    static let threeFingerTapEnabled = "threeFingerTapEnabled"
+    static let threeFingerSwipeUpEnabled = "threeFingerSwipeUpEnabled"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

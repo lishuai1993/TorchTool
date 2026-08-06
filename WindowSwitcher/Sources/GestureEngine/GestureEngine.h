@@ -9,6 +9,8 @@ typedef enum {
     GestureThreeFingerTap,
     GestureThreeFingerSwipeLeft,
     GestureThreeFingerSwipeRight,
+    GestureThreeFingerSwipeUp,
+    GestureThreeFingerSwipeDown,
     GestureSwipeUpdate,   // ongoing swipe, signed progress (right=+, left=-)
     GestureEnd,           // fingers lifted, gesture finished
 } GestureType;
