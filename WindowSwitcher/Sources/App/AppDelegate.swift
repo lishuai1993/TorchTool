@@ -222,10 +222,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 finishElasticDrag()
                 return
             }
+            if overlayController.isVisible {
+                overlayController.selectFocused()
+                return
+            }
             guard settings.immersiveModeEnabled else { return }
             showImmersiveOverlay()
 
         case .threeFingerSwipeLeft:
+            if overlayController.isVisible {
+                overlayController.moveFocusRight()
+                return
+            }
             if elasticDragInProgress {
                 logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -237,6 +245,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             quickSwitch(directionRight: true)
 
         case .threeFingerSwipeRight:
+            if overlayController.isVisible {
+                overlayController.moveFocusLeft()
+                return
+            }
             if elasticDragInProgress {
                 logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -250,6 +262,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .swipeUpdate(let progress):
             if overlayController.isVisible {
                 overlayController.updateProgress(abs(progress))
+                return
             }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
             let dirRight = progress < 0
@@ -302,12 +315,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             logDebug("showImmersiveOverlay: no windows found, aborting")
             return
         }
-        windowManager.preloadThumbnails(
-            count: min(windowList.count, AppSettings.shared.maxVisibleCount)
-        )
-        let updatedList = windowManager.refreshWindows()
-        overlayController.show(with: updatedList)
-        logDebug("showImmersiveOverlay: overlay shown with \(updatedList.count) windows")
+        windowManager.preloadThumbnails(count: windowList.count)
+        let orderedIDs = windowManager.orderingEngine.orderedIDs
+        let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
+        overlayController.show(with: windowsWithThumbnails)
+        logDebug("showImmersiveOverlay: overlay shown with \(windowsWithThumbnails.count) windows")
     }
 
     // MARK: - Quick switch mode

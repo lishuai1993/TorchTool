@@ -1,46 +1,48 @@
 import SwiftUI
 
 struct OverlayView: View {
+    @ObservedObject var viewModel: OverlayViewModel
     @ObservedObject var settings = AppSettings.shared
-
-    let windows: [WindowInfo]
-    @Binding var focusedIndex: Int
 
     var onSelect: ((WindowInfo) -> Void)?
     var onDismiss: (() -> Void)?
 
-    @State private var hoveredIndex: Int? = nil
-
     var body: some View {
         ZStack {
-            // Full-screen dimming background
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
                 .onTapGesture { onDismiss?() }
 
-            // Centered thumbnail strip
             thumbnailStrip
         }
-        .onAppear { focusedIndex = windows.count / 2 }
     }
 
     // MARK: - Thumbnail Strip
 
     private var thumbnailStrip: some View {
-        VStack(spacing: 4) {
+        let displayIdx = viewModel.displayIndex
+
+        return VStack(spacing: 4) {
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: settings.thumbnailSpacing) {
-                        ForEach(Array(windows.enumerated()), id: \.element.id) { idx, window in
+                        ForEach(Array(viewModel.windows.enumerated()), id: \.element.id) { idx, window in
                             ThumbnailCard(
                                 window: window,
-                                isFocused: idx == (hoveredIndex ?? focusedIndex),
+                                isFocused: idx == displayIdx,
                                 settings: settings
                             )
+                            .frame(
+                                width: thumbnailWidth(for: window, height: settings.thumbnailHeight),
+                                height: settings.thumbnailHeight
+                            )
                             .id(idx)
-                            .onTapGesture { onSelect?(window) }
+                            .onTapGesture {
+                                viewModel.focusedIndex = idx
+                                onSelect?(window)
+                            }
                             .onHover { hovering in
-                                hoveredIndex = hovering ? idx : nil
+                                viewModel.hoveredIndex = hovering ? idx : nil
                             }
                         }
                     }
@@ -48,19 +50,19 @@ struct OverlayView: View {
                     .padding(.vertical, 16)
                 }
                 .frame(maxWidth: .infinity)
-                .onChange(of: focusedIndex) { _, newIdx in
+                .onChange(of: viewModel.focusedIndex) { _, newIdx in
                     withAnimation(.easeOut(duration: settings.animationDuration)) {
                         proxy.scrollTo(newIdx, anchor: .center)
                     }
                 }
             }
 
-            // Window title hint
-            if let idx = hoveredIndex ?? (focusedIndex < windows.count ? focusedIndex : nil),
-               idx < windows.count {
-                Text(windows[idx].windowTitle.isEmpty
-                     ? windows[idx].ownerName
-                     : "\(windows[idx].ownerName) — \(windows[idx].windowTitle)")
+            if let idx = viewModel.hoveredIndex ?? (displayIdx < viewModel.windows.count ? displayIdx : nil),
+               idx < viewModel.windows.count {
+                let w = viewModel.windows[idx]
+                Text(w.windowTitle.isEmpty
+                     ? w.ownerName
+                     : "\(w.ownerName) — \(w.windowTitle)")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.white.opacity(0.9))
                     .lineLimit(1)
@@ -82,7 +84,20 @@ struct OverlayView: View {
                 .stroke(Color.white.opacity(0.15), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.3), radius: 30, y: 10)
-        .padding(.horizontal, 60)
+        .padding(.horizontal, 20)
+    }
+
+    // MARK: - Thumbnail Sizing
+
+    private func thumbnailWidth(for window: WindowInfo, height: CGFloat) -> CGFloat {
+        let ratio: CGFloat
+        if let thumb = window.thumbnail {
+            ratio = thumb.size.width / thumb.size.height
+        } else {
+            ratio = 1.6
+        }
+        let w = height * ratio
+        return min(max(w, height * 0.8), settings.thumbnailMaxWidth)
     }
 }
 
@@ -103,7 +118,6 @@ struct ThumbnailCard: View {
                 placeholderView
             }
         }
-        .frame(height: settings.thumbnailHeight)
         .clipShape(RoundedRectangle(cornerRadius: settings.thumbnailCornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: settings.thumbnailCornerRadius)
@@ -129,7 +143,6 @@ struct ThumbnailCard: View {
     private var placeholderView: some View {
         RoundedRectangle(cornerRadius: settings.thumbnailCornerRadius)
             .fill(Color.gray.opacity(0.3))
-            .frame(width: settings.thumbnailHeight * 1.6) // 16:10-ish aspect
             .overlay(
                 VStack(spacing: 4) {
                     Image(systemName: "macwindow")
