@@ -15,12 +15,11 @@ TARGET         := $(ARCH)-apple-macos14.0
 SIGN_IDENTITY  ?= Apple Development: 1807819314@qq.com (84298355F8)
 
 SWIFT_SOURCES  := $(shell find Sources -name '*.swift')
-C_SOURCES      := Sources/GestureEngine/GestureEngine.c \
-                  Sources/WindowManager/WindowCapture.c
+C_SOURCES      := Sources/GestureEngine/GestureEngine.c
 C_OBJECTS      := $(patsubst Sources/%.c,$(BUILD_DIR)/%.o,$(C_SOURCES))
 BRIDGING_HDR   := Sources/bridging-header.h
 
-FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics
+FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics -framework ScreenCaptureKit
 
 # ──────────────────────────────────────────────────
 # Top-level targets

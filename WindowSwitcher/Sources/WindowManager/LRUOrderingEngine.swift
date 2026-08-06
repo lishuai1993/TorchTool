@@ -112,20 +112,31 @@ final class LRUOrderingEngine {
     /// Moves the window to the front of the LRU list and resets cursor to 0.
     func windowDidInteract(_ id: CGWindowID) {
         lastInteraction[id] = Date()
-        guard let idx = orderedIDs.firstIndex(of: id), idx > 0 else { return }
-        orderedIDs.remove(at: idx)
-        orderedIDs.insert(id, at: 0)
-        currentIndex = 0
-        logDebug("LRU: interact [\(windowNames[id] ?? "?")] → moved to [0], cursor reset")
+        guard let idx = orderedIDs.firstIndex(of: id) else {
+            logDebug("LRU-INTERACT: id=\(id) name=\(windowNames[id] ?? "?") NOT FOUND in orderedIDs (count=\(orderedIDs.count))")
+            return
+        }
+        let before = orderedIDs.prefix(5).compactMap { windowNames[$0] }.joined(separator: " → ")
+        if idx > 0 {
+            orderedIDs.remove(at: idx)
+            orderedIDs.insert(id, at: 0)
+            currentIndex = 0
+            let after = orderedIDs.prefix(5).compactMap { windowNames[$0] }.joined(separator: " → ")
+            logDebug("LRU-INTERACT: [\(windowNames[id] ?? "?")] idx=\(idx)→0, before=[\(before)], after=[\(after)]")
+        } else {
+            logDebug("LRU-INTERACT: [\(windowNames[id] ?? "?")] already at idx=0, no-op. order=[\(before)]")
+        }
     }
 
     /// Call when the user explicitly selects a window from the overlay.
     /// Does NOT reorder — only positions the cursor at the activated window.
     func userDidSelectWindow(_ id: CGWindowID) {
+        let before = orderedIDs.prefix(5).compactMap { windowNames[$0] }.joined(separator: " → ")
         if let idx = orderedIDs.firstIndex(of: id) {
             currentIndex = idx
         }
-        logDebug("LRU: activated [\(windowNames[id] ?? "?")] → cursor at [\(currentIndex)]")
+        let after = orderedIDs.prefix(5).compactMap { windowNames[$0] }.joined(separator: " → ")
+        logDebug("LRU-SELECT: [\(windowNames[id] ?? "?")] cursor→\(currentIndex), order=[\(before)] (unchanged=\(before == after))")
     }
 
     // MARK: - Relative navigation

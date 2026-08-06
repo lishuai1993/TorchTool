@@ -15,16 +15,19 @@ final class WindowManager: @unchecked Sendable {
     /// Current frontmost window ID.
     private(set) var frontmostWindowID: CGWindowID?
 
-    /// Event tap for detecting substantial interaction.
-    private var eventTap: CFMachPort?
+    private var scrollMonitor: Any?
+    private var interactionMonitor: Any?
 
     /// Callback invoked when a window receives substantial interaction.
     var onInteraction: ((CGWindowID) -> Void)?
 
-    /// Callback invoked on trackpad scroll/swipe events. Used ONLY as a
-    /// "trackpad is in use" signal for the gesture-engine watchdog — it must
-    /// NOT go through windowDidInteract (a swipe would reset the LRU cursor).
+    /// Callback invoked on trackpad scroll/swipe events.
     var onTrackpadActivity: (() -> Void)?
+
+    /// Set by AppDelegate when a three-finger gesture is in progress.
+    /// When true, scroll events are treated as gesture artifacts and do NOT
+    /// trigger windowDidInteract (they would reset the LRU cursor mid-swipe).
+    var isGestureActive = false
 
     /// Per-app z-ordered window list (CGWindowID + frame) from the most recent
     /// refresh, in CGWindowList order (frontmost first). Used to correlate a
@@ -45,11 +48,13 @@ final class WindowManager: @unchecked Sendable {
                 logDebug("ActivationHistory: suppressed programmatic activation pid=\(pid)")
                 return
             }
-            // Real user activation (Cmd+Tab, Dock click) — reorder the list.
+            // Real user activation (Cmd+Tab, Dock click) — record focus
+            // but do NOT reorder. Only substantial interaction (click/type)
+            // triggers windowDidInteract → reorder.
             if let topWindowID = self.orderingEngine.orderedIDs.first(where: { id in
                 self.windows[id]?.ownerPid == pid
             }) {
-                self.orderingEngine.moveToFront(topWindowID)
+                self.orderingEngine.windowDidFocus(topWindowID)
             }
             // Refresh the frontmost-window cache so the event tap's
             // windowDidInteract reorders the window the user is ACTUALLY in.
@@ -120,14 +125,20 @@ final class WindowManager: @unchecked Sendable {
         return orderedIDs.compactMap { newWindows[$0] }
     }
 
-    /// Capture a thumbnail for a single window.
-    func captureThumbnail(for windowID: CGWindowID) -> NSImage? {
+    /// Capture a thumbnail for a single window using ScreenCaptureKit.
+    func captureThumbnail(for windowID: CGWindowID) async -> NSImage? {
         if let cached = windows[windowID]?.thumbnail { return cached }
 
-        let cgImageUnmanaged = WindowSwitcher_CaptureWindowImage(windowID)
-        guard let cgImage = cgImageUnmanaged?.takeRetainedValue() else {
+        guard let content = await WindowCaptureManager.shared.getShareableContent() else {
             return nil
         }
+
+        guard let cgImage = await WindowCaptureManager.shared.captureImage(
+            windowID: windowID, shareableContent: content
+        ) else {
+            return nil
+        }
+
         let nsImage = NSImage(cgImage: cgImage, size: NSSize(
             width: cgImage.width,
             height: cgImage.height
@@ -137,11 +148,16 @@ final class WindowManager: @unchecked Sendable {
     }
 
     /// Preload thumbnails for the top N windows.
-    func preloadThumbnails(count: Int) {
-        let ids = orderingEngine.orderedIDs.prefix(count)
+    func preloadThumbnails(count: Int) async {
+        WindowCaptureManager.shared.invalidateContentCache()
+        let ids = Array(orderingEngine.orderedIDs.prefix(count))
+        var successCount = 0
         for id in ids {
-            _ = captureThumbnail(for: id)
+            if await captureThumbnail(for: id) != nil {
+                successCount += 1
+            }
         }
+        logDebug("WindowManager: preloadThumbnails count=\(count) ids.count=\(ids.count) success=\(successCount)")
     }
 
     /// Activate (bring to front) a window.
@@ -239,90 +255,53 @@ final class WindowManager: @unchecked Sendable {
             logDebug("ACTIVATE-DIAG: skipping app.activate() (already active or needsActivate=false) for [\(info.ownerName)]")
         }
 
-        // Keep the event tap's windowDidInteract pointing at the real frontmost
-        // window so editing after a gesture reorders the correct window.
         frontmostWindowID = windowID
-
+        let idxBefore = orderingEngine.index(of: windowID)
         orderingEngine.userDidSelectWindow(windowID)
+        logDebug("ACTIVATE-DONE: window=\(info.ownerName) — \(info.windowTitle) idx=\(idxBefore.map(String.init(describing:)) ?? "nil") cursorAfter=\(orderingEngine.orderedIDs.firstIndex(of: windowID).map(String.init(describing:)) ?? "nil") orderedIDs[0]=\(orderingEngine.windowNames[orderingEngine.orderedIDs.first!] ?? "?") isActivating=\(isActivating)")
     }
 
-    // MARK: - Interaction event tap
+    // MARK: - Interaction monitoring
 
     func startInteractionMonitoring() -> Bool {
-        // Start activation history tracking (no permission required)
         activationHistory.start()
 
-        // Check Accessibility permission first
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue(): false]
-        let trusted = AXIsProcessTrustedWithOptions(options)
-        logDebug("WindowManager: AXIsProcessTrusted = \(trusted)")
-
-        if !trusted {
-            logDebug("WindowManager: Accessibility NOT granted, skipping event tap. Event tap requires Accessibility permission.")
-            return false
+        // Scroll monitor: trackpad activity watchdog + real-scroll reorder.
+        scrollMonitor = NSEvent.addGlobalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            guard let self else { return }
+            self.onTrackpadActivity?()
+            guard !self.isGestureActive,
+                  let frontID = self.frontmostWindowID,
+                  !self.isActivating else { return }
+            DispatchQueue.main.async {
+                self.orderingEngine.windowDidInteract(frontID)
+                self.onInteraction?(frontID)
+            }
         }
 
-        let eventMask: CGEventMask = (
-            (1 << CGEventType.leftMouseDown.rawValue) |
-            (1 << CGEventType.rightMouseDown.rawValue) |
-            (1 << CGEventType.keyDown.rawValue) |
-            (1 << CGEventType.scrollWheel.rawValue)
-        )
-        // scrollWheel is handled SEPARATELY below: macOS converts three-finger
-        // trackpad swipes into scroll events, which must NOT trigger
-        // windowDidInteract (it would reset the LRU cursor). Scroll events only
-        // signal the gesture-engine watchdog that the trackpad is in use.
-
-        logDebug("WindowManager: creating CGEvent tap...")
-        let tap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
-            place: .headInsertEventTap,
-            options: .listenOnly,
-            eventsOfInterest: eventMask,
-            callback: { (_, type, event, _) -> Unmanaged<CGEvent>? in
-                if type == .scrollWheel {
-                    // Trackpad scroll / swipe — watchdog signal only. Do NOT
-                    // call windowDidInteract (would reset the LRU cursor).
-                    WindowManager.shared.onTrackpadActivity?()
-                    return Unmanaged.passUnretained(event)
-                }
-                if let frontID = WindowManager.shared.frontmostWindowID {
-                    DispatchQueue.main.async {
-                        guard !WindowManager.shared.isActivating else { return }
-                        WindowManager.shared.orderingEngine.windowDidInteract(frontID)
-                        WindowManager.shared.onInteraction?(frontID)
-                    }
-                }
-                return Unmanaged.passUnretained(event)
-            },
-            userInfo: nil
-        )
-
-        guard let tap = tap else {
-            logDebug("WindowManager: CGEvent.tapCreate returned nil (likely permission denied)")
-            return false
+        // Interaction monitor: clicks on windows trigger reorder.
+        interactionMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown]
+        ) { [weak self] _ in
+            guard let self,
+                  let frontID = self.frontmostWindowID,
+                  !self.isActivating else { return }
+            DispatchQueue.main.async {
+                self.orderingEngine.windowDidInteract(frontID)
+                self.onInteraction?(frontID)
+            }
         }
 
-        let runLoopSource = CFMachPortCreateRunLoopSource(
-            kCFAllocatorDefault, tap, 0
-        )
-        CFRunLoopAddSource(
-            CFRunLoopGetMain(), runLoopSource, .commonModes
-        )
-        CGEvent.tapEnable(tap: tap, enable: true)
-        eventTap = tap
-        logDebug("WindowManager: event tap created and enabled OK")
+        logDebug("WindowManager: NSEvent monitors registered OK")
         return true
     }
 
     func stopInteractionMonitoring() {
+        if let m = scrollMonitor { NSEvent.removeMonitor(m); scrollMonitor = nil }
+        if let m = interactionMonitor { NSEvent.removeMonitor(m); interactionMonitor = nil }
         axFocusObserver.stopObserving()
         activationHistory.stop()
-        if let tap = eventTap {
-            CGEvent.tapEnable(tap: tap, enable: false)
-            eventTap = nil
-            logDebug("WindowManager: event tap stopped")
-        }
+        logDebug("WindowManager: interaction monitoring stopped")
     }
 
     /// Clear the thumbnail cache.

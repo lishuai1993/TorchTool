@@ -6,6 +6,7 @@ final class OverlayWindowController {
 
     private var panel: NSPanel?
     private let viewModel = OverlayViewModel()
+    private var localKeyMonitor: Any?
 
     var isVisible: Bool { panel?.isVisible ?? false }
 
@@ -24,10 +25,37 @@ final class OverlayWindowController {
         }
 
         viewModel.show(windows: windows)
+
+        NSApp.activate(ignoringOtherApps: true)
         panel?.makeKeyAndOrderFront(nil)
+
+        // Local event monitor for overlay keyboard navigation.
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+            switch event.keyCode {
+            case 53: // ESC
+                self.hide()
+                return nil
+            case 36: // Enter
+                self.selectFocused()
+                return nil
+            case 123: // Left arrow
+                self.viewModel.moveFocusLeft()
+                return nil
+            case 124: // Right arrow
+                self.viewModel.moveFocusRight()
+                return nil
+            default:
+                return event
+            }
+        }
     }
 
     func hide() {
+        if let m = localKeyMonitor {
+            NSEvent.removeMonitor(m)
+            localKeyMonitor = nil
+        }
         panel?.orderOut(nil)
         viewModel.hide()
         onDismiss?()
@@ -36,15 +64,18 @@ final class OverlayWindowController {
     // MARK: - Navigation
 
     func moveFocusRight() {
+        logDebug("OVERLAY-CTRL: moveFocusRight, windows=\(viewModel.windows.count), focusedIndex=\(viewModel.focusedIndex)")
         viewModel.moveFocusRight()
     }
 
     func moveFocusLeft() {
+        logDebug("OVERLAY-CTRL: moveFocusLeft, windows=\(viewModel.windows.count), focusedIndex=\(viewModel.focusedIndex)")
         viewModel.moveFocusLeft()
     }
 
     func selectFocused() {
         guard let window = viewModel.selectFocused() else { return }
+        logDebug("OVERLAY-SELECT: window=\(window.ownerName) — \(window.windowTitle)")
         hide()
         WindowManager.shared.activateWindow(window.id)
         onWindowSelected?(window)
@@ -76,6 +107,7 @@ final class OverlayWindowController {
         let overlayView = OverlayView(
             viewModel: viewModel,
             onSelect: { [weak self] window in
+                logDebug("OVERLAY-CLICK: window=\(window.ownerName) — \(window.windowTitle)")
                 self?.hide()
                 WindowManager.shared.activateWindow(window.id)
                 self?.onWindowSelected?(window)

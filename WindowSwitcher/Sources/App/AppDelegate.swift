@@ -217,6 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         switch event {
         case .threeFingerTap:
+            windowManager.isGestureActive = false
             if elasticDragInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDragSessionID)], triggering spring-back")
                 finishElasticDrag()
@@ -230,6 +231,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             showImmersiveOverlay()
 
         case .threeFingerSwipeLeft:
+            windowManager.isGestureActive = true
             if overlayController.isVisible {
                 overlayController.moveFocusRight()
                 return
@@ -245,6 +247,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             quickSwitch(directionRight: true)
 
         case .threeFingerSwipeRight:
+            windowManager.isGestureActive = true
             if overlayController.isVisible {
                 overlayController.moveFocusLeft()
                 return
@@ -260,6 +263,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             quickSwitch(directionRight: false)
 
         case .swipeUpdate(let progress):
+            windowManager.isGestureActive = true
             if overlayController.isVisible {
                 overlayController.updateProgress(abs(progress))
                 return
@@ -280,6 +284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
         case .gestureEnd:
+            windowManager.isGestureActive = false
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDragInProgress), session=\(elasticDragSessionID)")
             if elasticDragInProgress {
                 finishElasticDrag()
@@ -315,11 +320,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             logDebug("showImmersiveOverlay: no windows found, aborting")
             return
         }
-        windowManager.preloadThumbnails(count: windowList.count)
-        let orderedIDs = windowManager.orderingEngine.orderedIDs
-        let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
-        overlayController.show(with: windowsWithThumbnails)
-        logDebug("showImmersiveOverlay: overlay shown with \(windowsWithThumbnails.count) windows")
+
+        Task {
+            await windowManager.preloadThumbnails(count: windowList.count)
+
+            await MainActor.run {
+                let orderedIDs = windowManager.orderingEngine.orderedIDs
+                let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
+                let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
+                logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → ")), frontmostWindowID=\(windowManager.frontmostWindowID.map(String.init(describing:)) ?? "nil")")
+                overlayController.show(with: windowsWithThumbnails)
+                logDebug("showImmersiveOverlay: overlay shown with \(windowsWithThumbnails.count) windows")
+            }
+        }
     }
 
     // MARK: - Quick switch mode
