@@ -11,6 +11,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowManager = WindowManager.shared
     private let overlayController = OverlayWindowController.shared
     private let menuBar = MenuBarController.shared
+    private let elasticDrag = ElasticDragController.shared
+    private let immersiveOverlay = ImmersiveOverlayCoordinator.shared
     // MARK: - NSApplicationDelegate
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -154,6 +156,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         gestureEngine.onGesture = { [weak self] event in
             self?.handleGesture(event)
         }
+        elasticDrag.onShowHint = { [weak self] windowID in
+            self?.showQuickSwitchHint(for: windowID)
+        }
+        elasticDrag.onShakeHint = { [weak self] in
+            guard let hint = self?.hintWindow else { return }
+            let hintOrigin = hint.frame.origin
+            let offsets: [CGFloat] = [-8, 8, -6, 6, 0]
+            var delay: Double = 0
+            for offset in offsets {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    hint.setFrameOrigin(NSPoint(x: hintOrigin.x + offset, y: hintOrigin.y))
+                }
+                delay += 0.06
+            }
+        }
     }
 
     // MARK: - Single instance enforcement
@@ -214,9 +231,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerTap:
             logDebug("GESTURE: threeFingerTap, overlayVisible=\(overlayController.isVisible)")
             windowManager.isGestureActive = false
-            if elasticDragInProgress {
-                logDebug("ElasticDrag: tap intercepted [session=\(elasticDragSessionID)], triggering spring-back")
-                finishElasticDrag()
+            if elasticDrag.isInProgress {
+                logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
+                elasticDrag.finishDrag()
                 return
             }
             if overlayController.isVisible {
@@ -224,19 +241,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
             guard settings.immersiveModeEnabled, settings.threeFingerTapEnabled else { return }
-            showImmersiveOverlay()
+            immersiveOverlay.show()
 
         case .threeFingerSwipeUp:
             logDebug("GESTURE: threeFingerSwipeUp, overlayVisible=\(overlayController.isVisible)")
             windowManager.isGestureActive = false
-            if elasticDragInProgress {
-                logDebug("ElasticDrag: swipeUp intercepted [session=\(elasticDragSessionID)], triggering spring-back")
-                finishElasticDrag()
+            if elasticDrag.isInProgress {
+                logDebug("ElasticDrag: swipeUp intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
+                elasticDrag.finishDrag()
                 return
             }
             if overlayController.isVisible { return }
             guard settings.immersiveModeEnabled, settings.threeFingerSwipeUpEnabled else { return }
-            showImmersiveOverlay()
+            immersiveOverlay.show()
 
         case .threeFingerSwipeDown:
             logDebug("GESTURE: threeFingerSwipeDown, overlayVisible=\(overlayController.isVisible)")
@@ -249,11 +266,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeLeft:
             windowManager.isGestureActive = true
             guard !overlayController.isVisible else { return }
-            if elasticDragInProgress {
-                logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
+            if elasticDrag.isInProgress {
+                logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
             guard settings.quickSwitchModeEnabled else { return }
-            if !settings.cyclicScrollEnabled && isAtBoundary(directionRight: true) {
+            if !settings.cyclicScrollEnabled && elasticDrag.isAtBoundary(directionRight: true) {
                 logDebug("ElasticDrag: swipeLeft at boundary, skipping quickSwitch")
                 return
             }
@@ -262,11 +279,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeRight:
             windowManager.isGestureActive = true
             guard !overlayController.isVisible else { return }
-            if elasticDragInProgress {
-                logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDragSessionID)] — gestureEnd/tap was NOT received before next swipe action!")
+            if elasticDrag.isInProgress {
+                logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
             guard settings.quickSwitchModeEnabled else { return }
-            if !settings.cyclicScrollEnabled && isAtBoundary(directionRight: false) {
+            if !settings.cyclicScrollEnabled && elasticDrag.isAtBoundary(directionRight: false) {
                 logDebug("ElasticDrag: swipeRight at boundary, skipping quickSwitch")
                 return
             }
@@ -277,112 +294,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard !overlayController.isVisible else { return }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
             let dirRight = progress < 0
-            if !elasticDragInProgress {
-                guard isAtBoundary(directionRight: dirRight) else { return }
+            if !elasticDrag.isInProgress {
+                guard elasticDrag.isAtBoundary(directionRight: dirRight) else { return }
                 if settings.elasticDragEnabled {
-                    logDebug("ElasticDrag: begin [session=\(elasticDragSessionID + 1)], progress=\(String(format: "%.3f", progress)), dirRight=\(dirRight)")
-                    beginElasticDrag()
+                    logDebug("ElasticDrag: begin [session=\(elasticDrag.sessionID + 1)], progress=\(String(format: "%.3f", progress)), dirRight=\(dirRight)")
+                    elasticDrag.beginElasticDrag()
                 } else {
-                    atBoundaryWithoutDrag = true
+                    elasticDrag.setBoundaryWithoutDrag()
                 }
             }
             if settings.elasticDragEnabled {
-                applyElasticDisplacement(progress: progress)
-                scheduleWatchdog(sid: elasticDragSessionID)
+                elasticDrag.applyDisplacement(progress: progress)
+                elasticDrag.scheduleWatchdog()
             }
 
         case .gestureEnd:
             windowManager.isGestureActive = false
-            elasticDragWatchdog?.cancel()
-            elasticDragWatchdog = nil
-            logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDragInProgress), session=\(elasticDragSessionID)")
-            if elasticDragInProgress {
-                finishElasticDrag()
-            } else if atBoundaryWithoutDrag {
-                atBoundaryWithoutDrag = false
+            elasticDrag.cancelWatchdog()
+            logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDrag.isInProgress), session=\(elasticDrag.sessionID)")
+            if elasticDrag.isInProgress {
+                elasticDrag.finishDrag()
+            } else if elasticDrag.hasBoundaryWithoutDrag {
+                elasticDrag.clearBoundaryWithoutDrag()
                 logDebug("ElasticDrag: gestureEnd — showing hint at boundary (drag disabled)")
-                if let currentID = windowManager.frontmostWindowID {
-                    showQuickSwitchHint(for: currentID)
-                }
-                if AppSettings.shared.hintShakeEnabled, let hint = hintWindow {
-                    let hintOrigin = hint.frame.origin
-                    let offsets: [CGFloat] = [-8, 8, -6, 6, 0]
-                    var delay: Double = 0
-                    for offset in offsets {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            hint.setFrameOrigin(NSPoint(x: hintOrigin.x + offset, y: hintOrigin.y))
-                        }
-                        delay += 0.06
-                    }
-                }
+                elasticDrag.handleBoundaryHint()
             } else {
                 logDebug("ElasticDrag: gestureEnd ignored — no drag in progress")
-            }
-        }
-    }
-
-    // MARK: - Immersive mode
-
-    private func showImmersiveOverlay() {
-        let t0 = CACurrentMediaTime()
-        logDebug("TIMING: [t=0ms] showImmersiveOverlay called")
-
-        let windowList = windowManager.refreshWindows()
-        let t1 = CACurrentMediaTime()
-        logDebug("TIMING: [t=\(Int((t1 - t0) * 1000))ms] refreshWindows done, \(windowList.count) windows")
-
-        guard !windowList.isEmpty else {
-            logDebug("showImmersiveOverlay: no windows found, aborting")
-            return
-        }
-
-        // Preload only visible windows synchronously, the rest in background
-        let visibleCount = min(AppSettings.shared.maxVisibleCount, windowList.count)
-        windowManager.preloadThumbnails(count: visibleCount)
-        let t2 = CACurrentMediaTime()
-        let cachedCount = windowList.prefix(visibleCount).filter { $0.thumbnail != nil }.count
-        logDebug("TIMING: [t=\(Int((t2 - t0) * 1000))ms] preload visible done (capture=\(Int((t2 - t1) * 1000))ms, hit=\(cachedCount), miss=\(visibleCount - cachedCount))")
-
-        let orderedIDs = windowManager.orderingEngine.orderedIDs
-        let windowsWithThumbnails = windowManager.orderedWindows
-        let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
-        logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → "))")
-        overlayController.show(with: windowsWithThumbnails)
-        let t3 = CACurrentMediaTime()
-        logDebug("TIMING: [t=\(Int((t3 - t0) * 1000))ms] overlay shown (UI=\(Int((t3 - t2) * 1000))ms, total=\(Int((t3 - t0) * 1000))ms)")
-
-        // Background: capture remaining windows
-        let remaining = windowList.count - visibleCount
-        if remaining > 0 {
-            logDebug("CAPTURE: background capture starting, remaining=\(remaining), overlay shown at t=\(Int((t3 - t0) * 1000))ms")
-            let remainingIDs = Array(orderedIDs.dropFirst(visibleCount))
-            // Snapshot names on main thread — orderingEngine.windowNames is not
-            // safe to read from a background queue.
-            var namesSnapshot: [CGWindowID: String] = [:]
-            for id in remainingIDs {
-                namesSnapshot[id] = windowManager.orderingEngine.windowNames[id] ?? "?"
-            }
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                guard let self else { return }
-                let bgStart = CACurrentMediaTime()
-                var captured: [(CGWindowID, NSImage)] = []
-                for id in remainingIDs {
-                    if let image = self.windowManager.captureRawImage(for: id, ownerName: namesSnapshot[id] ?? "?") {
-                        captured.append((id, image))
-                    }
-                }
-                let bgTotal = Int((CACurrentMediaTime() - bgStart) * 1000)
-                if !captured.isEmpty {
-                    DispatchQueue.main.async {
-                        for (id, image) in captured {
-                            self.windowManager.setThumbnail(image, for: id)
-                        }
-                        self.overlayController.refreshThumbnails()
-                        logDebug("CAPTURE: background capture complete, captured=\(captured.count)/\(remainingIDs.count), dt=\(bgTotal)ms")
-                    }
-                } else {
-                    logDebug("CAPTURE: background capture complete, captured=0/\(remainingIDs.count), dt=\(bgTotal)ms")
-                }
             }
         }
     }
@@ -390,8 +327,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Quick switch mode
 
     private func quickSwitch(directionRight: Bool) {
-        if elasticDragInProgress {
-            logDebug("ElasticDrag: BUG quickSwitch called while drag in progress [session=\(elasticDragSessionID)]!")
+        if elasticDrag.isInProgress {
+            logDebug("ElasticDrag: BUG quickSwitch called while drag in progress [session=\(elasticDrag.sessionID)]!")
         }
         let dirLabel = directionRight ? "→ 右滑" : "← 左滑"
         let windows = windowManager.refreshWindows()
@@ -416,7 +353,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logDebug("QuickSwitch: \(dirLabel) → 激活 [\(targetName)]")
 
         windowManager.activateWindow(target)
-        cachedBoundaryOrigin = nil  // left the boundary — clear cached origin
+        elasticDrag.clearBoundaryOrigin()  // left the boundary — clear cached origin
 
         let idsAfter = engine.orderedIDs
         let namesAfter = idsAfter.compactMap { engine.windowNames[$0] }.joined(separator: " → ")
@@ -430,215 +367,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Elastic drag (wall-bump)
-
-    /// Returns true if the cursor is at the boundary for the given swipe direction.
-    private func isAtBoundary(directionRight: Bool) -> Bool {
-        let engine = windowManager.orderingEngine
-        guard engine.count > 1 else {
-            logDebug("ElasticDrag: isAtBoundary → true (count=\(engine.count) ≤ 1)")
-            return true
-        }
-        let result = engine.isAtBoundary(directionRight: directionRight)
-        logDebug("ElasticDrag: isAtBoundary(dirRight=\(directionRight)) → \(result), count=\(engine.count)")
-        return result
-    }
-
-    private func beginElasticDrag() {
-        // Cancel any in-flight spring-back animation frames from a previous session.
-        springBackGeneration += 1
-        let gen = springBackGeneration
-
-        if elasticDragInProgress {
-            logDebug("ElasticDrag: begin WARNING — already in progress [session=\(elasticDragSessionID)], overwriting")
-        }
-
-        guard let currentID = windowManager.frontmostWindowID,
-              let info = windowManager.windows[currentID] else {
-            logDebug("ElasticDrag: begin FAILED [session=\(elasticDragSessionID + 1)] — no window info")
-            return
-        }
-        let app = AXUIElementCreateApplication(info.ownerPid)
-        var focusedWindow: CFTypeRef?
-        let axWin: AXUIElement?
-        if AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &focusedWindow) == .success,
-           let fw = focusedWindow {
-            axWin = (fw as! AXUIElement)
-        } else {
-            // Fall back to frame matching via shared enumeration.
-            let snapshots = windowManager.enumerateAXWindows(forPid: info.ownerPid)
-            let match = snapshots.first { WindowManager.frameMatches($0.frame, info.frame, tolerance: 2) }
-            axWin = match?.element
-        }
-        guard let axWin = axWin else {
-            logDebug("ElasticDrag: begin FAILED [session=\(elasticDragSessionID + 1)] — no AX window for pid=\(info.ownerPid)")
-            return
-        }
-
-        // Read the window's current position as the drag reference point.
-        // If a previous spring-back animation was mid-flight, the generation bump
-        // above already cancelled its remaining frames; we pick up from wherever
-        // the window currently sits — this gives natural frame continuation.
-        var posVal: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &posVal) == .success,
-              let pv = posVal else {
-            logDebug("ElasticDrag: begin FAILED [session=\(elasticDragSessionID + 1)] — no position for pid=\(info.ownerPid)")
-            return
-        }
-        var currentPos = CGPoint.zero
-        AXValueGetValue(pv as! AXValue, .cgPoint, &currentPos)
-
-        // On the very first boundary hit, capture the true original position.
-        // All subsequent spring-backs target this cached value — never drifts.
-        if cachedBoundaryOrigin == nil {
-            cachedBoundaryOrigin = currentPos
-            logDebug("ElasticDrag: cached boundary origin = (\(String(format: "%.1f", currentPos.x)), \(String(format: "%.1f", currentPos.y)))")
-        }
-
-        elasticDragSessionID += 1
-        elasticDragAxWindow = axWin
-        elasticDragOrigin = currentPos
-        elasticDragInProgress = true
-        logDebug("ElasticDrag: began [session=\(elasticDragSessionID)], gen=\(gen), dragRef=(\(String(format: "%.1f", currentPos.x)), \(String(format: "%.1f", currentPos.y))), cachedOrigin=(\(String(format: "%.1f", cachedBoundaryOrigin!.x)), \(String(format: "%.1f", cachedBoundaryOrigin!.y))), title=\(info.windowTitle)")
-
-        // Callback-stream watchdog: if no .swipeUpdate arrives within 200ms,
-        // the MultitouchSupport callback stream is likely interrupted.
-        // Spring back immediately rather than waiting for a .gestureEnd that
-        // may never arrive.
-        scheduleWatchdog(sid: elasticDragSessionID)
-    }
-
-    private func applyElasticDisplacement(progress: Float) {
-        guard let axWin = elasticDragAxWindow,
-              let origin = elasticDragOrigin,
-              let p0 = cachedBoundaryOrigin else {
-            logDebug("ElasticDrag: apply skipped [session=\(elasticDragSessionID)] — axWin=\(elasticDragAxWindow != nil ? "ok" : "nil"), origin=\(elasticDragOrigin != nil ? "ok" : "nil"), cached=\(cachedBoundaryOrigin != nil ? "ok" : "nil")")
-            return
-        }
-        let raw = CGFloat(progress) * 60.0
-        let damped = raw / (1.0 + abs(raw) / 40.0)
-        let maxDisp = CGFloat(AppSettings.shared.elasticDragMaxDisplacement)
-        let clamped = max(-maxDisp, min(maxDisp, damped))
-        var newPos = CGPoint(x: p0.x + clamped, y: p0.y)
-        // Clamp to ±maxDisp from the true original position
-        newPos.x = max(p0.x - maxDisp, min(p0.x + maxDisp, newPos.x))
-        let val = AXValueCreate(.cgPoint, &newPos)!
-        AXUIElementSetAttributeValue(axWin, kAXPositionAttribute as CFString, val)
-    }
-
-    private func scheduleWatchdog(sid: Int) {
-        elasticDragWatchdog?.cancel()
-        let work = DispatchWorkItem { [weak self] in
-            guard let self = self,
-                  self.elasticDragInProgress,
-                  self.elasticDragSessionID == sid else { return }
-            logDebug("ElasticDrag: callback stream interrupted [session=\(sid)], triggering spring-back")
-            self.finishElasticDrag()
-        }
-        elasticDragWatchdog = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: work)
-    }
-
-    private func finishElasticDrag() {
-        let sid = elasticDragSessionID
-        elasticDragInProgress = false
-        elasticDragWatchdog?.cancel()
-        elasticDragWatchdog = nil
-
-        guard let axWin = elasticDragAxWindow,
-              let p0 = cachedBoundaryOrigin else {
-            logDebug("ElasticDrag: finish SKIPPED [session=\(sid)] — axWin=\(elasticDragAxWindow != nil ? "ok" : "nil"), cachedOrigin=\(cachedBoundaryOrigin != nil ? "ok" : "nil")")
-            elasticDragAxWindow = nil
-            elasticDragOrigin = nil
-            return
-        }
-
-        logDebug("ElasticDrag: finish [session=\(sid)], target=(\(String(format: "%.1f", p0.x)), \(String(format: "%.1f", p0.y)))")
-
-        // Show hint text
-        if let currentID = windowManager.frontmostWindowID {
-            showQuickSwitchHint(for: currentID)
-        }
-
-        // Shake the hint window
-        if AppSettings.shared.hintShakeEnabled, let hint = hintWindow {
-            let hintOrigin = hint.frame.origin
-            let offsets: [CGFloat] = [-8, 8, -6, 6, 0]
-            var delay: Double = 0
-            for offset in offsets {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                    hint.setFrameOrigin(NSPoint(x: hintOrigin.x + offset, y: hintOrigin.y))
-                }
-                delay += 0.06
-            }
-        }
-
-        // Spring-back animation: ease-out cubic over 0.3s.
-        // Always targets cachedBoundaryOrigin (the true original position).
-        // Each frame checks springBackGeneration — if a new drag starts before
-        // this animation completes, beginElasticDrag increments the generation
-        // and all remaining frames become no-ops.
-        let gen = springBackGeneration
-        var currentPos = p0
-        var readPosVal: CFTypeRef?
-        if AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &readPosVal) == .success,
-           let rpv = readPosVal {
-            AXValueGetValue(rpv as! AXValue, .cgPoint, &currentPos)
-        }
-        let startX = currentPos.x
-        let targetX = p0.x
-        logDebug("ElasticDrag: spring-back [session=\(sid), gen=\(gen)] from x=\(String(format: "%.1f", startX)) to x=\(String(format: "%.1f", targetX))")
-        let steps = 12
-        let duration: Double = 0.3
-        for i in 1...steps {
-            let t = Double(i) / Double(steps)
-            let eased = 1.0 - pow(1.0 - t, 3)
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration * t) { [self] in
-                guard springBackGeneration == gen else { return }
-                var pos = CGPoint(x: startX + (targetX - startX) * CGFloat(eased),
-                                  y: p0.y)
-                let val = AXValueCreate(.cgPoint, &pos)!
-                _ = AXUIElementSetAttributeValue(axWin, kAXPositionAttribute as CFString, val)
-                if i == steps {
-                    var finalPos = CGPoint.zero
-                    var finalVal: CFTypeRef?
-                    if AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &finalVal) == .success {
-                        AXValueGetValue(finalVal as! AXValue, .cgPoint, &finalPos)
-                    }
-                    let delta = abs(finalPos.x - targetX)
-                    logDebug("ElasticDrag: spring-back DONE [session=\(sid), gen=\(gen)], step=\(i), finalX=\(String(format: "%.1f", finalPos.x)), targetX=\(String(format: "%.1f", targetX)), delta=\(String(format: "%.1f", delta))")
-                }
-            }
-        }
-
-        elasticDragAxWindow = nil
-        elasticDragOrigin = nil
-    }
-
     // MARK: - Quick switch hint
 
     private var hintWindow: NSWindow?
     private var hintDismissWork: DispatchWorkItem?
-
-    // Elastic drag state for wall-bump effect
-    private var elasticDragInProgress = false
-    private var elasticDragAxWindow: AXUIElement?
-    private var elasticDragOrigin: CGPoint?
-    private var elasticDragSessionID = 0
-    private var elasticDragWatchdog: DispatchWorkItem?
-
-    // Animation generation counter. Incremented each beginElasticDrag so stale
-    // spring-back animation frames from a previous session bail out.
-    private var springBackGeneration = 0
-
-    // The true original window position, captured on the first boundary hit.
-    // All spring-back animations target this position (never drifts).
-    // Cleared when the user successfully switches away from the boundary.
-    private var cachedBoundaryOrigin: CGPoint?
-
-    // True when user swipes at boundary with elasticDragEnabled=false.
-    // On gestureEnd, show hint text + shake without window dragging.
-    private var atBoundaryWithoutDrag = false
 
     private func showQuickSwitchHint(for windowID: CGWindowID) {
         guard let info = windowManager.windows[windowID] else { return }

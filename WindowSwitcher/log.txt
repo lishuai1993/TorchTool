@@ -1,21 +1,21 @@
-[2026-08-07 20:28:17.307] [Logger.swift:23] ══════════════════════════════════════
-[2026-08-07 20:28:17.313] [Logger.swift:24] WindowSwitcher logger initialized
-[2026-08-07 20:28:17.314] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
-[2026-08-07 20:28:17.314] [Logger.swift:26] PID: 25841
-[2026-08-07 20:28:17.314] [Logger.swift:27] ══════════════════════════════════════
-[2026-08-07 20:28:17.314] [main.swift:3] main.swift: entry point
-[2026-08-07 20:28:17.351] [main.swift:8] main.swift: starting run loop...
-[2026-08-07 20:28:17.361] [AppDelegate.swift:17] === applicationDidFinishLaunching BEGIN ===
-[2026-08-07 20:28:17.361] [AppDelegate.swift:20] Step 0: Ensuring single instance...
-[2026-08-07 20:28:17.426] [AppDelegate.swift:27] Step 1: Setting activation policy to .accessory
-[2026-08-07 20:28:17.426] [AppDelegate.swift:29] Step 1: OK
-[2026-08-07 20:28:17.427] [AppDelegate.swift:32] Step 2: Setting up menu bar...
-[2026-08-07 20:28:17.454] [AppDelegate.swift:34] Step 2: Menu bar OK
+[2026-08-07 22:02:33.776] [Logger.swift:23] ══════════════════════════════════════
+[2026-08-07 22:02:33.779] [Logger.swift:24] WindowSwitcher logger initialized
+[2026-08-07 22:02:33.780] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
+[2026-08-07 22:02:33.780] [Logger.swift:26] PID: 36419
+[2026-08-07 22:02:33.780] [Logger.swift:27] ══════════════════════════════════════
+[2026-08-07 22:02:33.780] [main.swift:3] main.swift: entry point
+[2026-08-07 22:02:33.815] [main.swift:8] main.swift: starting run loop...
+[2026-08-07 22:02:33.821] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
+[2026-08-07 22:02:33.821] [AppDelegate.swift:22] Step 0: Ensuring single instance...
+[2026-08-07 22:02:33.886] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
+[2026-08-07 22:02:33.887] [AppDelegate.swift:31] Step 1: OK
+[2026-08-07 22:02:33.887] [AppDelegate.swift:34] Step 2: Setting up menu bar...
+[2026-08-07 22:02:33.906] [AppDelegate.swift:36] Step 2: Menu bar OK
+[2026-08-07 22:02:33.906] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
 [WS] C engine logging to: /Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt
-[2026-08-07 20:28:17.454] [AppDelegate.swift:37] Step 3: Starting gesture engine (MultitouchSupport)...
-[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:58] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
-[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:61] GestureEngine: sensitivity — touchdownWindow=400ms
-[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:62] GestureEngine: starting C engine (MultitouchSupport)...
+[2026-08-07 22:02:33.906] [GestureEngineWrapper.swift:58] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
+[2026-08-07 22:02:33.906] [GestureEngineWrapper.swift:61] GestureEngine: sensitivity — touchdownWindow=400ms
+[2026-08-07 22:02:33.906] [GestureEngineWrapper.swift:62] GestureEngine: starting C engine (MultitouchSupport)...
 [WS] Symbol resolution:
 [WS]   MTDeviceCreateDefault    => 0x193b9b338
 [WS]   MTDeviceCreateList       => 0x193b9ad48
@@ -25,273 +25,1288 @@
 [WS]   MTRegisterContactFrameCallbackWithRefcon => 0x193baa740
 [WS]   MTUnregisterContactFrameCallback          => 0x193baa78c
 [WS]   MTUnregisterContactFrameCallbackWithRefcon => 0x0
-[WS] MTDeviceCreateDefault => 0x15e056400
+[WS] MTDeviceCreateDefault => 0x12b08dc00
 [WS] MTDeviceStop => -536870195 (0xe00002cd)
 [WS] Registering 6-param callback (WithRefcon)...
 [WS] MTRegisterContactFrameCallbackWithRefcon => 1 (0x1)
 [WS] Calling MTDeviceStart(mtDevice, 0)...
 [WS] MTDeviceStart => 0 (0x0)
 [WS] Gesture engine started (reg=1, start=0). Waiting for callbacks...
-[2026-08-07 20:28:17.455] [GestureEngineWrapper.swift:68] GestureEngine: C engine started OK (result=0)
-[2026-08-07 20:28:17.455] [AppDelegate.swift:40] Step 3: Gesture engine started OK
-[2026-08-07 20:28:17.456] [AppDelegate.swift:48] Step 4: Starting interaction monitoring...
-[2026-08-07 20:28:17.456] [ActivationHistory.swift:13] ActivationHistory: starting observation
-[2026-08-07 20:28:17.456] [ActivationHistory.swift:30] ActivationHistory: started OK
-[2026-08-07 20:28:17.457] [WindowManager.swift:313] WindowManager: NSEvent monitors registered OK
-[2026-08-07 20:28:17.457] [AppDelegate.swift:51] Step 4: Interaction monitoring started OK
-[2026-08-07 20:28:17.457] [AppDelegate.swift:57] Step 5: Wiring callbacks...
-[2026-08-07 20:28:17.457] [AppDelegate.swift:59] Step 5: Callbacks wired OK
-[2026-08-07 20:28:17.457] [AppDelegate.swift:63] Step 6.5: Setting up session observers...
-[2026-08-07 20:28:17.457] [AppDelegate.swift:65] Step 6.5: OK
-[2026-08-07 20:28:17.457] [AppDelegate.swift:68] Step 7: Checking permissions...
-[2026-08-07 20:28:17.460] [AppDelegate.swift:753] Permission check: Accessibility = true
-[2026-08-07 20:28:17.472] [LRUOrderingEngine.swift:71] LRU: sync - added 18 windows at front
-[2026-08-07 20:28:17.472] [WindowManager.swift:143] WindowManager: refreshed 18 windows
-[2026-08-07 20:28:17.472] [AppDelegate.swift:74] Initial LRU order:
-  [0] 终端 — WindowSwitcher — -zsh — 112×34 ← 游标
-  [1] Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10%
-  [2] Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘
-  [3] Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换
-  [4] 访达 — WindowSwitcher
-  [5] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
-  [6] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
-  [7] 坚果云 — 坚果云
-  [8] 时钟 — 时钟
-  [9] CodeBuddy CN — 20260723112900
-  [10] 青山 — 青山
-  [11] 网易有道翻译 — 网易有道翻译
-  [12] 系统设置 — 辅助功能
-  [13] HibernateModeManager — HibernateMode Manager
-  [14] 活动监视器 — 活动监视器
-  [15] 微信读书 — 微信读书
-  [16] 微信 — 微信
-  [17] 微信 — 微信 (窗口)
-[2026-08-07 20:28:17.472] [AppDelegate.swift:80] === applicationDidFinishLaunching END (SUCCESS) ===
-[WS-DBG] processContactData: ALIVE frame=42 count=1
+[2026-08-07 22:02:33.907] [GestureEngineWrapper.swift:68] GestureEngine: C engine started OK (result=0)
+[2026-08-07 22:02:33.907] [AppDelegate.swift:42] Step 3: Gesture engine started OK
+[2026-08-07 22:02:33.907] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
+[2026-08-07 22:02:33.907] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-07 22:02:33.908] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-07 22:02:33.908] [WindowManager.swift:291] WindowManager: NSEvent monitors registered OK
+[2026-08-07 22:02:33.908] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
+[2026-08-07 22:02:33.908] [AppDelegate.swift:59] Step 5: Wiring callbacks...
+[2026-08-07 22:02:33.908] [AppDelegate.swift:61] Step 5: Callbacks wired OK
+[2026-08-07 22:02:33.908] [AppDelegate.swift:65] Step 6.5: Setting up session observers...
+[2026-08-07 22:02:33.908] [AppDelegate.swift:67] Step 6.5: OK
+[2026-08-07 22:02:33.908] [AppDelegate.swift:70] Step 7: Checking permissions...
+[2026-08-07 22:02:33.912] [AppDelegate.swift:485] Permission check: Accessibility = true
+[2026-08-07 22:02:34.184] [LRUOrderingEngine.swift:71] LRU: sync - added 19 windows at front
+[2026-08-07 22:02:34.185] [WindowManager.swift:148] WindowManager: refreshed 19 windows
+[2026-08-07 22:02:34.185] [AppDelegate.swift:76] Initial LRU order:
+  [0] 终端 — WindowSwitcher — WindowSwitcher ◂ make debug — 112×34 ← 游标
+  [1] Google Chrome — DeepSeek 开放平台 - Google Chrome
+  [2] Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome
+  [3] Google Chrome — 新标签页 - Google Chrome
+  [4] 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4
+  [5] 访达 — WindowSwitcher
+  [6] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
+  [7] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
+  [8] 坚果云 — 坚果云
+  [9] 时钟 — 时钟
+  [10] CodeBuddy CN — 20260723112900
+  [11] 青山 — 青山
+  [12] 网易有道翻译 — 网易有道翻译
+  [13] 系统设置 — 辅助功能
+  [14] HibernateModeManager — HibernateMode Manager
+  [15] 活动监视器 — 活动监视器 – 所有进程
+  [16] 微信读书 — 微信读书
+  [17] 微信 — 微信
+  [18] 微信 — 微信 (窗口)
+[2026-08-07 22:02:34.185] [AppDelegate.swift:82] === applicationDidFinishLaunching END (SUCCESS) ===
+[WS-DBG] processContactData: ALIVE frame=152 count=1
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0913,x=0.575,y=0.283
-[WS] CB6: count=3 frame=151
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.514,y=0.283 [1]st=1,ty=0,fl=0,z=0.0000,x=0.612,y=0.451 [2]st=1,ty=0,fl=0,z=0.0000,x=0.561,y=0.020
-[WS] CB6: count=3 frame=152
-[WS] CB6: count=3 frame=153
-[WS-DBG] fingerCount: 0 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=0.3083,x=0.515,y=0.287 [1]st=4,ty=1,fl=1,z=0.0893,x=0.614,y=0.456 [2]st=4,ty=2,fl=-1,z=-0.0976,x=0.566,y=0.018
-[WS-DBG] STATE: IDLE -> TRACKING [session=1] (touchdown 0ms, prevFinger=0)
-[WS] CB6: count=3 frame=154
-[WS] CB6: count=3 frame=155
-[WS] CB6: count=3 frame=156
-[WS] CB6: count=3 frame=157
-[WS] CB6: count=3 frame=158
-[WS] CB6: count=3 frame=159
-[WS] CB6: count=3 frame=160
-[WS] CB6: count=3 frame=161
-[WS] CB6: count=3 frame=162
-[WS] CB6: count=3 frame=163
-[WS] CB6: count=3 frame=164
-[WS] CB6: count=3 frame=165
-[WS] CB6: count=3 frame=166
-[WS] CB6: count=3 frame=167
-[WS] CB6: count=3 frame=168
-[WS] CB6: count=3 frame=169
-[WS-DBG] TRACK postSettle: dispX=-0.0003 dispY=0.0192 |dX|=0.0003 |dY|=0.0192 swipeMinDisp=0.0800 elapsed=48ms
-[WS] CB6: count=3 frame=170
-[WS] CB6: count=3 frame=171
-[WS] CB6: count=3 frame=172
-[WS] CB6: count=3 frame=173
-[WS] CB6: count=3 frame=174
-[WS-DBG] GESTURE: UP candidate [session=1] dX=0.0090 dY=0.1261 |dX/dY|=0.07
-[WS] CB6: count=3 frame=175
-[WS] CB6: count=3 frame=176
-[WS] CB6: count=3 frame=177
-[WS] CB6: count=3 frame=178
-[WS] CB6: count=3 frame=179
-[WS] CB6: count=3 frame=180
-[WS] CB6: count=3 frame=181
-[WS] CB6: count=3 frame=182
-[WS-DBG] GESTURE: swipe UP confirmed [session=1] dX=0.0318 dY=0.3244 |dX/dY|=0.10 confirm=64ms
-[2026-08-07 20:28:18.798] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #1, type=4, progress=1.0
-[2026-08-07 20:28:18.798] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
-[2026-08-07 20:28:18.798] [AppDelegate.swift:230] GESTURE: threeFingerSwipeUp, overlayVisible=false
-[2026-08-07 20:28:18.798] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[WS] CB6: count=3 frame=183
-[2026-08-07 20:28:18.806] [WindowManager.swift:143] WindowManager: refreshed 18 windows
-[2026-08-07 20:28:18.806] [AppDelegate.swift:332] TIMING: [t=8ms] refreshWindows done, 18 windows
-[WS] CB6: count=3 frame=184
-[WS] CB6: count=3 frame=185
-[WS] CB6: count=3 frame=186
-[WS] CB6: count=3 frame=187
-[WS] CB6: count=3 frame=188
-[WS] CB6: count=3 frame=189
-[WS] CB6: count=3 frame=190
-[WS] CB6: count=3 frame=191
-[WS] CB6: count=3 frame=192
-[WS] CB6: count=3 frame=193
-[WS] CB6: count=3 frame=194
-[WS] CB6: count=3 frame=195
-[WS] CB6: count=3 frame=196
-[WS] CB6: count=3 frame=197
-[WS] CB6: count=3 frame=198
-[WS] CB6: count=3 frame=199
-[WS] CB6: count=3 frame=200
-[WS] CB6: count=3 frame=201
-[WS-DBG] processContactData: ALIVE frame=201 count=3
-[WS] CB6: count=3 frame=202
-[WS] CB6: count=3 frame=203
-[2026-08-07 20:28:18.968] [WindowManager.swift:164] CAPTURE: OK [?] win=17079 size=2932x1822 dt=161ms
-[WS] CB6: count=3 frame=204
-[2026-08-07 20:28:18.976] [WindowManager.swift:164] CAPTURE: OK [?] win=16219 size=2940x1836 dt=7ms
-[WS] CB6: count=3 frame=205
-[2026-08-07 20:28:18.983] [WindowManager.swift:164] CAPTURE: OK [?] win=16224 size=2940x1836 dt=7ms
-[WS] CB6: count=3 frame=206
-[2026-08-07 20:28:18.990] [WindowManager.swift:164] CAPTURE: OK [?] win=16229 size=2940x1836 dt=6ms
-[2026-08-07 20:28:18.997] [WindowManager.swift:164] CAPTURE: OK [?] win=40 size=2940x1836 dt=7ms
-[WS] CB6: count=3 frame=207
-[WS] CB6: count=3 frame=208
-[WS] CB6: count=3 frame=209
-[2026-08-07 20:28:19.013] [WindowManager.swift:164] CAPTURE: OK [?] win=14251 size=2940x1836 dt=16ms
-[2026-08-07 20:28:19.021] [WindowManager.swift:164] CAPTURE: OK [?] win=14250 size=2940x1836 dt=6ms
-[2026-08-07 20:28:19.021] [WindowManager.swift:187] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=214ms
-[2026-08-07 20:28:19.021] [AppDelegate.swift:344] TIMING: [t=222ms] preload visible done (capture=214ms, hit=0, miss=7)
-[2026-08-07 20:28:19.021] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Google Chrome → [2]Google Chrome → [3]Google Chrome → [4]访达 → [5]Obsidian → [6]Obsidian → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[WS] CB6: count=3 frame=210
-[WS] CB6: count=3 frame=211
-[WS] CB6: count=3 frame=212
-[2026-08-07 20:28:19.039] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[WS] CB6: count=3 frame=213
-[2026-08-07 20:28:19.047] [AppDelegate.swift:352] TIMING: [t=249ms] overlay shown (UI=26ms, total=249ms)
-[2026-08-07 20:28:19.047] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=249ms
-[2026-08-07 20:28:19.048] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=25841
-[2026-08-07 20:28:19.051] [AXFocusObserver.swift:58] AXFocusObserver: started pid=25841
-[WS] CB6: count=3 frame=214
-[WS] CB6: count=3 frame=215
-[2026-08-07 20:28:19.067] [WindowManager.swift:164] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=18ms
-[WS] CB6: count=3 frame=216
-[WS] CB6: count=3 frame=217
-[2026-08-07 20:28:19.078] [WindowManager.swift:164] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=10ms
-[2026-08-07 20:28:19.079] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[WS] CB6: count=3 frame=218
-[2026-08-07 20:28:19.088] [WindowManager.swift:164] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=9ms
-[WS] CB6: count=3 frame=219
-[2026-08-07 20:28:19.097] [WindowManager.swift:164] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=8ms
-[WS] CB6: count=3 frame=220
-[WS] CB6: count=3 frame=221
-[WS] CB6: count=3 frame=222
-[WS] CB6: count=3 frame=223
-[WS] CB6: count=3 frame=224
-[WS] CB6: count=3 frame=225
-[2026-08-07 20:28:19.145] [WindowManager.swift:164] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=47ms
-[WS] CB6: count=3 frame=226
-[2026-08-07 20:28:19.152] [WindowManager.swift:164] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=7ms
-[WS] CB6: count=3 frame=227
-[2026-08-07 20:28:19.161] [WindowManager.swift:164] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=9ms
-[WS] CB6: count=3 frame=228
-[2026-08-07 20:28:19.168] [WindowManager.swift:164] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[WS] CB6: count=3 frame=229
-[2026-08-07 20:28:19.179] [WindowManager.swift:164] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=10ms
-[WS] CB6: count=3 frame=230
-[2026-08-07 20:28:19.187] [WindowManager.swift:164] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[WS] CB6: count=3 frame=231
-[2026-08-07 20:28:19.194] [WindowManager.swift:164] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=7ms
-[2026-08-07 20:28:19.195] [AppDelegate.swift:381] CAPTURE: background capture complete, captured=11/11, dt=146ms
-[WS] CB6: count=3 frame=232
-[WS] CB6: count=3 frame=233
-[WS] CB6: count=3 frame=234
-[WS] CB6: count=3 frame=235
-[WS] CB6: count=3 frame=236
-[WS] CB6: count=3 frame=237
-[WS] CB6: count=3 frame=238
-[WS] CB6: count=3 frame=239
-[WS] CB6: count=3 frame=240
-[WS] CB6: count=3 frame=241
-[WS] CB6: count=3 frame=242
-[WS] CB6: count=3 frame=243
-[WS] CB6: count=3 frame=244
-[WS] CB6: count=3 frame=245
-[WS] CB6: count=3 frame=246
-[WS] CB6: count=3 frame=247
-[WS] CB6: count=3 frame=248
-[WS] CB6: count=3 frame=249
-[WS] CB6: count=3 frame=250
-[WS] CB6: count=3 frame=251
-[WS] CB6: count=3 frame=252
-[WS] CB6: count=3 frame=253
-[WS] CB6: count=3 frame=254
-[WS-DBG] fingerCount: 3 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=-0.2315,x=0.698,y=0.876
-[WS-DBG] TRAJECTORY: swipe-end [session=1] dX=0.1325 dY=0.6186 |dX/dY|=0.21
-[WS-DBG] STATE: SWIPING -> IDLE [session=1] (lift, fingerCount=1) GestureEnd fired
-[2026-08-07 20:28:19.381] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-07 20:28:19.381] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0208,x=0.675,y=0.237
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.569,y=0.682
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.538,y=0.625
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0560,x=0.569,y=0.681
-[2026-08-07 20:28:20.213] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0778,x=0.540,y=0.614
+[2026-08-07 22:02:35.515] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — WindowSwitcher ◂ make debug — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — WindowSwitcher ◂ make debug — 112×34 → Google Chrome — DeepSeek 开放平台 - Google Chrome → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome → Google Chrome — 新标签页 - Google Chrome → 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4]
+[2026-08-07 22:02:35.515] [AppDelegate.swift:151] onInteraction fired for window 17079
+[WS-DBG] processContactData: ALIVE frame=287 count=1
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.549,y=0.148
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.529,y=0.675
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0457,x=0.552,y=0.139
-[WS-DBG] processContactData: ALIVE frame=392 count=1
-[2026-08-07 20:28:21.103] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
-[2026-08-07 20:28:21.103] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 20:28:21.119] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 20:28:21.120] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 20:28:21.151] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] processContactData: ALIVE frame=512 count=1
-[2026-08-07 20:28:21.612] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
-[2026-08-07 20:28:21.613] [AppDelegate.swift:149] onInteraction fired for window 17079
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1111,x=0.533,y=0.654
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.377,y=0.378
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.621,y=0.375
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.2574,x=0.385,y=0.383
-[WS-DBG] processContactData: ALIVE frame=724 count=1
-[2026-08-07 20:28:23.179] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
-[2026-08-07 20:28:23.179] [AppDelegate.swift:149] onInteraction fired for window 17079
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0291,x=0.622,y=0.381
+[WS] CB6: count=3 frame=413
+[WS] CB6: count=3 frame=414
+[WS] CB6: count=3 frame=415
+[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0156,x=0.515,y=0.288 [1]st=4,ty=2,fl=1,z=0.2533,x=0.498,y=0.026 [2]st=4,ty=4,fl=1,z=0.1266,x=0.626,y=0.392
+[WS-DBG] STATE: IDLE -> TRACKING [session=1] (touchdown 24ms, prevFinger=1)
+[WS] CB6: count=3 frame=416
+[WS] CB6: count=3 frame=417
+[WS] CB6: count=3 frame=418
+[WS] CB6: count=3 frame=419
+[WS] CB6: count=3 frame=420
+[WS] CB6: count=3 frame=421
+[WS] CB6: count=3 frame=422
+[WS] CB6: count=3 frame=423
+[WS] CB6: count=3 frame=424
+[WS] CB6: count=3 frame=425
+[WS] CB6: count=3 frame=426
+[WS] CB6: count=3 frame=427
+[WS] CB6: count=3 frame=428
+[WS-DBG] TRACK postSettle: dispX=-0.0009 dispY=0.0215 |dX|=0.0009 |dY|=0.0215 swipeMinDisp=0.0800 elapsed=24ms
+[WS] CB6: count=3 frame=429
+[WS] CB6: count=3 frame=430
+[2026-08-07 22:02:36.747] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=431
+[WS] CB6: count=3 frame=432
+[2026-08-07 22:02:36.763] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-1.600 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=433
+[WS] CB6: count=3 frame=434
+[WS-DBG] GESTURE: UP candidate [session=1] dX=0.0052 dY=0.1290 |dX/dY|=0.04
+[2026-08-07 22:02:36.779] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-2.100 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=435
+[WS] CB6: count=3 frame=436
+[2026-08-07 22:02:36.796] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-2.700 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=437
+[WS] CB6: count=3 frame=438
+[2026-08-07 22:02:36.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.600 dY=-3.000 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=439
+[WS] CB6: count=3 frame=440
+[2026-08-07 22:02:36.830] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.300 dY=-3.300 frontID=17079 gesture=false activating=false
+[WS] CB6: count=3 frame=441
+[WS] CB6: count=3 frame=442
+[WS-DBG] GESTURE: swipe UP confirmed [session=1] dX=0.0208 dY=0.2988 |dX/dY|=0.07 confirm=64ms
+[2026-08-07 22:02:36.842] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #1, type=4, progress=1.0
+[2026-08-07 22:02:36.842] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
+[2026-08-07 22:02:36.842] [AppDelegate.swift:247] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 22:02:36.842] [ImmersiveOverlayCoordinator.swift:16] TIMING: [t=0ms] showImmersiveOverlay called
+[WS] CB6: count=3 frame=443
+[2026-08-07 22:02:36.854] [LRUOrderingEngine.swift:63] LRU: sync - removed 1 windows
+[2026-08-07 22:02:36.854] [LRUOrderingEngine.swift:71] LRU: sync - added 1 windows at front
+[2026-08-07 22:02:36.854] [WindowManager.swift:148] WindowManager: refreshed 19 windows
+[2026-08-07 22:02:36.854] [ImmersiveOverlayCoordinator.swift:20] TIMING: [t=12ms] refreshWindows done, 19 windows
+[WS] CB6: count=3 frame=444
+[WS] CB6: count=3 frame=445
+[2026-08-07 22:02:36.874] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=5828 dt=19ms
+[WS] CB6: count=3 frame=446
+[2026-08-07 22:02:36.874] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16219 dt=0ms
+[2026-08-07 22:02:36.874] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16224 dt=0ms
+[2026-08-07 22:02:36.875] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16229 dt=0ms
+[2026-08-07 22:02:36.875] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=24826 dt=0ms
+[2026-08-07 22:02:36.875] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=40 dt=0ms
+[2026-08-07 22:02:36.876] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=14251 dt=0ms
+[2026-08-07 22:02:36.876] [ThumbnailCapturer.swift:45] CAPTURE: preloadThumbnails count=7 ids=7 success=0 dt=21ms
+[2026-08-07 22:02:36.876] [ImmersiveOverlayCoordinator.swift:32] TIMING: [t=33ms] preload visible done (capture=21ms, hit=0, miss=7)
+[2026-08-07 22:02:36.876] [ImmersiveOverlayCoordinator.swift:37] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Google Chrome → [2]Google Chrome → [3]Google Chrome → [4]迅雷影音 → [5]访达 → [6]Obsidian → [7]Obsidian → [8]坚果云 → [9]时钟 → [10]CodeBuddy CN → [11]青山 → [12]网易有道翻译 → [13]系统设置 → [14]HibernateModeManager → [15]活动监视器 → [16]微信读书 → [17]微信 → [18]微信
+[WS] CB6: count=3 frame=447
+[2026-08-07 22:02:36.883] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=19, withThumbnails=0
+[2026-08-07 22:02:36.889] [ImmersiveOverlayCoordinator.swift:40] TIMING: [t=46ms] overlay shown (UI=12ms, total=46ms)
+[2026-08-07 22:02:36.889] [ImmersiveOverlayCoordinator.swift:45] CAPTURE: background capture starting, remaining=12, overlay shown at t=46ms
+[2026-08-07 22:02:36.889] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 dt=0ms
+[2026-08-07 22:02:36.889] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=36419
+[2026-08-07 22:02:36.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [坚果云 — 坚果云] win=15794 dt=0ms
+[2026-08-07 22:02:36.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [时钟 — 时钟] win=72 dt=0ms
+[2026-08-07 22:02:36.890] [AXFocusObserver.swift:58] AXFocusObserver: started pid=36419
+[2026-08-07 22:02:36.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [CodeBuddy CN — 20260723112900] win=3993 dt=0ms
+[2026-08-07 22:02:36.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [青山 — 青山] win=129 dt=0ms
+[WS] CB6: count=3 frame=448
+[2026-08-07 22:02:36.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [网易有道翻译 — 网易有道翻译] win=106 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [系统设置 — 辅助功能] win=17781 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [HibernateModeManager — HibernateMode Manager] win=73 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [活动监视器 — 活动监视器 – 所有进程] win=85 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信读书 — 微信读书] win=20873 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信] win=158 dt=0ms
+[2026-08-07 22:02:36.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信 (窗口)] win=10870 dt=0ms
+[2026-08-07 22:02:36.891] [ImmersiveOverlayCoordinator.swift:70] CAPTURE: background capture complete, captured=0/12, dt=2ms
+[WS] CB6: count=3 frame=449
+[WS] CB6: count=3 frame=450
+[2026-08-07 22:02:36.908] [OverlayView.swift:89] CARD-FRAMES: updated, count=19
+[WS] CB6: count=3 frame=451
+[WS] CB6: count=3 frame=452
+[WS] CB6: count=3 frame=453
+[2026-08-07 22:02:36.931] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.700 dY=-7.200 frontID=5828 gesture=false activating=false
+[2026-08-07 22:02:36.931] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.200 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=454
+[WS] CB6: count=3 frame=455
+[WS] CB6: count=3 frame=456
+[2026-08-07 22:02:36.955] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=457
+[2026-08-07 22:02:36.962] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=458
+[WS] CB6: count=3 frame=459
+[WS] CB6: count=3 frame=460
+[WS] CB6: count=3 frame=461
+[WS] CB6: count=3 frame=462
+[WS] CB6: count=3 frame=463
+[2026-08-07 22:02:37.013] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=464
+[WS] CB6: count=3 frame=465
+[WS] CB6: count=3 frame=466
+[WS] CB6: count=3 frame=467
+[WS] CB6: count=3 frame=468
+[WS] CB6: count=3 frame=469
+[WS] CB6: count=3 frame=470
+[WS] CB6: count=3 frame=471
+[WS] CB6: count=3 frame=472
+[WS] CB6: count=3 frame=473
+[WS] CB6: count=3 frame=474
+[WS] CB6: count=3 frame=475
+[WS] CB6: count=3 frame=476
+[WS] CB6: count=3 frame=477
+[WS] CB6: count=3 frame=478
+[WS] CB6: count=3 frame=479
+[WS] CB6: count=3 frame=480
+[WS] CB6: count=3 frame=481
+[WS] CB6: count=3 frame=482
+[WS] CB6: count=3 frame=483
+[WS] CB6: count=3 frame=484
+[WS] CB6: count=3 frame=485
+[WS] CB6: count=3 frame=486
+[WS] CB6: count=3 frame=487
+[WS] CB6: count=3 frame=488
+[WS] CB6: count=3 frame=489
+[WS-DBG] processContactData: ALIVE frame=489 count=3
+[WS] CB6: count=3 frame=490
+[WS] CB6: count=3 frame=491
+[WS] CB6: count=3 frame=492
+[WS] CB6: count=3 frame=493
+[WS] CB6: count=3 frame=494
+[WS] CB6: count=3 frame=495
+[WS] CB6: count=3 frame=496
+[WS] CB6: count=3 frame=497
+[WS] CB6: count=3 frame=498
+[WS] CB6: count=3 frame=499
+[WS] CB6: count=3 frame=500
+[WS] CB6: count=3 frame=501
+[WS] CB6: count=3 frame=502
+[WS] CB6: count=3 frame=503
+[WS] CB6: count=3 frame=504
+[WS] CB6: count=3 frame=505
+[2026-08-07 22:02:37.346] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=506
+[WS] CB6: count=3 frame=507
+[2026-08-07 22:02:37.365] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS] CB6: count=3 frame=508
+[WS] CB6: count=3 frame=509
+[2026-08-07 22:02:37.379] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
+[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=6,ty=1,fl=1,z=0.0291,x=0.480,y=0.350 [1]st=4,ty=3,fl=1,z=-0.0343,x=0.702,y=0.802
+[WS-DBG] TRAJECTORY: swipe-end [session=1] dX=0.0450 dY=0.3290 |dX/dY|=0.14
+[WS-DBG] STATE: SWIPING -> IDLE [session=1] (lift, fingerCount=2) GestureEnd fired
+[2026-08-07 22:02:37.386] [AppDelegate.swift:314] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 22:02:37.386] [AppDelegate.swift:322] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=-0.1235,x=0.700,y=0.797
+[2026-08-07 22:02:37.415] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=5828 gesture=false activating=false
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.574,y=0.792
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.616,y=0.458
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0778,x=0.614,y=0.458
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.478,y=0.466
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1868,x=0.485,y=0.474
+[2026-08-07 22:02:39.682] [OverlayWindowController.swift:217] OVERLAY-CLICK: window=Google Chrome — DeepSeek 开放平台 - Google Chrome
+[2026-08-07 22:02:39.682] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
+[2026-08-07 22:02:39.684] [WindowManager.swift:175] ACTIVATE-DIAG: [Google Chrome] pid=24972 bid=com.google.Chrome isActive=false needsActivate=true frontmostBefore=WindowSwitcher window=16219
+[2026-08-07 22:02:39.685] [WindowManager.swift:182] AX: Google Chrome has 3 AX windows, target=[DeepSeek 开放平台 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:39.686] [WindowManager.swift:187] AX:   [0][DeepSeek 开放平台 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:39.686] [WindowManager.swift:187] AX:   [1][「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:39.686] [WindowManager.swift:187] AX:   [2][新标签页 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:39.686] [WindowManager.swift:204] AX: raised [Google Chrome] idx=0 title="DeepSeek 开放平台 - Google Chrome"
+[2026-08-07 22:02:39.686] [WindowManager.swift:217] ACTIVATE-DIAG: calling app.activate() for [Google Chrome] pid=24972
+[2026-08-07 22:02:39.693] [WindowManager.swift:220] ACTIVATE-DIAG: app.activate() returned true for [Google Chrome]
+[2026-08-07 22:02:39.693] [LRUOrderingEngine.swift:129] LRU-SELECT: [Google Chrome — DeepSeek 开放平台 - Google Chrome] cursor→1, order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Google Chrome — DeepSeek 开放平台 - Google Chrome → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome → Google Chrome — 新标签页 - Google Chrome → 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4] (unchanged=true)
+[2026-08-07 22:02:39.693] [WindowManager.swift:236] ACTIVATE-DONE: window=Google Chrome — DeepSeek 开放平台 - Google Chrome idx=1 cursorAfter=1 orderedIDs[0]=终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 isActivating=true
+[2026-08-07 22:02:39.693] [ActivationHistory.swift:27] ActivationHistory: app activated [Google Chrome] pid=24972
+[2026-08-07 22:02:39.694] [WindowManager.swift:65] ActivationHistory: suppressed programmatic activation pid=24972
+[2026-08-07 22:02:40.000] [AXWindowMatcher.swift:213] MAPPING-OK: window=16219 focused="DeepSeek 开放平台 - Google Chrome"
+[2026-08-07 22:02:40.001] [WindowManager.swift:227] ACTIVATE-DIAG: after 300ms frontmost=Google Chrome [Google Chrome] isActiveNow=true
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.639,y=0.777
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.473,y=0.664 [1]st=4,ty=2,fl=1,z=0.0000,x=0.583,y=0.812
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0135,x=0.639,y=0.777 [1]st=3,ty=2,fl=1,z=0.2367,x=0.514,y=0.654
 [WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1796,x=0.480,y=0.663 [1]st=4,ty=3,fl=1,z=0.0633,x=0.583,y=0.814
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.0021,x=0.640,y=0.777 [1]st=4,ty=2,fl=1,z=0.1588,x=0.515,y=0.651
+[2026-08-07 22:02:42.363] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.430] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.446] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.465] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[WS-DBG] processContactData: ALIVE frame=834 count=2
+[2026-08-07 22:02:42.481] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.498] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.514] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.530] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.548] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=2.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.564] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.800 dY=2.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.581] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.598] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.615] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=2.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.632] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=2.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.648] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=2.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.663] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.679] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.697] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.714] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.730] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.752] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.762] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.779] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.796] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:42.999] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.527,y=0.575
+[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.567,y=0.272
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.422,y=0.171
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0311,x=0.424,y=0.164
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.653,y=0.790
+[WS-DBG] fingerCount: 0 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1526,x=0.525,y=0.686 [1]st=4,ty=3,fl=1,z=0.0415,x=0.657,y=0.808
+[2026-08-07 22:02:43.414] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.580] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.599] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.620] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.631] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.648] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.665] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.682] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.699] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.714] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.100 frontID=16219 gesture=false activating=false
+[WS-DBG] processContactData: ALIVE frame=990 count=2
+[2026-08-07 22:02:43.730] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.757] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.763] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.779] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.796] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=2.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.830] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.847] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.863] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.881] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.897] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.915] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.931] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:43.947] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:44.031] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:44.331] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.454,y=0.140
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.534,y=0.757
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=2,ty=3,fl=1,z=0.1899,x=0.678,y=0.877 [1]st=4,ty=2,fl=1,z=0.0394,x=0.532,y=0.759
 [WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0239,x=0.424,y=0.195 [1]st=4,ty=3,fl=1,z=0.2356,x=0.517,y=0.406
-[WS-DBG] processContactData: ALIVE frame=913 count=2
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.0405,x=0.677,y=0.878 [1]st=4,ty=2,fl=1,z=-0.0104,x=0.532,y=0.758
+[2026-08-07 22:02:44.832] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] processContactData: ALIVE frame=1155 count=2
+[2026-08-07 22:02:45.296] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.315] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.329] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.347] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.364] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.381] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.398] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.415] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.431] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.448] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.465] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.481] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=2.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.498] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=2.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.515] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.531] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.548] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.564] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=3.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.583] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=2.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.596] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.613] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.631] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.647] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.664] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.682] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.696] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.713] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.731] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:45.762] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] processContactData: ALIVE frame=1275 count=2
+[2026-08-07 22:02:46.099] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.5937,x=0.621,y=0.862
+[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.534,y=0.295
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.425,y=0.276
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0799,x=0.428,y=0.275
-[WS-DBG] processContactData: ALIVE frame=1098 count=1
-[2026-08-07 20:28:26.828] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
-[2026-08-07 20:28:26.828] [AppDelegate.swift:149] onInteraction fired for window 17079
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.650,y=0.789
+[WS-DBG] fingerCount: 0 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1681,x=0.518,y=0.673 [1]st=4,ty=3,fl=1,z=0.0270,x=0.650,y=0.797
+[2026-08-07 22:02:46.396] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.547] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.563] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.584] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.598] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.615] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.631] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.648] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=4.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.665] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.682] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=4.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.698] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=3.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.714] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.730] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=2.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.753] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.762] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.779] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.796] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.829] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.848] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.863] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:46.879] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:47.013] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=-0.1671,x=0.552,y=0.323
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.517,y=0.671 [1]st=1,ty=0,fl=0,z=0.0000,x=0.646,y=0.778
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1547,x=0.518,y=0.663 [1]st=3,ty=3,fl=1,z=0.0571,x=0.649,y=0.782
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0228,x=0.518,y=0.663 [1]st=4,ty=3,fl=1,z=0.0156,x=0.649,y=0.782
+[2026-08-07 22:02:48.430] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] processContactData: ALIVE frame=1582 count=2
+[2026-08-07 22:02:48.480] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.498] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.700 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.525] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.529] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.547] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.569] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=3.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.583] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.596] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.500 dY=3.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.614] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.630] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.400 dY=2.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.647] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.300 dY=1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.664] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.681] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.698] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.714] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.729] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.753] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.762] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:48.931] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.550,y=0.315
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.600,y=0.840
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.608,y=0.404
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0695,x=0.595,y=0.825
-[WS-DBG] processContactData: ALIVE frame=1230 count=1
-[2026-08-07 20:28:27.361] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
-[2026-08-07 20:28:27.361] [AppDelegate.swift:149] onInteraction fired for window 17079
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0633,x=0.606,y=0.408
+[WS] CB6: count=3 frame=1716
+[WS] CB6: count=3 frame=1717
+[WS] CB6: count=3 frame=1718
+[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0695,x=0.478,y=0.073 [1]st=4,ty=3,fl=1,z=0.2377,x=0.491,y=0.308 [2]st=4,ty=4,fl=1,z=0.0311,x=0.607,y=0.410
+[WS-DBG] STATE: IDLE -> TRACKING [session=2] (touchdown 32ms, prevFinger=1)
+[WS] CB6: count=3 frame=1719
+[WS] CB6: count=3 frame=1720
+[WS] CB6: count=3 frame=1721
+[WS] CB6: count=3 frame=1722
+[WS] CB6: count=3 frame=1723
+[WS] CB6: count=3 frame=1724
+[WS] CB6: count=3 frame=1725
+[WS] CB6: count=3 frame=1726
+[WS] CB6: count=3 frame=1727
+[WS] CB6: count=3 frame=1728
+[WS] CB6: count=3 frame=1729
+[WS] CB6: count=3 frame=1730
+[WS] CB6: count=3 frame=1731
+[WS] CB6: count=3 frame=1732
+[WS] CB6: count=3 frame=1733
+[WS] CB6: count=3 frame=1734
+[WS] CB6: count=3 frame=1735
+[WS] CB6: count=3 frame=1736
+[WS] CB6: count=3 frame=1737
+[WS] CB6: count=3 frame=1738
+[WS] CB6: count=3 frame=1739
+[WS] CB6: count=3 frame=1740
+[WS] CB6: count=3 frame=1741
+[WS] CB6: count=3 frame=1742
+[WS] CB6: count=3 frame=1743
+[WS] CB6: count=3 frame=1744
+[2026-08-07 22:02:49.763] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1745
+[WS] CB6: count=3 frame=1746
+[2026-08-07 22:02:49.779] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.900 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1747
+[WS] CB6: count=3 frame=1748
+[2026-08-07 22:02:49.796] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-2.200 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1749
+[WS-DBG] GESTURE: UP candidate [session=2] dX=0.0057 dY=0.1371 |dX/dY|=0.04
+[WS] CB6: count=3 frame=1750
+[WS] CB6: count=3 frame=1751
+[2026-08-07 22:02:49.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-3.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1752
+[WS] CB6: count=3 frame=1753
+[2026-08-07 22:02:49.831] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-3.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1754
+[WS] CB6: count=3 frame=1755
+[2026-08-07 22:02:49.846] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.800 dY=-3.400 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1756
+[WS] CB6: count=3 frame=1757
+[WS-DBG] GESTURE: swipe UP confirmed [session=2] dX=0.0181 dY=0.2926 |dX/dY|=0.06 confirm=64ms
+[2026-08-07 22:02:49.861] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #3, type=4, progress=1.0
+[2026-08-07 22:02:49.861] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
+[2026-08-07 22:02:49.861] [AppDelegate.swift:247] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 22:02:49.861] [ImmersiveOverlayCoordinator.swift:16] TIMING: [t=0ms] showImmersiveOverlay called
+[WS] CB6: count=3 frame=1758
+[2026-08-07 22:02:49.874] [WindowManager.swift:148] WindowManager: refreshed 19 windows
+[2026-08-07 22:02:49.875] [ImmersiveOverlayCoordinator.swift:20] TIMING: [t=13ms] refreshWindows done, 19 windows
+[2026-08-07 22:02:49.875] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=5828 dt=0ms
+[2026-08-07 22:02:49.875] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16219 dt=0ms
+[WS] CB6: count=3 frame=1759
+[2026-08-07 22:02:49.883] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16224 dt=8ms
+[2026-08-07 22:02:49.883] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16229 dt=0ms
+[2026-08-07 22:02:49.884] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=24826 dt=0ms
+[2026-08-07 22:02:49.884] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=40 dt=0ms
+[2026-08-07 22:02:49.884] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=14251 dt=0ms
+[2026-08-07 22:02:49.884] [ThumbnailCapturer.swift:45] CAPTURE: preloadThumbnails count=7 ids=7 success=0 dt=9ms
+[2026-08-07 22:02:49.884] [ImmersiveOverlayCoordinator.swift:32] TIMING: [t=22ms] preload visible done (capture=9ms, hit=0, miss=7)
+[2026-08-07 22:02:49.884] [ImmersiveOverlayCoordinator.swift:37] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Google Chrome → [2]Google Chrome → [3]Google Chrome → [4]迅雷影音 → [5]访达 → [6]Obsidian → [7]Obsidian → [8]坚果云 → [9]时钟 → [10]CodeBuddy CN → [11]青山 → [12]网易有道翻译 → [13]系统设置 → [14]HibernateModeManager → [15]活动监视器 → [16]微信读书 → [17]微信 → [18]微信
+[2026-08-07 22:02:49.884] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=19, withThumbnails=0
+[WS] CB6: count=3 frame=1760
+[2026-08-07 22:02:49.888] [ImmersiveOverlayCoordinator.swift:40] TIMING: [t=27ms] overlay shown (UI=4ms, total=27ms)
+[WS] CB6: count=3 frame=1761
+[2026-08-07 22:02:49.888] [ImmersiveOverlayCoordinator.swift:45] CAPTURE: background capture starting, remaining=12, overlay shown at t=27ms
+[2026-08-07 22:02:49.889] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=36419
+[2026-08-07 22:02:49.889] [AXFocusObserver.swift:26] AXFocusObserver: already observing pid=36419
+[2026-08-07 22:02:49.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 dt=0ms
+[2026-08-07 22:02:49.890] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [坚果云 — 坚果云] win=15794 dt=0ms
+[2026-08-07 22:02:49.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [时钟 — 时钟] win=72 dt=0ms
+[2026-08-07 22:02:49.891] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [CodeBuddy CN — 20260723112900] win=3993 dt=0ms
+[2026-08-07 22:02:49.894] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [青山 — 青山] win=129 dt=3ms
+[2026-08-07 22:02:49.894] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [网易有道翻译 — 网易有道翻译] win=106 dt=0ms
+[2026-08-07 22:02:49.894] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [系统设置 — 辅助功能] win=17781 dt=0ms
+[2026-08-07 22:02:49.894] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [HibernateModeManager — HibernateMode Manager] win=73 dt=0ms
+[2026-08-07 22:02:49.895] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [活动监视器 — 活动监视器 – 所有进程] win=85 dt=0ms
+[2026-08-07 22:02:49.895] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信读书 — 微信读书] win=20873 dt=0ms
+[2026-08-07 22:02:49.895] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信] win=158 dt=0ms
+[2026-08-07 22:02:49.895] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信 (窗口)] win=10870 dt=0ms
+[2026-08-07 22:02:49.895] [ImmersiveOverlayCoordinator.swift:70] CAPTURE: background capture complete, captured=0/12, dt=5ms
+[WS] CB6: count=3 frame=1762
+[2026-08-07 22:02:49.903] [OverlayView.swift:89] CARD-FRAMES: updated, count=19
+[WS] CB6: count=3 frame=1763
+[WS] CB6: count=3 frame=1764
+[2026-08-07 22:02:49.919] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-5.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:49.922] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.800 dY=-0.600 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1765
+[WS] CB6: count=3 frame=1766
+[2026-08-07 22:02:49.938] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.300 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1767
+[2026-08-07 22:02:49.946] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1768
+[WS] CB6: count=3 frame=1769
+[2026-08-07 22:02:49.962] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1770
+[WS-DBG] processContactData: ALIVE frame=1770 count=3
+[WS] CB6: count=3 frame=1771
+[WS] CB6: count=3 frame=1772
+[WS] CB6: count=3 frame=1773
+[WS] CB6: count=3 frame=1774
+[WS] CB6: count=3 frame=1775
+[WS] CB6: count=3 frame=1776
+[WS] CB6: count=3 frame=1777
+[WS] CB6: count=3 frame=1778
+[WS] CB6: count=3 frame=1779
+[WS] CB6: count=3 frame=1780
+[WS] CB6: count=3 frame=1781
+[WS] CB6: count=3 frame=1782
+[WS] CB6: count=3 frame=1783
+[WS] CB6: count=3 frame=1784
+[WS] CB6: count=3 frame=1785
+[WS] CB6: count=3 frame=1786
+[WS] CB6: count=3 frame=1787
+[WS] CB6: count=3 frame=1788
+[WS] CB6: count=3 frame=1789
+[WS] CB6: count=3 frame=1790
+[WS] CB6: count=3 frame=1791
+[WS] CB6: count=3 frame=1792
+[WS] CB6: count=3 frame=1793
+[WS] CB6: count=3 frame=1794
+[WS] CB6: count=3 frame=1795
+[WS] CB6: count=3 frame=1796
+[WS] CB6: count=3 frame=1797
+[WS] CB6: count=3 frame=1798
+[WS] CB6: count=3 frame=1799
+[WS] CB6: count=3 frame=1800
+[WS] CB6: count=3 frame=1801
+[WS] CB6: count=3 frame=1802
+[WS] CB6: count=3 frame=1803
+[WS] CB6: count=3 frame=1804
+[WS] CB6: count=3 frame=1805
+[WS] CB6: count=3 frame=1806
+[WS] CB6: count=3 frame=1807
+[WS] CB6: count=3 frame=1808
+[WS] CB6: count=3 frame=1809
+[WS] CB6: count=3 frame=1810
+[WS] CB6: count=3 frame=1811
+[WS] CB6: count=3 frame=1812
+[WS] CB6: count=3 frame=1813
+[WS] CB6: count=3 frame=1814
+[WS] CB6: count=3 frame=1815
+[WS] CB6: count=3 frame=1816
+[WS] CB6: count=3 frame=1817
+[WS] CB6: count=3 frame=1818
+[WS] CB6: count=3 frame=1819
+[WS] CB6: count=3 frame=1820
+[WS] CB6: count=3 frame=1821
+[WS] CB6: count=3 frame=1822
+[WS] CB6: count=3 frame=1823
+[WS] CB6: count=3 frame=1824
+[WS] CB6: count=3 frame=1825
+[WS] CB6: count=3 frame=1826
+[WS] CB6: count=3 frame=1827
+[WS] CB6: count=3 frame=1828
+[WS] CB6: count=3 frame=1829
+[WS] CB6: count=3 frame=1830
+[WS] CB6: count=3 frame=1831
+[WS] CB6: count=3 frame=1832
+[WS] CB6: count=3 frame=1833
+[WS] CB6: count=3 frame=1834
+[WS] CB6: count=3 frame=1835
+[WS] CB6: count=3 frame=1836
+[WS] CB6: count=3 frame=1837
+[WS] CB6: count=3 frame=1838
+[WS] CB6: count=3 frame=1839
+[WS] CB6: count=3 frame=1840
+[WS] CB6: count=3 frame=1841
+[WS] CB6: count=3 frame=1842
+[WS] CB6: count=3 frame=1843
+[WS] CB6: count=3 frame=1844
+[WS] CB6: count=3 frame=1845
+[WS] CB6: count=3 frame=1846
+[WS] CB6: count=3 frame=1847
+[WS] CB6: count=3 frame=1848
+[WS] CB6: count=3 frame=1849
+[WS] CB6: count=3 frame=1850
+[WS] CB6: count=3 frame=1851
+[WS] CB6: count=3 frame=1852
+[WS] CB6: count=3 frame=1853
+[WS] CB6: count=3 frame=1854
+[WS] CB6: count=3 frame=1855
+[WS] CB6: count=3 frame=1856
+[WS] CB6: count=3 frame=1857
+[WS] CB6: count=3 frame=1858
+[WS] CB6: count=3 frame=1859
+[WS] CB6: count=3 frame=1860
+[WS] CB6: count=3 frame=1861
+[WS] CB6: count=3 frame=1862
+[WS] CB6: count=3 frame=1863
+[WS] CB6: count=3 frame=1864
+[WS] CB6: count=3 frame=1865
+[WS] CB6: count=3 frame=1866
+[WS] CB6: count=3 frame=1867
+[WS] CB6: count=3 frame=1868
+[WS] CB6: count=3 frame=1869
+[WS] CB6: count=3 frame=1870
+[WS] CB6: count=3 frame=1871
+[WS] CB6: count=3 frame=1872
+[WS] CB6: count=3 frame=1873
+[WS] CB6: count=3 frame=1874
+[WS] CB6: count=3 frame=1875
+[WS] CB6: count=3 frame=1876
+[2026-08-07 22:02:50.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1877
+[WS] CB6: count=3 frame=1878
+[2026-08-07 22:02:50.829] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=1879
+[WS] CB6: count=3 frame=1880
+[WS] CB6: count=3 frame=1881
+[WS] CB6: count=3 frame=1882
+[WS] CB6: count=3 frame=1883
+[WS] CB6: count=3 frame=1884
+[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.520,y=0.695 [1]st=4,ty=3,fl=1,z=-0.0664,x=0.681,y=0.808
+[WS-DBG] TRAJECTORY: swipe-end [session=2] dX=0.0748 dY=0.4875 |dX/dY|=0.15
+[WS-DBG] STATE: SWIPING -> IDLE [session=2] (lift, fingerCount=2) GestureEnd fired
+[2026-08-07 22:02:50.884] [AppDelegate.swift:314] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 22:02:50.884] [AppDelegate.swift:322] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=-0.1079,x=0.680,y=0.806
+[2026-08-07 22:02:50.913] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.943,y=0.487
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.512,y=0.437
+[WS-DBG] processContactData: ALIVE frame=1903 count=1
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.4224,x=0.965,y=0.490
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0000,x=0.511,y=0.442
+[2026-08-07 22:02:53.681] [OverlayWindowController.swift:217] OVERLAY-CLICK: window=Google Chrome — DeepSeek 开放平台 - Google Chrome
+[2026-08-07 22:02:53.681] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
+[2026-08-07 22:02:53.684] [WindowManager.swift:175] ACTIVATE-DIAG: [Google Chrome] pid=24972 bid=com.google.Chrome isActive=false needsActivate=true frontmostBefore=WindowSwitcher window=16219
+[2026-08-07 22:02:53.685] [WindowManager.swift:182] AX: Google Chrome has 3 AX windows, target=[DeepSeek 开放平台 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:53.685] [WindowManager.swift:187] AX:   [0][DeepSeek 开放平台 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:53.685] [WindowManager.swift:187] AX:   [1][「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:53.685] [WindowManager.swift:187] AX:   [2][新标签页 - Google Chrome] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:02:53.686] [WindowManager.swift:204] AX: raised [Google Chrome] idx=0 title="DeepSeek 开放平台 - Google Chrome"
+[2026-08-07 22:02:53.686] [WindowManager.swift:217] ACTIVATE-DIAG: calling app.activate() for [Google Chrome] pid=24972
+[2026-08-07 22:02:53.692] [WindowManager.swift:220] ACTIVATE-DIAG: app.activate() returned true for [Google Chrome]
+[2026-08-07 22:02:53.692] [LRUOrderingEngine.swift:129] LRU-SELECT: [Google Chrome — DeepSeek 开放平台 - Google Chrome] cursor→1, order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Google Chrome — DeepSeek 开放平台 - Google Chrome → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome → Google Chrome — 新标签页 - Google Chrome → 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4] (unchanged=true)
+[2026-08-07 22:02:53.692] [WindowManager.swift:236] ACTIVATE-DONE: window=Google Chrome — DeepSeek 开放平台 - Google Chrome idx=1 cursorAfter=1 orderedIDs[0]=终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 isActivating=true
+[2026-08-07 22:02:53.693] [ActivationHistory.swift:27] ActivationHistory: app activated [Google Chrome] pid=24972
+[2026-08-07 22:02:53.693] [WindowManager.swift:65] ActivationHistory: suppressed programmatic activation pid=24972
+[2026-08-07 22:02:54.000] [AXWindowMatcher.swift:213] MAPPING-OK: window=16219 focused="DeepSeek 开放平台 - Google Chrome"
+[2026-08-07 22:02:54.001] [WindowManager.swift:227] ACTIVATE-DIAG: after 300ms frontmost=Google Chrome [Google Chrome] isActiveNow=true
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=3,ty=7,fl=1,z=0.1920,x=0.982,y=0.511
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.545,y=0.202
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.1619,x=0.983,y=0.511
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0374,x=0.552,y=0.206
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.1474,x=0.556,y=0.213 [1]st=4,ty=2,fl=1,z=0.0125,x=0.459,y=0.088
+[2026-08-07 22:02:54.763] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.796] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.813] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.831] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.400 dY=-3.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.847] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.500 dY=-5.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.863] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.600 dY=-6.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.879] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.900 dY=-6.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.898] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=1.200 dY=-5.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.899] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.640,y=0.628
+[2026-08-07 22:02:54.904] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=began dX=1.400 dY=-8.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.922] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-9.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.938] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-9.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.955] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-9.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.972] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-8.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:54.988] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-8.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.005] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.600 dY=-8.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.023] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.600 dY=-8.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.038] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.400 dY=-7.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.054] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.300 dY=-7.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.072] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.200 dY=-6.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.089] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.100 dY=-6.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.105] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.000 dY=-5.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.122] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.900 dY=-5.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.138] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.800 dY=-5.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.156] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.800 dY=-4.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.172] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.700 dY=-4.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.188] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.600 dY=-3.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.205] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.600 dY=-3.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.222] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.500 dY=-3.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.239] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.500 dY=-3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.254] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-2.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.272] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-2.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.288] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.200 dY=-2.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.305] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-2.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.324] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.337] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.355] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.300 dY=-1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.371] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.389] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.405] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.421] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.438] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.200 dY=-1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.455] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.472] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.489] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.504] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.522] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.538] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.900 dY=-0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.555] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.572] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.589] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.606] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.622] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.639] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.655] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.672] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.689] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.800 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.706] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.722] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.738] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.763] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.771] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.788] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.805] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.822] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.838] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.855] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.872] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.888] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.905] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.939] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.956] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:55.972] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=ended dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.970,y=0.253
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.971,y=0.253
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.632,y=0.700
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.0062,x=0.632,y=0.701 [1]st=3,ty=2,fl=1,z=-0.0052,x=0.510,y=0.583
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0062,x=0.632,y=0.701 [1]st=4,ty=2,fl=1,z=0.0747,x=0.510,y=0.582
+[2026-08-07 22:02:56.098] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.197] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.214] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.200 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.232] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.600 dY=2.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.248] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-1.300 dY=5.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.268] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-2.400 dY=12.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.280] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-2.200 dY=17.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.280] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.9653,x=0.500,y=0.119
+[2026-08-07 22:02:56.296] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=began dX=0.000 dY=21.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.313] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=20.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.330] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=19.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.347] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=18.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.363] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=17.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.380] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=16.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.400] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=14.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.413] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=13.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.430] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=13.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.447] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=12.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.464] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=12.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.481] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=11.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.497] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=11.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.513] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=10.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.535] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=10.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.551] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=9.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.564] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=9.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.581] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=9.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.598] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=8.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.615] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=8.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.631] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=7.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.648] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=7.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.665] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=6.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.681] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=6.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.698] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=5.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.714] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=5.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.730] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=5.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.753] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.762] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.779] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.796] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.812] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.829] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.846] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.863] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.880] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.898] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.915] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.931] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.947] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.965] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.981] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:56.998] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.014] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.032] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.053] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.063] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.080] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.101] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.114] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.130] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.147] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.164] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.179] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.198] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.212] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.231] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.255] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.262] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.279] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.296] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.313] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.329] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.346] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.362] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.378] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.396] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.413] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.431] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.458,y=0.110 [1]st=1,ty=0,fl=0,z=0.0000,x=0.559,y=0.233
+[2026-08-07 22:02:57.446] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.454] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=ended dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=3,ty=2,fl=1,z=-0.2865,x=0.456,y=0.107 [1]st=4,ty=3,fl=1,z=0.1630,x=0.560,y=0.232
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0104,x=0.456,y=0.107 [1]st=4,ty=3,fl=1,z=0.0457,x=0.561,y=0.234
+[2026-08-07 22:02:57.530] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.569] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.580] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.598] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.400 dY=-3.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.615] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.900 dY=-7.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.632] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=1.700 dY=-9.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.648] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=2.800 dY=-11.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.664] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=3.400 dY=-9.500 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=1.6213,x=0.730,y=0.792
+[2026-08-07 22:02:57.682] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=4.100 dY=-13.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.682] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=began dX=4.100 dY=-13.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.700] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.800 dY=-13.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.713] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.900 dY=-13.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.729] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=5.000 dY=-13.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.745] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.900 dY=-12.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.765] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.600 dY=-11.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.779] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.900 dY=-11.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.795] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.900 dY=-10.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.813] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.500 dY=-10.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.829] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=4.100 dY=-9.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.846] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=3.800 dY=-9.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.864] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=3.500 dY=-8.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.882] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=3.200 dY=-8.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.898] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=3.000 dY=-7.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.915] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=2.700 dY=-7.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.930] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=2.400 dY=-6.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.948] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=2.200 dY=-6.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.965] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=2.000 dY=-5.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.981] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.900 dY=-5.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:57.998] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.700 dY=-5.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.015] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.600 dY=-4.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.033] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.400 dY=-4.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.048] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.300 dY=-4.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.065] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.200 dY=-3.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.081] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.100 dY=-3.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.097] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.000 dY=-3.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.114] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.900 dY=-2.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.131] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.800 dY=-2.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.149] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.800 dY=-2.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.165] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.700 dY=-2.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.181] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.700 dY=-2.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.197] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.600 dY=-1.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.214] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.600 dY=-1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.231] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.500 dY=-1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.253] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.500 dY=-1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.262] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.278] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.295] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.312] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.500 dY=-0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.329] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.347] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.363] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.378] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.100 dY=-0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.399] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.415] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.431] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.448] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.464] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=1.000 dY=-0.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.481] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.498] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.515] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.532] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.549] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.564] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.581] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.900 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.596] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.615] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.629] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.646] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.665] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.680] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.698] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.712] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.735] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.745] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.762] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.780] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.812] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=-0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.829] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.980,y=0.427
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.689,y=0.813
+[2026-08-07 22:02:58.868] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:58.868] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=ended dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.980,y=0.427
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0560,x=0.689,y=0.813
+[WS-DBG] processContactData: ALIVE frame=2568 count=2
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0353,x=0.562,y=0.702 [1]st=4,ty=3,fl=1,z=0.0426,x=0.691,y=0.814
+[2026-08-07 22:02:58.996] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.116] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.117] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.130] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-1.900 dY=4.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.148] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-3.100 dY=13.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.166] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-2.800 dY=17.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.194] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-1.700 dY=16.800 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=1,fl=-1,z=-0.6726,x=0.524,y=0.158
+[2026-08-07 22:02:59.196] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=-0.900 dY=12.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.196] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.206] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=began dX=0.000 dY=20.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.222] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=20.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.239] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=19.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.263] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=18.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.272] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=17.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.289] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=16.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.305] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=14.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.322] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=13.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.339] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=13.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.355] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=12.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.372] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=12.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.389] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=11.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.405] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=11.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.423] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=10.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.439] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=10.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.456] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=9.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.472] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=9.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.489] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=8.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.505] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=8.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.523] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=7.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.539] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=7.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.556] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=6.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.573] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=6.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.590] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=6.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.605] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=5.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.623] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=5.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.639] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.656] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.673] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=4.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.689] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.706] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.722] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.739] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=3.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.757] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.771] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.789] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.806] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=2.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.822] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.839] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.855] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.872] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.400 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.889] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.300 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.906] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.200 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.923] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.100 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.939] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.956] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.900 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.973] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:02:59.989] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.800 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.006] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.023] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.700 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.039] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.056] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.600 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.072] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.089] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.106] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.123] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.140] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.156] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.500 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.173] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.189] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.206] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.222] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[2026-08-07 22:03:00.239] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=changed dX=0.000 dY=1.100 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.494,y=0.033 [1]st=1,ty=0,fl=0,z=0.0000,x=0.584,y=0.390
+[2026-08-07 22:03:00.252] [WindowManager.swift:260] SCROLL-DIAG: phase=none(0) momentum=ended dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=3,ty=1,fl=1,z=0.1879,x=0.491,y=0.023 [1]st=4,ty=2,fl=1,z=0.0706,x=0.588,y=0.394
+[WS] CB6: count=3 frame=2737
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.471,y=0.280 [1]st=4,ty=1,fl=1,z=0.2450,x=0.493,y=0.023 [2]st=4,ty=2,fl=1,z=-0.1349,x=0.587,y=0.393
+[WS] CB6: count=3 frame=2738
+[WS] CB6: count=3 frame=2739
+[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1246,x=0.482,y=0.287 [1]st=4,ty=1,fl=1,z=0.0529,x=0.494,y=0.025 [2]st=4,ty=3,fl=1,z=0.1121,x=0.590,y=0.397
+[WS-DBG] STATE: IDLE -> TRACKING [session=3] (touchdown 24ms, prevFinger=2)
+[WS] CB6: count=3 frame=2740
+[WS] CB6: count=3 frame=2741
+[WS] CB6: count=3 frame=2742
+[WS] CB6: count=3 frame=2743
+[WS] CB6: count=3 frame=2744
+[WS] CB6: count=3 frame=2745
+[WS] CB6: count=3 frame=2746
+[WS] CB6: count=3 frame=2747
+[2026-08-07 22:03:00.346] [WindowManager.swift:260] SCROLL-DIAG: phase=mayBegin momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2748
+[WS] CB6: count=3 frame=2749
+[WS] CB6: count=3 frame=2750
+[WS] CB6: count=3 frame=2751
+[WS-DBG] TRACK postSettle: dispX=0.0024 dispY=0.0235 |dX|=0.0024 |dY|=0.0235 swipeMinDisp=0.0800 elapsed=16ms
+[2026-08-07 22:03:00.379] [WindowManager.swift:260] SCROLL-DIAG: phase=cancelled momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2752
+[WS] CB6: count=3 frame=2753
+[2026-08-07 22:03:00.396] [WindowManager.swift:260] SCROLL-DIAG: phase=began momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2754
+[WS] CB6: count=3 frame=2755
+[2026-08-07 22:03:00.415] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.800 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2756
+[WS-DBG] GESTURE: UP candidate [session=3] dX=0.0141 dY=0.1243 |dX/dY|=0.11
+[WS] CB6: count=3 frame=2757
+[2026-08-07 22:03:00.431] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.500 dY=-3.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2758
+[WS] CB6: count=3 frame=2759
+[2026-08-07 22:03:00.448] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.600 dY=-3.700 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2760
+[WS] CB6: count=3 frame=2761
+[2026-08-07 22:03:00.465] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.800 dY=-4.200 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2762
+[WS] CB6: count=3 frame=2763
+[2026-08-07 22:03:00.481] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.700 dY=-3.500 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2764
+[WS-DBG] GESTURE: swipe UP confirmed [session=3] dX=0.0491 dY=0.3175 |dX/dY|=0.15 confirm=64ms
+[2026-08-07 22:03:00.482] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #5, type=4, progress=1.0
+[2026-08-07 22:03:00.482] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
+[2026-08-07 22:03:00.482] [AppDelegate.swift:247] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 22:03:00.482] [ImmersiveOverlayCoordinator.swift:16] TIMING: [t=0ms] showImmersiveOverlay called
+[WS] CB6: count=3 frame=2765
+[WS] CB6: count=3 frame=2766
+[2026-08-07 22:03:00.506] [WindowManager.swift:148] WindowManager: refreshed 19 windows
+[WS] CB6: count=3 frame=2767
+[2026-08-07 22:03:00.506] [ImmersiveOverlayCoordinator.swift:20] TIMING: [t=23ms] refreshWindows done, 19 windows
+[2026-08-07 22:03:00.506] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=5828 dt=0ms
+[2026-08-07 22:03:00.507] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16219 dt=0ms
+[2026-08-07 22:03:00.507] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16224 dt=0ms
+[2026-08-07 22:03:00.507] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=16229 dt=0ms
+[2026-08-07 22:03:00.507] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=24826 dt=0ms
+[2026-08-07 22:03:00.508] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=40 dt=0ms
+[2026-08-07 22:03:00.508] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [?] win=14251 dt=0ms
+[2026-08-07 22:03:00.508] [ThumbnailCapturer.swift:45] CAPTURE: preloadThumbnails count=7 ids=7 success=0 dt=1ms
+[2026-08-07 22:03:00.508] [ImmersiveOverlayCoordinator.swift:32] TIMING: [t=25ms] preload visible done (capture=1ms, hit=0, miss=7)
+[2026-08-07 22:03:00.508] [ImmersiveOverlayCoordinator.swift:37] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Google Chrome → [2]Google Chrome → [3]Google Chrome → [4]迅雷影音 → [5]访达 → [6]Obsidian → [7]Obsidian → [8]坚果云 → [9]时钟 → [10]CodeBuddy CN → [11]青山 → [12]网易有道翻译 → [13]系统设置 → [14]HibernateModeManager → [15]活动监视器 → [16]微信读书 → [17]微信 → [18]微信
+[2026-08-07 22:03:00.508] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=19, withThumbnails=0
+[WS] CB6: count=3 frame=2768
+[WS] CB6: count=3 frame=2769
+[2026-08-07 22:03:00.520] [ImmersiveOverlayCoordinator.swift:40] TIMING: [t=37ms] overlay shown (UI=11ms, total=37ms)
+[2026-08-07 22:03:00.520] [ImmersiveOverlayCoordinator.swift:45] CAPTURE: background capture starting, remaining=12, overlay shown at t=37ms
+[2026-08-07 22:03:00.520] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=36419
+[2026-08-07 22:03:00.521] [AXFocusObserver.swift:26] AXFocusObserver: already observing pid=36419
+[2026-08-07 22:03:00.524] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 dt=1ms
+[WS] CB6: count=3 frame=2770
+[2026-08-07 22:03:00.528] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [坚果云 — 坚果云] win=15794 dt=4ms
+[2026-08-07 22:03:00.531] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [时钟 — 时钟] win=72 dt=2ms
+[2026-08-07 22:03:00.531] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [CodeBuddy CN — 20260723112900] win=3993 dt=0ms
+[2026-08-07 22:03:00.531] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [青山 — 青山] win=129 dt=0ms
+[2026-08-07 22:03:00.532] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [网易有道翻译 — 网易有道翻译] win=106 dt=0ms
+[2026-08-07 22:03:00.532] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [系统设置 — 辅助功能] win=17781 dt=0ms
+[2026-08-07 22:03:00.532] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [HibernateModeManager — HibernateMode Manager] win=73 dt=0ms
+[2026-08-07 22:03:00.532] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [活动监视器 — 活动监视器 – 所有进程] win=85 dt=0ms
+[2026-08-07 22:03:00.533] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信读书 — 微信读书] win=20873 dt=0ms
+[2026-08-07 22:03:00.533] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信] win=158 dt=0ms
+[2026-08-07 22:03:00.533] [ThumbnailCapturer.swift:19] CAPTURE: FAIL [微信 — 微信 (窗口)] win=10870 dt=0ms
+[2026-08-07 22:03:00.533] [ImmersiveOverlayCoordinator.swift:70] CAPTURE: background capture complete, captured=0/12, dt=10ms
+[WS] CB6: count=3 frame=2771
+[2026-08-07 22:03:00.538] [OverlayView.swift:89] CARD-FRAMES: updated, count=19
+[WS] CB6: count=3 frame=2772
+[WS] CB6: count=3 frame=2773
+[2026-08-07 22:03:00.556] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=1.500 dY=-6.400 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2774
+[WS] CB6: count=3 frame=2775
+[2026-08-07 22:03:00.573] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=-0.300 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2776
+[2026-08-07 22:03:00.581] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2777
+[WS] CB6: count=3 frame=2778
+[2026-08-07 22:03:00.596] [WindowManager.swift:260] SCROLL-DIAG: phase=changed momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS] CB6: count=3 frame=2779
+[WS] CB6: count=3 frame=2780
+[WS] CB6: count=3 frame=2781
+[WS] CB6: count=3 frame=2782
+[WS] CB6: count=3 frame=2783
+[WS] CB6: count=3 frame=2784
+[WS] CB6: count=3 frame=2785
+[WS] CB6: count=3 frame=2786
+[WS] CB6: count=3 frame=2787
+[WS] CB6: count=3 frame=2788
+[WS] CB6: count=3 frame=2789
+[WS] CB6: count=3 frame=2790
+[WS] CB6: count=3 frame=2791
+[WS] CB6: count=3 frame=2792
+[WS] CB6: count=3 frame=2793
+[WS] CB6: count=3 frame=2794
+[WS] CB6: count=3 frame=2795
+[WS] CB6: count=3 frame=2796
+[WS] CB6: count=3 frame=2797
+[WS] CB6: count=3 frame=2798
+[WS] CB6: count=3 frame=2799
+[WS] CB6: count=3 frame=2800
+[WS] CB6: count=3 frame=2801
+[WS] CB6: count=3 frame=2802
+[WS] CB6: count=3 frame=2803
+[WS] CB6: count=3 frame=2804
+[WS] CB6: count=3 frame=2805
+[WS] CB6: count=3 frame=2806
+[WS] CB6: count=3 frame=2807
+[WS] CB6: count=3 frame=2808
+[WS] CB6: count=3 frame=2809
+[WS] CB6: count=3 frame=2810
+[WS] CB6: count=3 frame=2811
+[WS] CB6: count=3 frame=2812
+[WS] CB6: count=3 frame=2813
+[WS] CB6: count=3 frame=2814
+[WS] CB6: count=3 frame=2815
+[WS] CB6: count=3 frame=2816
+[WS-DBG] processContactData: ALIVE frame=2816 count=3
+[WS] CB6: count=3 frame=2817
+[WS] CB6: count=3 frame=2818
+[WS] CB6: count=3 frame=2819
+[WS] CB6: count=3 frame=2820
+[WS] CB6: count=3 frame=2821
+[WS] CB6: count=3 frame=2822
+[WS] CB6: count=3 frame=2823
+[WS] CB6: count=3 frame=2824
+[WS] CB6: count=3 frame=2825
+[WS] CB6: count=3 frame=2826
+[WS] CB6: count=3 frame=2827
+[WS] CB6: count=3 frame=2828
+[WS] CB6: count=3 frame=2829
+[WS] CB6: count=3 frame=2830
+[WS] CB6: count=3 frame=2831
+[WS] CB6: count=3 frame=2832
+[WS] CB6: count=3 frame=2833
+[WS] CB6: count=3 frame=2834
+[WS] CB6: count=3 frame=2835
+[WS] CB6: count=3 frame=2836
+[WS] CB6: count=3 frame=2837
+[WS] CB6: count=3 frame=2838
+[WS] CB6: count=3 frame=2839
+[WS] CB6: count=3 frame=2840
+[WS] CB6: count=3 frame=2841
+[WS] CB6: count=3 frame=2842
+[WS] CB6: count=3 frame=2843
+[WS] CB6: count=3 frame=2844
+[WS] CB6: count=3 frame=2845
+[WS] CB6: count=3 frame=2846
+[WS] CB6: count=3 frame=2847
+[WS] CB6: count=3 frame=2848
+[WS] CB6: count=3 frame=2849
+[WS] CB6: count=3 frame=2850
+[WS] CB6: count=3 frame=2851
+[WS] CB6: count=3 frame=2852
+[WS] CB6: count=3 frame=2853
+[WS] CB6: count=3 frame=2854
+[WS] CB6: count=3 frame=2855
+[WS] CB6: count=3 frame=2856
+[WS] CB6: count=3 frame=2857
+[WS] CB6: count=3 frame=2858
+[WS] CB6: count=3 frame=2859
+[WS] CB6: count=3 frame=2860
+[WS] CB6: count=3 frame=2861
+[WS] CB6: count=3 frame=2862
+[WS] CB6: count=3 frame=2863
+[WS] CB6: count=3 frame=2864
+[WS] CB6: count=3 frame=2865
+[WS] CB6: count=3 frame=2866
+[WS] CB6: count=3 frame=2867
+[WS] CB6: count=3 frame=2868
+[WS] CB6: count=3 frame=2869
+[WS] CB6: count=3 frame=2870
+[WS] CB6: count=3 frame=2871
+[WS] CB6: count=3 frame=2872
+[WS] CB6: count=3 frame=2873
+[WS] CB6: count=3 frame=2874
+[WS] CB6: count=3 frame=2875
+[WS] CB6: count=3 frame=2876
+[WS] CB6: count=3 frame=2877
+[WS] CB6: count=3 frame=2878
+[WS] CB6: count=3 frame=2879
+[WS] CB6: count=3 frame=2880
+[WS] CB6: count=3 frame=2881
+[WS] CB6: count=3 frame=2882
+[WS] CB6: count=3 frame=2883
+[WS] CB6: count=3 frame=2884
+[WS] CB6: count=3 frame=2885
+[2026-08-07 22:03:01.449] [WindowManager.swift:260] SCROLL-DIAG: phase=ended momentum=none(0) dX=0.000 dY=0.000 frontID=16219 gesture=false activating=false
+[WS-DBG] fingerCount: 3 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=6,ty=3,fl=1,z=-0.1796,x=0.707,y=0.814
+[WS-DBG] TRAJECTORY: swipe-end [session=3] dX=0.1843 dY=0.5654 |dX/dY|=0.33
+[WS-DBG] STATE: SWIPING -> IDLE [session=3] (lift, fingerCount=1) GestureEnd fired
+[2026-08-07 22:03:01.457] [AppDelegate.swift:314] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 22:03:01.457] [AppDelegate.swift:322] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.627,y=0.401
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.2782,x=0.621,y=0.397
+[WS-DBG] processContactData: ALIVE frame=3161 count=1
+[2026-08-07 22:03:03.966] [OverlayWindowController.swift:217] OVERLAY-CLICK: window=终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34
+[2026-08-07 22:03:03.966] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
+[2026-08-07 22:03:03.967] [WindowManager.swift:175] ACTIVATE-DIAG: [终端] pid=8243 bid=com.apple.Terminal isActive=false needsActivate=true frontmostBefore=WindowSwitcher window=5828
+[2026-08-07 22:03:03.967] [WindowManager.swift:182] AX: 终端 has 1 AX windows, target=[TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:03:03.967] [WindowManager.swift:187] AX:   [0][TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] frame=(0.0, 38.0, 1470.0, 918.0)
+[2026-08-07 22:03:03.968] [WindowManager.swift:204] AX: raised [终端] idx=0 title="TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34"
+[2026-08-07 22:03:03.968] [WindowManager.swift:217] ACTIVATE-DIAG: calling app.activate() for [终端] pid=8243
+[2026-08-07 22:03:03.974] [WindowManager.swift:220] ACTIVATE-DIAG: app.activate() returned true for [终端]
+[2026-08-07 22:03:03.974] [LRUOrderingEngine.swift:129] LRU-SELECT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] cursor→0, order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Google Chrome — DeepSeek 开放平台 - Google Chrome → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 - Google Chrome → Google Chrome — 新标签页 - Google Chrome → 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4] (unchanged=true)
+[2026-08-07 22:03:03.974] [WindowManager.swift:236] ACTIVATE-DONE: window=终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 idx=0 cursorAfter=0 orderedIDs[0]=终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 isActivating=true
+[2026-08-07 22:03:03.975] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-07 22:03:03.975] [WindowManager.swift:65] ActivationHistory: suppressed programmatic activation pid=8243
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.329,y=0.185
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1681,x=0.331,y=0.189
+[2026-08-07 22:03:04.283] [AXWindowMatcher.swift:213] MAPPING-OK: window=5828 focused="TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34"
+[2026-08-07 22:03:04.284] [WindowManager.swift:227] ACTIVATE-DIAG: after 300ms frontmost=终端 [终端] isActiveNow=true
+[WS-DBG] processContactData: ALIVE frame=3300 count=1
+[2026-08-07 22:03:04.802] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
+[2026-08-07 22:03:04.803] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.803] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.803] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.803] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.803] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.806] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.807] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:04.807] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.598,y=0.733
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1910,x=0.601,y=0.730
+[2026-08-07 22:03:05.254] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 22:03:05.303] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 22:03:05.303] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 22:03:05.554] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
+[2026-08-07 22:03:05.555] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 22:03:05.847] [AppDelegate.swift:136] stopService called
+[WS] Gesture engine stopped (total callbacks received: 1696, errors: 0)
+[2026-08-07 22:03:05.848] [GestureEngineWrapper.swift:215] GestureEngine: stopped
+[2026-08-07 22:03:05.849] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-07 22:03:05.849] [ActivationHistory.swift:37] ActivationHistory: stopped
+[2026-08-07 22:03:05.849] [WindowManager.swift:300] WindowManager: interaction monitoring stopped
+[2026-08-07 22:03:05.849] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=false
+[2026-08-07 22:03:07.403] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
+[2026-08-07 22:03:07.404] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
+[2026-08-07 22:03:07.404] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
