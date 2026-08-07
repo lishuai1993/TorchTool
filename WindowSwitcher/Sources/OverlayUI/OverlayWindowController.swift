@@ -27,6 +27,9 @@ final class OverlayWindowController {
 
         viewModel.show(windows: windows)
 
+        let withThumbnails = windows.filter { $0.thumbnail != nil }.count
+        logDebug("CAPTURE-UI: overlay show, windows=\(windows.count), withThumbnails=\(withThumbnails)")
+
         NSApp.activate(ignoringOtherApps: true)
         panel?.makeKeyAndOrderFront(nil)
 
@@ -124,6 +127,7 @@ final class OverlayWindowController {
     }
 
     func hide() {
+        logDebug("CAPTURE-UI: overlay hide called, isVisible=\(isVisible)")
         if let m = localKeyMonitor {
             NSEvent.removeMonitor(m)
             localKeyMonitor = nil

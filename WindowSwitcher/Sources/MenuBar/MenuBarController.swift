@@ -118,6 +118,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     private var statusItem: NSStatusItem?
     private var settingsWindow: NSWindow?
+    private var helpWindow: NSWindow?
 
     // Custom view references for dynamic state updates
     private weak var startServiceView: MenuItemView?
@@ -252,6 +253,14 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             DispatchQueue.main.async { self.openSettings() }
         }
         menu.addItem(settingsItem)
+
+        // Help — MenuItemView, closes menu before opening help window
+        let helpItem = makeActionItem(title: "帮助文档", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            self.menu.cancelTracking()
+            DispatchQueue.main.async { self.openHelp() }
+        }
+        menu.addItem(helpItem)
 
         menu.addItem(.separator())
 
@@ -465,6 +474,25 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             settingsWindow = window
         }
         settingsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func openHelp() {
+        if helpWindow == nil {
+            let hosting = NSHostingView(rootView: HelpPanelView())
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 500, height: 560),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = "WindowSwitcher 帮助"
+            window.contentView = hosting
+            window.center()
+            window.isReleasedWhenClosed = false
+            helpWindow = window
+        }
+        helpWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 }

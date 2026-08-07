@@ -132,10 +132,15 @@ final class WindowManager: @unchecked Sendable {
 
     /// Stateless raw capture — safe to call from any thread.
     func captureRawImage(for windowID: CGWindowID) -> NSImage? {
+        let name = orderingEngine.windowNames[windowID] ?? "?"
+        let t0 = CACurrentMediaTime()
         let cgImageUnmanaged = WindowSwitcher_CaptureWindowImage(windowID)
+        let t1 = CACurrentMediaTime()
         guard let cgImage = cgImageUnmanaged?.takeRetainedValue() else {
+            logDebug("CAPTURE: FAIL [\(name)] win=\(windowID) dt=\(Int((t1 - t0) * 1000))ms")
             return nil
         }
+        logDebug("CAPTURE: OK [\(name)] win=\(windowID) size=\(cgImage.width)x\(cgImage.height) dt=\(Int((t1 - t0) * 1000))ms")
         return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
     }
 
@@ -149,6 +154,7 @@ final class WindowManager: @unchecked Sendable {
 
     /// Preload thumbnails for the top N windows.
     func preloadThumbnails(count: Int) {
+        let t0 = CACurrentMediaTime()
         let ids = Array(orderingEngine.orderedIDs.prefix(count))
         var successCount = 0
         for id in ids {
@@ -156,7 +162,8 @@ final class WindowManager: @unchecked Sendable {
                 successCount += 1
             }
         }
-        logDebug("WindowManager: preloadThumbnails count=\(count) ids.count=\(ids.count) success=\(successCount)")
+        let dt = Int((CACurrentMediaTime() - t0) * 1000)
+        logDebug("CAPTURE: preloadThumbnails count=\(count) ids=\(ids.count) success=\(successCount) dt=\(dt)ms")
     }
     func activateWindow(_ windowID: CGWindowID) {
         isActivating = true

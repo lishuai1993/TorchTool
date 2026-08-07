@@ -359,23 +359,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Background: capture remaining windows
         let remaining = windowList.count - visibleCount
         if remaining > 0 {
+            logDebug("CAPTURE: background capture starting, remaining=\(remaining), overlay shown at t=\(Int((t3 - t0) * 1000))ms")
             let remainingIDs = Array(orderedIDs.dropFirst(visibleCount))
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 guard let self else { return }
+                let bgStart = CACurrentMediaTime()
                 var captured: [(CGWindowID, NSImage)] = []
                 for id in remainingIDs {
                     if let image = self.windowManager.captureRawImage(for: id) {
                         captured.append((id, image))
                     }
                 }
+                let bgTotal = Int((CACurrentMediaTime() - bgStart) * 1000)
                 if !captured.isEmpty {
                     DispatchQueue.main.async {
                         for (id, image) in captured {
                             self.windowManager.setThumbnail(image, for: id)
                         }
                         self.overlayController.refreshThumbnails()
-                        logDebug("TIMING: background preload complete, captured \(captured.count) thumbnails")
+                        logDebug("CAPTURE: background capture complete, captured=\(captured.count)/\(remainingIDs.count), dt=\(bgTotal)ms")
                     }
+                } else {
+                    logDebug("CAPTURE: background capture complete, captured=0/\(remainingIDs.count), dt=\(bgTotal)ms")
                 }
             }
         }
