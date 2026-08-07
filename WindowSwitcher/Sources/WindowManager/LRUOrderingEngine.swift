@@ -17,7 +17,7 @@ final class LRUOrderingEngine {
 
     /// Cursor pointing to the current position in the LRU list.
     /// Always reflects the most-recently-activated window (index 0 after activation).
-    private var currentIndex: Int = 0
+    private(set) var currentIndex: Int = 0
 
     /// Window name lookup, populated by WindowManager during sync.
     var windowNames: [CGWindowID: String] = [:]

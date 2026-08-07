@@ -293,10 +293,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             if settings.elasticDragEnabled {
                 applyElasticDisplacement(progress: progress)
+                scheduleWatchdog(sid: elasticDragSessionID)
             }
 
         case .gestureEnd:
             windowManager.isGestureActive = false
+            elasticDragWatchdog?.cancel()
+            elasticDragWatchdog = nil
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDragInProgress), session=\(elasticDragSessionID)")
             if elasticDragInProgress {
                 finishElasticDrag()
@@ -387,6 +390,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let dirLabel = directionRight ? "→ 右滑" : "← 左滑"
         let windows = windowManager.refreshWindows()
         guard windows.count > 1 else { return }
+
+        let engine = windowManager.orderingEngine
+        let idsBefore = engine.orderedIDs
+        let namesBefore = idsBefore.compactMap { engine.windowNames[$0] }.joined(separator: " → ")
+        let cursorBefore = engine.currentIndex
+        let frontBefore = windowManager.frontmostWindowID
+        let frontNameBefore = frontBefore.flatMap { engine.windowNames[$0] } ?? "?"
+        logDebug("QuickSwitch: \(dirLabel) BEFORE cursor=\(cursorBefore) front=[\(frontNameBefore)] order=[\(namesBefore)]")
+
         let cyclic = AppSettings.shared.cyclicScrollEnabled
         guard let target = windowManager.orderingEngine.advanceCursor(directionRight: directionRight,
                                                                       cyclic: cyclic) else {
@@ -399,6 +411,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         windowManager.activateWindow(target)
         cachedBoundaryOrigin = nil  // left the boundary — clear cached origin
+
+        let idsAfter = engine.orderedIDs
+        let namesAfter = idsAfter.compactMap { engine.windowNames[$0] }.joined(separator: " → ")
+        let cursorAfter = engine.currentIndex
+        let frontAfter = windowManager.frontmostWindowID
+        let frontNameAfter = frontAfter.flatMap { engine.windowNames[$0] } ?? "?"
+        logDebug("QuickSwitch: \(dirLabel) AFTER  cursor=\(cursorAfter) front=[\(frontNameAfter)] order=[\(namesAfter)]")
+
         if AppSettings.shared.quickSwitchHintEnabled {
             showQuickSwitchHint(for: target)
         }
@@ -477,6 +497,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         elasticDragStaleTimer = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: work)
+
+        // Callback-stream watchdog: if no .swipeUpdate arrives within 200ms,
+        // the MultitouchSupport callback stream is likely interrupted.
+        // Spring back immediately rather than waiting for a .gestureEnd that
+        // may never arrive.
+        scheduleWatchdog(sid: elasticDragSessionID)
     }
 
     private func applyElasticDisplacement(progress: Float) {
@@ -490,11 +516,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let damped = raw / (1.0 + abs(raw) / 40.0)
         let maxDisp = CGFloat(AppSettings.shared.elasticDragMaxDisplacement)
         let clamped = max(-maxDisp, min(maxDisp, damped))
-        var newPos = CGPoint(x: origin.x + clamped, y: origin.y)
+        var newPos = CGPoint(x: p0.x + clamped, y: p0.y)
         // Clamp to ±maxDisp from the true original position
         newPos.x = max(p0.x - maxDisp, min(p0.x + maxDisp, newPos.x))
         let val = AXValueCreate(.cgPoint, &newPos)!
         AXUIElementSetAttributeValue(axWin, kAXPositionAttribute as CFString, val)
+    }
+
+    private func scheduleWatchdog(sid: Int) {
+        elasticDragWatchdog?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self,
+                  self.elasticDragInProgress,
+                  self.elasticDragSessionID == sid else { return }
+            logDebug("ElasticDrag: callback stream interrupted [session=\(sid)], triggering spring-back")
+            self.finishElasticDrag()
+        }
+        elasticDragWatchdog = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: work)
     }
 
     private func finishElasticDrag() {
@@ -502,6 +541,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         elasticDragInProgress = false
         elasticDragStaleTimer?.cancel()
         elasticDragStaleTimer = nil
+        elasticDragWatchdog?.cancel()
+        elasticDragWatchdog = nil
 
         guard let axWin = elasticDragAxWindow,
               let p0 = cachedBoundaryOrigin else {
@@ -619,6 +660,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var elasticDragOrigin: CGPoint?
     private var elasticDragSessionID = 0
     private var elasticDragStaleTimer: DispatchWorkItem?
+    private var elasticDragWatchdog: DispatchWorkItem?
 
     // Animation generation counter. Incremented each beginElasticDrag so stale
     // spring-back animation frames from a previous session bail out.

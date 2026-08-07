@@ -267,12 +267,23 @@ final class WindowManager: @unchecked Sendable {
         scrollMonitor = NSEvent.addGlobalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
             guard let self else { return }
             self.onTrackpadActivity?()
-            guard !self.isGestureActive,
-                  let frontID = self.frontmostWindowID,
-                  !self.isActivating else { return }
+            let blockedByGesture = self.isGestureActive
+            let blockedByActivating = self.isActivating
+            let frontID = self.frontmostWindowID
+            if blockedByGesture || blockedByActivating || frontID == nil {
+                if event.momentumPhase.isEmpty && event.phase == .ended {
+                    logDebug("SCROLL-MON: blocked gesture=\(blockedByGesture) activating=\(blockedByActivating) frontID=\(frontID?.description ?? "nil")")
+                }
+                return
+            }
+            // Only trigger reorder on vertical-dominant scroll (page content
+            // scrolling). Horizontal-dominant scroll is a three-finger swipe
+            // artifact and must not trigger windowDidInteract.
+            guard event.phase == .began, abs(event.deltaY) > abs(event.deltaX) else { return }
+            logDebug("SCROLL-MON: → windowDidInteract(\(frontID!)) name=\(self.orderingEngine.windowNames[frontID!] ?? "?")")
             DispatchQueue.main.async {
-                self.orderingEngine.windowDidInteract(frontID)
-                self.onInteraction?(frontID)
+                self.orderingEngine.windowDidInteract(frontID!)
+                self.onInteraction?(frontID!)
             }
         }
 

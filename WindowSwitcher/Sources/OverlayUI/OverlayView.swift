@@ -114,8 +114,8 @@ struct OverlayView: View {
                idx < viewModel.windows.count {
                 let w = viewModel.windows[idx]
                 Text(w.windowTitle.isEmpty
-                     ? w.ownerName
-                     : "\(w.ownerName) — \(w.windowTitle)")
+                     ? "\(idx + 1). \(w.ownerName)"
+                     : "\(idx + 1). \(w.ownerName) — \(w.windowTitle)")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.white.opacity(0.9))
                     .lineLimit(1)

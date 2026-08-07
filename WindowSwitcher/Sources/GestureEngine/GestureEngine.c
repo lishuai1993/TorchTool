@@ -143,6 +143,7 @@ static float   lastCentroidX       = 0;
 static float   maxPostSettleDisp   = 0;  // max displacement after settling
 static int     activeFingerCount   = 0;
 static bool    swipeActionFired    = false;
+static int     lastFrame           = 0;   // for detecting callback interruption
 
 // Sensitivity
 static float   tapMaxDurationSec   = 0.350;  // 350ms from first touch
@@ -452,7 +453,6 @@ static void contactFrameCallback6(int deviceIndex, void *data,
 static void processContactData(int deviceIndex, void *data,
                                 int count, double timestamp, int frame) {
     (void)deviceIndex;
-    (void)frame;
 
     // Guard the userCallback/engineRunning read so a stop/start from the main
     // thread can't tear it mid-restart. The state machine below re-locks.
@@ -603,7 +603,15 @@ static void processContactData(int deviceIndex, void *data,
     }
 
     case GS_SWIPING:
-        if (fingerCount < 3) {
+        // Detect callback interruption: if the system frame counter jumped,
+        // callbacks were suspended and fingers likely lifted during the gap.
+        if (frame - lastFrame > 30) {
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (callback gap, frame %d->%d) GestureEnd fired\n",
+                   gestureSessionID, lastFrame, frame);
+            gState = GS_IDLE;
+            swipeActionFired = false;
+        } else if (fingerCount < 3) {
             userCallback(GestureEnd, 0);
             ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (lift, fingerCount=%d) GestureEnd fired\n",
                    gestureSessionID, fingerCount);
@@ -617,5 +625,6 @@ static void processContactData(int deviceIndex, void *data,
         break;
     }
 
+    lastFrame = frame;
     pthread_mutex_unlock(&stateLock);
 }
