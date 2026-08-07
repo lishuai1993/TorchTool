@@ -1,6 +1,13 @@
 import AppKit
 import CoreGraphics
 
+/// Snapshot of a single Accessibility API window element.
+struct AXWindowSnapshot {
+    let element: AXUIElement
+    let title: String
+    let frame: CGRect
+}
+
 final class WindowManager: @unchecked Sendable {
     static let shared = WindowManager()
 
@@ -198,29 +205,15 @@ final class WindowManager: @unchecked Sendable {
         // Step 2: Raise the specific window via Accessibility API.
         // Do this BEFORE activation so the app comes to front already showing
         // the correct window, avoiding a flash of a different window first.
-        let axApp = AXUIElementCreateApplication(info.ownerPid)
-        var windowList: CFTypeRef?
-        let copyResult = AXUIElementCopyAttributeValue(axApp, kAXWindowsAttribute as CFString, &windowList)
-        if copyResult == .success, let axWindows = windowList as? [AXUIElement] {
-            logDebug("AX: \(info.ownerName) has \(axWindows.count) AX windows, target=[\(info.windowTitle)] frame=\(info.frame)")
+        let snapshots = enumerateAXWindows(forPid: info.ownerPid)
+        if !snapshots.isEmpty {
+            logDebug("AX: \(info.ownerName) has \(snapshots.count) AX windows, target=[\(info.windowTitle)] frame=\(info.frame)")
 
-            // Collect all AX windows with (index, title, frame) in AX order.
+            // Build index-keyed info for selectAXWindow
             var axWindowsInfo: [(index: Int, title: String, frame: CGRect)] = []
-            for (idx, axWindow) in axWindows.enumerated() {
-                var axTitle: CFTypeRef?
-                AXUIElementCopyAttributeValue(axWindow, kAXTitleAttribute as CFString, &axTitle)
-                let title = (axTitle as? String) ?? ""
-
-                var axPos: CFTypeRef?
-                var axSize: CFTypeRef?
-                AXUIElementCopyAttributeValue(axWindow, kAXPositionAttribute as CFString, &axPos)
-                AXUIElementCopyAttributeValue(axWindow, kAXSizeAttribute as CFString, &axSize)
-                var axFrame = CGRect.zero
-                if let posVal = axPos { AXValueGetValue(posVal as! AXValue, .cgPoint, &axFrame.origin) }
-                if let sizeVal = axSize { AXValueGetValue(sizeVal as! AXValue, .cgSize, &axFrame.size) }
-
-                logDebug("AX:   [\(idx)][\(title)] frame=\(axFrame)")
-                axWindowsInfo.append((idx, title, axFrame))
+            for (idx, s) in snapshots.enumerated() {
+                logDebug("AX:   [\(idx)][\(s.title)] frame=\(s.frame)")
+                axWindowsInfo.append((idx, s.title, s.frame))
             }
 
             // Select the AX element that corresponds to the EXACT target window:
@@ -233,15 +226,15 @@ final class WindowManager: @unchecked Sendable {
                 axWindows: axWindowsInfo
             )
 
-            if let sel = selected, sel.index >= 0 && sel.index < axWindows.count {
-                AXUIElementPerformAction(axWindows[sel.index], kAXRaiseAction as CFString)
+            if let sel = selected, sel.index >= 0 && sel.index < snapshots.count {
+                AXUIElementPerformAction(snapshots[sel.index].element, kAXRaiseAction as CFString)
                 logDebug("AX: raised [\(info.ownerName)] idx=\(sel.index) title=\"\(sel.title)\"")
                 scheduleMappingCheck(pid: info.ownerPid, expectedTitle: sel.title, windowID: windowID)
             } else {
                 logDebug("AX: NO MATCH for [\(info.ownerName) — \(info.windowTitle)]")
             }
         } else {
-            logDebug("AX: failed to get windows for \(info.ownerName), result=\(copyResult.rawValue)")
+            logDebug("AX: failed to get windows for \(info.ownerName)")
         }
 
         // Step 3: Activate the application if not already frontmost.
@@ -333,6 +326,40 @@ final class WindowManager: @unchecked Sendable {
 
     // MARK: - Private
 
+    /// Enumerate all AX windows for a given pid, returning title + frame for each.
+    /// This is the single source of truth for AX window enumeration in the app.
+    func enumerateAXWindows(forPid pid: pid_t) -> [AXWindowSnapshot] {
+        let app = AXUIElementCreateApplication(pid)
+        var list: CFTypeRef?
+        let r = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &list)
+        guard r == .success, let axWindows = list as? [AXUIElement] else { return [] }
+
+        var result: [AXWindowSnapshot] = []
+        for axWin in axWindows {
+            var t: CFTypeRef?
+            AXUIElementCopyAttributeValue(axWin, kAXTitleAttribute as CFString, &t)
+            let title = (t as? String) ?? ""
+
+            var pos: CFTypeRef?, size: CFTypeRef?
+            var frame = CGRect.zero
+            AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &pos)
+            AXUIElementCopyAttributeValue(axWin, kAXSizeAttribute as CFString, &size)
+            if let pv = pos { AXValueGetValue(pv as! AXValue, .cgPoint, &frame.origin) }
+            if let sv = size { AXValueGetValue(sv as! AXValue, .cgSize, &frame.size) }
+
+            result.append(AXWindowSnapshot(element: axWin, title: title, frame: frame))
+        }
+        return result
+    }
+
+    /// Whether two rects describe the same on-screen window frame (with tolerance).
+    static func frameMatches(_ a: CGRect, _ b: CGRect, tolerance: CGFloat = 10) -> Bool {
+        abs(a.origin.x - b.origin.x) < tolerance &&
+        abs(a.origin.y - b.origin.y) < tolerance &&
+        abs(a.size.width - b.size.width) < tolerance &&
+        abs(a.size.height - b.size.height) < tolerance
+    }
+
     /// Called by AXFocusObserver when the focused AX window changes within the
     /// same app. Queries the AX focused window's title & frame, matches it to
     /// a known CGWindowID, and updates frontmostWindowID + LRU ordering.
@@ -416,23 +443,10 @@ final class WindowManager: @unchecked Sendable {
 
         // Enumerate AX windows to find the focused one's rank among same-frame
         var sameFrameAXTitles: [String] = []
-        let app = AXUIElementCreateApplication(pid)
-        var axList: CFTypeRef?
-        if AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &axList) == .success,
-           let axWindows = axList as? [AXUIElement] {
-            for axWin in axWindows {
-                var axT: CFTypeRef?
-                AXUIElementCopyAttributeValue(axWin, kAXTitleAttribute as CFString, &axT)
-                let t = (axT as? String) ?? ""
-                var axP: CFTypeRef?, axS: CFTypeRef?
-                var axF = CGRect.zero
-                AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &axP)
-                AXUIElementCopyAttributeValue(axWin, kAXSizeAttribute as CFString, &axS)
-                if let pv = axP { AXValueGetValue(pv as! AXValue, .cgPoint, &axF.origin) }
-                if let sv = axS { AXValueGetValue(sv as! AXValue, .cgSize, &axF.size) }
-                if self.frameMatches(axF, frame) {
-                    sameFrameAXTitles.append(t)
-                }
+        let snapshots = enumerateAXWindows(forPid: pid)
+        for s in snapshots {
+            if Self.frameMatches(s.frame, frame) {
+                sameFrameAXTitles.append(s.title)
             }
         }
 
@@ -463,10 +477,7 @@ final class WindowManager: @unchecked Sendable {
 
     /// Whether two rects describe the same on-screen window frame (with tolerance).
     private func frameMatches(_ a: CGRect, _ b: CGRect) -> Bool {
-        abs(a.origin.x - b.origin.x) < 10 &&
-        abs(a.origin.y - b.origin.y) < 10 &&
-        abs(a.size.width - b.size.width) < 10 &&
-        abs(a.size.height - b.size.height) < 10
+        Self.frameMatches(a, b)
     }
 
     /// Selects the AX window corresponding to `targetID` among the app's AX
@@ -515,25 +526,13 @@ final class WindowManager: @unchecked Sendable {
         guard !emptyPids.isEmpty else { return }
 
         for pid in emptyPids {
-            let app = AXUIElementCreateApplication(pid)
-            var list: CFTypeRef?
-            let r = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &list)
-            guard r == .success, let axWindows = list as? [AXUIElement] else { continue }
+            let snapshots = enumerateAXWindows(forPid: pid)
+            guard !snapshots.isEmpty else { continue }
 
             var axInfo: [(index: Int, title: String, frame: CGRect)] = []
-            for (idx, w) in axWindows.enumerated() {
-                var t: CFTypeRef?
-                AXUIElementCopyAttributeValue(w, kAXTitleAttribute as CFString, &t)
-                let title = (t as? String) ?? ""
-                var pos: CFTypeRef?, size: CFTypeRef?
-                var frame = CGRect.zero
-                AXUIElementCopyAttributeValue(w, kAXPositionAttribute as CFString, &pos)
-                AXUIElementCopyAttributeValue(w, kAXSizeAttribute as CFString, &size)
-                if let pv = pos { AXValueGetValue(pv as! AXValue, .cgPoint, &frame.origin) }
-                if let sv = size { AXValueGetValue(sv as! AXValue, .cgSize, &frame.size) }
-                axInfo.append((idx, title, frame))
+            for (idx, s) in snapshots.enumerated() {
+                axInfo.append((idx, s.title, s.frame))
             }
-            guard !axInfo.isEmpty else { continue }
 
             let zOrder = appZOrder[pid] ?? []
             for key in dict.keys where dict[key]?.ownerPid == pid && (dict[key]?.windowTitle.isEmpty ?? true) {

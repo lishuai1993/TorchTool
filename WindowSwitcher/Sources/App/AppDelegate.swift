@@ -459,7 +459,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            let fw = focusedWindow {
             axWin = (fw as! AXUIElement)
         } else {
-            axWin = axWindowFor(pid: info.ownerPid, frame: info.frame)
+            // Fall back to frame matching via shared enumeration.
+            let snapshots = windowManager.enumerateAXWindows(forPid: info.ownerPid)
+            let match = snapshots.first { WindowManager.frameMatches($0.frame, info.frame, tolerance: 2) }
+            axWin = match?.element
         }
         guard let axWin = axWin else {
             logDebug("ElasticDrag: begin FAILED [session=\(elasticDragSessionID + 1)] — no AX window for pid=\(info.ownerPid)")
@@ -470,10 +473,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // If a previous spring-back animation was mid-flight, the generation bump
         // above already cancelled its remaining frames; we pick up from wherever
         // the window currently sits — this gives natural frame continuation.
-        guard let currentPos = axPosition(of: axWin) else {
+        var posVal: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &posVal) == .success,
+              let pv = posVal else {
             logDebug("ElasticDrag: begin FAILED [session=\(elasticDragSessionID + 1)] — no position for pid=\(info.ownerPid)")
             return
         }
+        var currentPos = CGPoint.zero
+        AXValueGetValue(pv as! AXValue, .cgPoint, &currentPos)
 
         // On the very first boundary hit, capture the true original position.
         // All subsequent spring-backs target this cached value — never drifts.
@@ -567,7 +574,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // and all remaining frames become no-ops.
         let gen = springBackGeneration
         var currentPos = p0
-        if let p = axPosition(of: axWin) { currentPos = p }
+        var readPosVal: CFTypeRef?
+        if AXUIElementCopyAttributeValue(axWin, kAXPositionAttribute as CFString, &readPosVal) == .success,
+           let rpv = readPosVal {
+            AXValueGetValue(rpv as! AXValue, .cgPoint, &currentPos)
+        }
         let startX = currentPos.x
         let targetX = p0.x
         logDebug("ElasticDrag: spring-back [session=\(sid), gen=\(gen)] from x=\(String(format: "%.1f", startX)) to x=\(String(format: "%.1f", targetX))")
@@ -596,45 +607,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         elasticDragAxWindow = nil
         elasticDragOrigin = nil
-    }
-
-    /// Find the AXUIElement for a window matching the given pid and frame.
-    private func axWindowFor(pid: pid_t, frame: CGRect) -> AXUIElement? {
-        let app = AXUIElementCreateApplication(pid)
-        var list: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &list) == .success,
-              let axWindows = list as? [AXUIElement] else { return nil }
-
-        for axWin in axWindows {
-            guard let axFrame = axFrame(of: axWin) else { continue }
-            if abs(axFrame.origin.x - frame.origin.x) < 2,
-               abs(axFrame.origin.y - frame.origin.y) < 2,
-               abs(axFrame.size.width - frame.size.width) < 2,
-               abs(axFrame.size.height - frame.size.height) < 2 {
-                return axWin
-            }
-        }
-        return nil
-    }
-
-    private func axFrame(of axWindow: AXUIElement) -> CGRect? {
-        var posVal: CFTypeRef?
-        var sizeVal: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(axWindow, kAXPositionAttribute as CFString, &posVal) == .success,
-              AXUIElementCopyAttributeValue(axWindow, kAXSizeAttribute as CFString, &sizeVal) == .success else { return nil }
-        var pos = CGPoint.zero
-        var size = CGSize.zero
-        guard AXValueGetValue(posVal as! AXValue, .cgPoint, &pos),
-              AXValueGetValue(sizeVal as! AXValue, .cgSize, &size) else { return nil }
-        return CGRect(origin: pos, size: size)
-    }
-
-    private func axPosition(of axWindow: AXUIElement) -> CGPoint? {
-        var posVal: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(axWindow, kAXPositionAttribute as CFString, &posVal) == .success else { return nil }
-        var pos = CGPoint.zero
-        guard AXValueGetValue(posVal as! AXValue, .cgPoint, &pos) else { return nil }
-        return pos
     }
 
     // MARK: - Quick switch hint
