@@ -356,12 +356,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if remaining > 0 {
             logDebug("CAPTURE: background capture starting, remaining=\(remaining), overlay shown at t=\(Int((t3 - t0) * 1000))ms")
             let remainingIDs = Array(orderedIDs.dropFirst(visibleCount))
+            // Snapshot names on main thread — orderingEngine.windowNames is not
+            // safe to read from a background queue.
+            var namesSnapshot: [CGWindowID: String] = [:]
+            for id in remainingIDs {
+                namesSnapshot[id] = windowManager.orderingEngine.windowNames[id] ?? "?"
+            }
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 guard let self else { return }
                 let bgStart = CACurrentMediaTime()
                 var captured: [(CGWindowID, NSImage)] = []
                 for id in remainingIDs {
-                    if let image = self.windowManager.captureRawImage(for: id) {
+                    if let image = self.windowManager.captureRawImage(for: id, ownerName: namesSnapshot[id] ?? "?") {
                         captured.append((id, image))
                     }
                 }

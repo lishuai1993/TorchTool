@@ -70,8 +70,12 @@ final class WindowManager: @unchecked Sendable {
             }
             // Refresh the frontmost-window cache so the event tap's
             // windowDidInteract reorders the window the user is ACTUALLY in.
-            if let front = self.frontmostWindow(for: pid) {
+            // Validate against the canonical window list to avoid storing an ID
+            // from a stale snapshot that may have been filtered out by parseWindow.
+            if let front = self.frontmostWindow(for: pid), windows[front] != nil {
                 self.frontmostWindowID = front
+            } else if frontmostWindowID == nil || windows[frontmostWindowID!] == nil {
+                self.frontmostWindowID = orderingEngine.orderedIDs.first
             }
             // Start observing same-app focused-window changes for the new app.
             self.axFocusObserver.startObserving(pid: pid)
@@ -127,9 +131,12 @@ final class WindowManager: @unchecked Sendable {
             orderingEngine.windowNames[id] = "\(info.ownerName)\(title)"
         }
 
-        // Update frontmost
+        // Update frontmost if stale — but don't clobber a fresher value set
+        // by handleAXFocusChange or activateWindow between refreshes.
         if let front = orderedIDs.first {
-            frontmostWindowID = front
+            if frontmostWindowID == nil || windows[frontmostWindowID!] == nil {
+                frontmostWindowID = front
+            }
             orderingEngine.windowDidFocus(front)
         }
 
@@ -143,16 +150,18 @@ final class WindowManager: @unchecked Sendable {
     }
 
     /// Stateless raw capture — safe to call from any thread.
-    func captureRawImage(for windowID: CGWindowID) -> NSImage? {
-        let name = orderingEngine.windowNames[windowID] ?? "?"
+    /// - Parameter ownerName: Human-readable owner name for logging (must be
+    ///   provided by the caller, which reads it on the main thread, because
+    ///   orderingEngine.windowNames is main-thread-only).
+    func captureRawImage(for windowID: CGWindowID, ownerName: String = "?") -> NSImage? {
         let t0 = CACurrentMediaTime()
         let cgImageUnmanaged = WindowSwitcher_CaptureWindowImage(windowID)
         let t1 = CACurrentMediaTime()
         guard let cgImage = cgImageUnmanaged?.takeRetainedValue() else {
-            logDebug("CAPTURE: FAIL [\(name)] win=\(windowID) dt=\(Int((t1 - t0) * 1000))ms")
+            logDebug("CAPTURE: FAIL [\(ownerName)] win=\(windowID) dt=\(Int((t1 - t0) * 1000))ms")
             return nil
         }
-        logDebug("CAPTURE: OK [\(name)] win=\(windowID) size=\(cgImage.width)x\(cgImage.height) dt=\(Int((t1 - t0) * 1000))ms")
+        logDebug("CAPTURE: OK [\(ownerName)] win=\(windowID) size=\(cgImage.width)x\(cgImage.height) dt=\(Int((t1 - t0) * 1000))ms")
         return NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
     }
 
@@ -286,10 +295,8 @@ final class WindowManager: @unchecked Sendable {
             // artifact and must not trigger windowDidInteract.
             guard event.phase == .began, abs(event.deltaY) > abs(event.deltaX) else { return }
             logDebug("SCROLL-MON: → windowDidInteract(\(frontID!)) name=\(self.orderingEngine.windowNames[frontID!] ?? "?")")
-            DispatchQueue.main.async {
-                self.orderingEngine.windowDidInteract(frontID!)
-                self.onInteraction?(frontID!)
-            }
+            self.orderingEngine.windowDidInteract(frontID!)
+            self.onInteraction?(frontID!)
         }
 
         // Interaction monitor: clicks on windows trigger reorder.
@@ -299,10 +306,8 @@ final class WindowManager: @unchecked Sendable {
             guard let self,
                   let frontID = self.frontmostWindowID,
                   !self.isActivating else { return }
-            DispatchQueue.main.async {
-                self.orderingEngine.windowDidInteract(frontID)
-                self.onInteraction?(frontID)
-            }
+            self.orderingEngine.windowDidInteract(frontID)
+            self.onInteraction?(frontID)
         }
 
         logDebug("WindowManager: NSEvent monitors registered OK")

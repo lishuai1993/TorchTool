@@ -1,21 +1,21 @@
-[2026-08-07 19:26:17.946] [Logger.swift:23] ══════════════════════════════════════
-[2026-08-07 19:26:17.954] [Logger.swift:24] WindowSwitcher logger initialized
-[2026-08-07 19:26:17.955] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
-[2026-08-07 19:26:17.955] [Logger.swift:26] PID: 15609
-[2026-08-07 19:26:17.955] [Logger.swift:27] ══════════════════════════════════════
-[2026-08-07 19:26:17.955] [main.swift:3] main.swift: entry point
-[2026-08-07 19:26:17.994] [main.swift:8] main.swift: starting run loop...
-[2026-08-07 19:26:18.009] [AppDelegate.swift:17] === applicationDidFinishLaunching BEGIN ===
-[2026-08-07 19:26:18.009] [AppDelegate.swift:20] Step 0: Ensuring single instance...
-[2026-08-07 19:26:18.075] [AppDelegate.swift:27] Step 1: Setting activation policy to .accessory
-[2026-08-07 19:26:18.075] [AppDelegate.swift:29] Step 1: OK
-[2026-08-07 19:26:18.075] [AppDelegate.swift:32] Step 2: Setting up menu bar...
-[2026-08-07 19:26:18.107] [AppDelegate.swift:34] Step 2: Menu bar OK
+[2026-08-07 20:28:17.307] [Logger.swift:23] ══════════════════════════════════════
+[2026-08-07 20:28:17.313] [Logger.swift:24] WindowSwitcher logger initialized
+[2026-08-07 20:28:17.314] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
+[2026-08-07 20:28:17.314] [Logger.swift:26] PID: 25841
+[2026-08-07 20:28:17.314] [Logger.swift:27] ══════════════════════════════════════
+[2026-08-07 20:28:17.314] [main.swift:3] main.swift: entry point
+[2026-08-07 20:28:17.351] [main.swift:8] main.swift: starting run loop...
+[2026-08-07 20:28:17.361] [AppDelegate.swift:17] === applicationDidFinishLaunching BEGIN ===
+[2026-08-07 20:28:17.361] [AppDelegate.swift:20] Step 0: Ensuring single instance...
+[2026-08-07 20:28:17.426] [AppDelegate.swift:27] Step 1: Setting activation policy to .accessory
+[2026-08-07 20:28:17.426] [AppDelegate.swift:29] Step 1: OK
+[2026-08-07 20:28:17.427] [AppDelegate.swift:32] Step 2: Setting up menu bar...
+[2026-08-07 20:28:17.454] [AppDelegate.swift:34] Step 2: Menu bar OK
 [WS] C engine logging to: /Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt
-[2026-08-07 19:26:18.107] [AppDelegate.swift:37] Step 3: Starting gesture engine (MultitouchSupport)...
-[2026-08-07 19:26:18.107] [GestureEngineWrapper.swift:58] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
-[2026-08-07 19:26:18.107] [GestureEngineWrapper.swift:61] GestureEngine: sensitivity — touchdownWindow=500ms
-[2026-08-07 19:26:18.107] [GestureEngineWrapper.swift:62] GestureEngine: starting C engine (MultitouchSupport)...
+[2026-08-07 20:28:17.454] [AppDelegate.swift:37] Step 3: Starting gesture engine (MultitouchSupport)...
+[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:58] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
+[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:61] GestureEngine: sensitivity — touchdownWindow=400ms
+[2026-08-07 20:28:17.454] [GestureEngineWrapper.swift:62] GestureEngine: starting C engine (MultitouchSupport)...
 [WS] Symbol resolution:
 [WS]   MTDeviceCreateDefault    => 0x193b9b338
 [WS]   MTDeviceCreateList       => 0x193b9ad48
@@ -25,36 +25,36 @@
 [WS]   MTRegisterContactFrameCallbackWithRefcon => 0x193baa740
 [WS]   MTUnregisterContactFrameCallback          => 0x193baa78c
 [WS]   MTUnregisterContactFrameCallbackWithRefcon => 0x0
-[WS] MTDeviceCreateDefault => 0x14c883e00
+[WS] MTDeviceCreateDefault => 0x15e056400
 [WS] MTDeviceStop => -536870195 (0xe00002cd)
 [WS] Registering 6-param callback (WithRefcon)...
 [WS] MTRegisterContactFrameCallbackWithRefcon => 1 (0x1)
 [WS] Calling MTDeviceStart(mtDevice, 0)...
 [WS] MTDeviceStart => 0 (0x0)
 [WS] Gesture engine started (reg=1, start=0). Waiting for callbacks...
-[2026-08-07 19:26:18.108] [GestureEngineWrapper.swift:68] GestureEngine: C engine started OK (result=0)
-[2026-08-07 19:26:18.108] [AppDelegate.swift:40] Step 3: Gesture engine started OK
-[2026-08-07 19:26:18.109] [AppDelegate.swift:48] Step 4: Starting interaction monitoring...
-[2026-08-07 19:26:18.109] [ActivationHistory.swift:13] ActivationHistory: starting observation
-[2026-08-07 19:26:18.109] [ActivationHistory.swift:30] ActivationHistory: started OK
-[2026-08-07 19:26:18.110] [WindowManager.swift:308] WindowManager: NSEvent monitors registered OK
-[2026-08-07 19:26:18.110] [AppDelegate.swift:51] Step 4: Interaction monitoring started OK
-[2026-08-07 19:26:18.110] [AppDelegate.swift:57] Step 5: Wiring callbacks...
-[2026-08-07 19:26:18.110] [AppDelegate.swift:59] Step 5: Callbacks wired OK
-[2026-08-07 19:26:18.110] [AppDelegate.swift:63] Step 6.5: Setting up session observers...
-[2026-08-07 19:26:18.110] [AppDelegate.swift:65] Step 6.5: OK
-[2026-08-07 19:26:18.110] [AppDelegate.swift:68] Step 7: Checking permissions...
-[2026-08-07 19:26:18.114] [AppDelegate.swift:747] Permission check: Accessibility = true
-[2026-08-07 19:26:18.123] [LRUOrderingEngine.swift:71] LRU: sync - added 18 windows at front
-[2026-08-07 19:26:18.123] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:26:18.123] [AppDelegate.swift:74] Initial LRU order:
+[2026-08-07 20:28:17.455] [GestureEngineWrapper.swift:68] GestureEngine: C engine started OK (result=0)
+[2026-08-07 20:28:17.455] [AppDelegate.swift:40] Step 3: Gesture engine started OK
+[2026-08-07 20:28:17.456] [AppDelegate.swift:48] Step 4: Starting interaction monitoring...
+[2026-08-07 20:28:17.456] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-07 20:28:17.456] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-07 20:28:17.457] [WindowManager.swift:313] WindowManager: NSEvent monitors registered OK
+[2026-08-07 20:28:17.457] [AppDelegate.swift:51] Step 4: Interaction monitoring started OK
+[2026-08-07 20:28:17.457] [AppDelegate.swift:57] Step 5: Wiring callbacks...
+[2026-08-07 20:28:17.457] [AppDelegate.swift:59] Step 5: Callbacks wired OK
+[2026-08-07 20:28:17.457] [AppDelegate.swift:63] Step 6.5: Setting up session observers...
+[2026-08-07 20:28:17.457] [AppDelegate.swift:65] Step 6.5: OK
+[2026-08-07 20:28:17.457] [AppDelegate.swift:68] Step 7: Checking permissions...
+[2026-08-07 20:28:17.460] [AppDelegate.swift:753] Permission check: Accessibility = true
+[2026-08-07 20:28:17.472] [LRUOrderingEngine.swift:71] LRU: sync - added 18 windows at front
+[2026-08-07 20:28:17.472] [WindowManager.swift:143] WindowManager: refreshed 18 windows
+[2026-08-07 20:28:17.472] [AppDelegate.swift:74] Initial LRU order:
   [0] 终端 — WindowSwitcher — -zsh — 112×34 ← 游标
-  [1] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
-  [2] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
-  [3] 访达 — WindowSwitcher
-  [4] Google Chrome — 全国睡眠舒适度地图_百度搜索
-  [5] Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘
-  [6] Google Chrome — 新标签页
+  [1] Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10%
+  [2] Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘
+  [3] Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换
+  [4] 访达 — WindowSwitcher
+  [5] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
+  [6] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
   [7] 坚果云 — 坚果云
   [8] 时钟 — 时钟
   [9] CodeBuddy CN — 20260723112900
@@ -66,1723 +66,232 @@
   [15] 微信读书 — 微信读书
   [16] 微信 — 微信
   [17] 微信 — 微信 (窗口)
-[2026-08-07 19:26:18.123] [AppDelegate.swift:80] === applicationDidFinishLaunching END (SUCCESS) ===
-[WS-DBG] processContactData: ALIVE frame=148 count=1
+[2026-08-07 20:28:17.472] [AppDelegate.swift:80] === applicationDidFinishLaunching END (SUCCESS) ===
+[WS-DBG] processContactData: ALIVE frame=42 count=1
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1619,x=0.610,y=0.222
-[2026-08-07 19:26:19.074] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
-[2026-08-07 19:26:19.075] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.075] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.075] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.075] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.075] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.079] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.079] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:19.079] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.481,y=0.625
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.5449,x=0.490,y=0.649
-[WS-DBG] processContactData: ALIVE frame=495 count=1
-[2026-08-07 19:26:21.275] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:26:21.426] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:26:21.427] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:26:21.475] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:26:21.475] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.569,y=0.736
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0197,x=0.571,y=0.735
-[2026-08-07 19:26:22.376] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:26:22.377] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:26:22.426] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:26:22.427] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:26:22.476] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[WS-DBG] processContactData: ALIVE frame=678 count=1
-[2026-08-07 19:26:22.719] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:22.720] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:22.721] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] processContactData: ALIVE frame=798 count=1
-[2026-08-07 19:26:23.504] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.504] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.504] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.713] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.713] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.714] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=false, isEnabled=false
-[2026-08-07 19:26:23.714] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:23.714] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] processContactData: ALIVE frame=918 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.609,y=0.731
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0114,x=0.611,y=0.725
-[2026-08-07 19:26:25.511] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.511] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.512] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=false, isEnabled=false
-[2026-08-07 19:26:25.512] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.512] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.516] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.516] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.517] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.551] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.552] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.552] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:25.579] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:26:26.334] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:26:26.336] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.374] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:26:26.380] [AXFocusObserver.swift:92] AXFocusObserver: callback - focus changed pid=15609
-[2026-08-07 19:26:26.407] [WindowManager.swift:392] AXFocusChange: pid=15609 title="WindowSwitcher 设置" frame=(525.0, 131.0, 420.0, 546.0)
-[2026-08-07 19:26:26.407] [WindowManager.swift:395] AXFocusChange: NO MATCH for pid=15609 title="WindowSwitcher 设置"
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.741,y=0.615
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0540,x=0.744,y=0.620
-[WS-DBG] processContactData: ALIVE frame=1284 count=1
-[WS-DBG] processContactData: ALIVE frame=1404 count=1
-[WS-DBG] processContactData: ALIVE frame=1524 count=1
-[WS-DBG] processContactData: ALIVE frame=1644 count=1
-[WS-DBG] processContactData: ALIVE frame=1764 count=1
-[WS-DBG] processContactData: ALIVE frame=1884 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.558,y=0.161
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0820,x=0.556,y=0.151
-[WS-DBG] processContactData: ALIVE frame=2019 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.571,y=0.764
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0384,x=0.571,y=0.761
-[WS-DBG] processContactData: ALIVE frame=2350 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.478,y=0.625
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.5055,x=0.484,y=0.617
-[WS-DBG] processContactData: ALIVE frame=2486 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.551,y=0.752
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1059,x=0.553,y=0.747
-[WS-DBG] processContactData: ALIVE frame=2620 count=1
-[WS-DBG] processContactData: ALIVE frame=2740 count=1
-[WS-DBG] processContactData: ALIVE frame=2860 count=1
-[WS-DBG] processContactData: ALIVE frame=2980 count=1
-[WS-DBG] processContactData: ALIVE frame=3100 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.627,y=0.136
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1194,x=0.624,y=0.136
-[WS-DBG] processContactData: ALIVE frame=3261 count=1
-[WS-DBG] processContactData: ALIVE frame=3381 count=1
-[2026-08-07 19:26:46.725] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:26:46.725] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 19:26:46.727] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:26:46.731] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:26:46.764] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.471,y=0.221
-[WS] CB6: count=4 frame=3453
-[WS] CB6: count=4 frame=3454
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=4)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.9726,x=0.472,y=0.218 [1]st=3,ty=2,fl=1,z=-0.6207,x=0.436,y=0.542 [2]st=7,ty=0,fl=0,z=0.0000,x=0.560,y=1.000 [3]st=3,ty=4,fl=1,z=-0.2024,x=0.559,y=0.752
-[WS] CB6: count=3 frame=3455
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.3394,x=0.469,y=0.218 [1]st=4,ty=2,fl=1,z=-0.2034,x=0.434,y=0.543 [2]st=4,ty=4,fl=1,z=-0.3249,x=0.557,y=0.754
-[WS-DBG] STATE: IDLE -> TRACKING [session=1] (touchdown 8ms, prevFinger=2)
-[WS] CB6: count=3 frame=3456
-[WS] CB6: count=3 frame=3457
-[WS] CB6: count=3 frame=3458
-[WS] CB6: count=3 frame=3459
-[WS] CB6: count=3 frame=3460
-[WS] CB6: count=3 frame=3461
-[WS] CB6: count=3 frame=3462
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=1,fl=1,z=0.0716,x=0.471,y=0.209 [1]st=5,ty=3,fl=1,z=-0.1360,x=0.554,y=0.750
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.454,y=0.453
-[WS-DBG] STATE: TRACKING -> IDLE [session=1] (lift after 808ms > 200ms) GestureEnd fired
-[2026-08-07 19:26:48.081] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #1, type=7, progress=0.0
-[2026-08-07 19:26:48.081] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-07 19:26:48.082] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=3558
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=0.0000,x=0.454,y=0.454 [1]st=3,ty=2,fl=-1,z=1.2466,x=0.512,y=0.167 [2]st=1,ty=0,fl=0,z=0.0000,x=0.556,y=0.674
-[WS] CB6: count=3 frame=3559
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=4,fl=-1,z=-0.1163,x=0.453,y=0.454 [1]st=4,ty=3,fl=-1,z=-0.1702,x=0.510,y=0.168 [2]st=3,ty=2,fl=-1,z=-0.0467,x=0.556,y=0.671
-[WS] CB6: count=3 frame=3560
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=-0.2086,x=0.452,y=0.455 [1]st=4,ty=1,fl=-1,z=-0.3581,x=0.507,y=0.170 [2]st=4,ty=2,fl=-1,z=-0.1495,x=0.555,y=0.672
-[WS-DBG] STATE: IDLE -> TRACKING [session=2] (touchdown 16ms, prevFinger=2)
-[WS] CB6: count=3 frame=3561
-[WS] CB6: count=3 frame=3562
-[WS] CB6: count=3 frame=3563
-[WS] CB6: count=3 frame=3564
-[WS] CB6: count=3 frame=3565
-[WS] CB6: count=3 frame=3566
-[WS] CB6: count=3 frame=3567
-[WS] CB6: count=3 frame=3568
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=1,fl=1,z=0.0488,x=0.509,y=0.167 [1]st=6,ty=2,fl=1,z=-0.0021,x=0.554,y=0.674
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=-1,z=0.0000,x=0.509,y=0.167
-[WS-DBG] GESTURE: Three-finger tap [session=2] (88ms, postSettleDisp=0.0001)
-[2026-08-07 19:26:48.201] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:26:48.201] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:26:48.201] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:26:48.209] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:26:48.209] [AppDelegate.swift:332] TIMING: [t=7ms] refreshWindows done, 18 windows
-[2026-08-07 19:26:48.322] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=113ms
-[2026-08-07 19:26:48.330] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=8ms
-[2026-08-07 19:26:48.338] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=7ms
-[2026-08-07 19:26:48.345] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=6ms
-[2026-08-07 19:26:48.353] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=8ms
-[2026-08-07 19:26:48.361] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-07 19:26:48.368] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:26:48.368] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=159ms
-[2026-08-07 19:26:48.368] [AppDelegate.swift:344] TIMING: [t=167ms] preload visible done (capture=159ms, hit=0, miss=7)
-[2026-08-07 19:26:48.368] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:26:48.377] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:26:48.384] [AppDelegate.swift:352] TIMING: [t=182ms] overlay shown (UI=15ms, total=182ms)
-[2026-08-07 19:26:48.384] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=182ms
-[2026-08-07 19:26:48.384] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:26:48.397] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:26:48.397] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:26:48.398] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=13ms
-[2026-08-07 19:26:48.407] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=9ms
-[2026-08-07 19:26:48.417] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:26:48.417] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=10ms
-[2026-08-07 19:26:48.427] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=9ms
-[2026-08-07 19:26:48.436] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=8ms
-[2026-08-07 19:26:48.485] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=49ms
-[2026-08-07 19:26:48.494] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=8ms
-[2026-08-07 19:26:48.502] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=7ms
-[2026-08-07 19:26:48.518] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=16ms
-[2026-08-07 19:26:48.526] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=8ms
-[2026-08-07 19:26:48.533] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=6ms
-[2026-08-07 19:26:48.534] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=148ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.468,y=0.497
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0083,x=0.471,y=0.510
-[2026-08-07 19:26:50.291] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.478,y=0.192
-[WS] CB6: count=4 frame=3916
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=4)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.7318,x=0.478,y=0.192 [1]st=1,ty=0,fl=0,z=0.0000,x=0.546,y=0.721 [2]st=3,ty=3,fl=-1,z=0.0000,x=0.435,y=0.488 [3]st=1,ty=0,fl=0,z=0.0000,x=0.541,y=1.000
-[WS] CB6: count=4 frame=3917
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=4)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.3000,x=0.475,y=0.191 [1]st=3,ty=4,fl=1,z=0.8034,x=0.553,y=0.726 [2]st=4,ty=2,fl=1,z=-0.6394,x=0.430,y=0.488 [3]st=7,ty=0,fl=0,z=0.0000,x=0.541,y=1.000
-[WS-DBG] STATE: IDLE -> TRACKING [session=3] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=3918
-[WS] CB6: count=3 frame=3919
-[WS] CB6: count=3 frame=3920
-[WS] CB6: count=3 frame=3921
-[WS] CB6: count=3 frame=3922
-[WS] CB6: count=3 frame=3923
-[WS] CB6: count=3 frame=3924
-[WS] CB6: count=3 frame=3925
-[WS] CB6: count=3 frame=3926
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=7,ty=1,fl=1,z=0.0000,x=0.477,y=0.188 [1]st=7,ty=2,fl=1,z=0.0000,x=0.551,y=0.735
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.442,y=0.521
-[WS-DBG] STATE: TRACKING -> IDLE [session=3] (lift after 1064ms > 200ms) GestureEnd fired
-[2026-08-07 19:26:52.042] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-07 19:26:52.042] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=4051
-[WS] CB6: count=3 frame=4052
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=3,fl=1,z=1.4573,x=0.495,y=0.219 [1]st=3,ty=4,fl=1,z=1.4832,x=0.564,y=0.737 [2]st=4,ty=2,fl=1,z=0.4671,x=0.451,y=0.519
-[WS] CB6: count=3 frame=4053
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=1,fl=-1,z=-0.4858,x=0.491,y=0.221 [1]st=4,ty=1,fl=1,z=-0.0239,x=0.563,y=0.739 [2]st=4,ty=2,fl=-1,z=-0.5377,x=0.447,y=0.521
-[WS-DBG] STATE: IDLE -> TRACKING [session=4] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=4054
-[WS] CB6: count=3 frame=4055
-[WS] CB6: count=3 frame=4056
-[WS] CB6: count=3 frame=4057
-[WS] CB6: count=3 frame=4058
-[WS] CB6: count=3 frame=4059
-[WS] CB6: count=3 frame=4060
-[WS] CB6: count=3 frame=4061
-[WS] CB6: count=3 frame=4062
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=-1,z=0.0000,x=0.492,y=0.204 [1]st=7,ty=1,fl=1,z=0.0000,x=0.558,y=0.737
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.465,y=0.221
-[WS-DBG] STATE: TRACKING -> IDLE [session=4] (lift after 760ms > 200ms) GestureEnd fired
-[2026-08-07 19:26:52.826] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-07 19:26:52.826] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=4149
-[WS] CB6: count=3 frame=4150
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.6082,x=0.475,y=0.222 [1]st=3,ty=1,fl=1,z=0.3404,x=0.570,y=0.754 [2]st=3,ty=2,fl=1,z=0.6404,x=0.442,y=0.543
-[WS] CB6: count=3 frame=4151
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.7421,x=0.469,y=0.225 [1]st=4,ty=1,fl=1,z=-0.3529,x=0.567,y=0.755 [2]st=4,ty=2,fl=1,z=-0.8542,x=0.436,y=0.548
-[WS-DBG] STATE: IDLE -> TRACKING [session=5] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=4152
-[WS] CB6: count=3 frame=4153
-[WS] CB6: count=3 frame=4154
-[WS] CB6: count=3 frame=4155
-[WS] CB6: count=3 frame=4156
-[WS] CB6: count=3 frame=4157
-[WS] CB6: count=3 frame=4158
-[WS] CB6: count=3 frame=4159
-[WS] CB6: count=3 frame=4160
-[WS] CB6: count=3 frame=4161
-[WS] CB6: count=3 frame=4162
-[WS] CB6: count=3 frame=4163
-[WS] CB6: count=3 frame=4164
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=1,fl=1,z=0.0187,x=0.468,y=0.223 [1]st=6,ty=2,fl=1,z=0.0176,x=0.559,y=0.765
-[WS-DBG] TRACK postSettle: dispX=0.0273 dispY=-0.0208 |dX|=0.0273 |dY|=0.0208 swipeMinDisp=0.0800 elapsed=32ms
-[2026-08-07 19:26:52.962] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-07 19:26:52.963] [AppDelegate.swift:283] ElasticDrag: begin [session=1], progress=0.341, dirRight=false
-[2026-08-07 19:26:52.963] [AppDelegate.swift:452] ElasticDrag: begin FAILED [session=1] — no window info
-[2026-08-07 19:26:52.963] [AppDelegate.swift:509] ElasticDrag: apply skipped [session=0] — axWin=nil, origin=nil, cached=nil
-[2026-08-07 19:26:52.970] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-07 19:26:52.970] [AppDelegate.swift:283] ElasticDrag: begin [session=1], progress=0.341, dirRight=false
-[2026-08-07 19:26:52.970] [AppDelegate.swift:452] ElasticDrag: begin FAILED [session=1] — no window info
-[2026-08-07 19:26:52.970] [AppDelegate.swift:509] ElasticDrag: apply skipped [session=0] — axWin=nil, origin=nil, cached=nil
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=-1,z=0.0000,x=0.468,y=0.219
-[2026-08-07 19:26:52.978] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[WS-DBG] GESTURE: Three-finger tap [session=5] (128ms, postSettleDisp=0.0355)
-[2026-08-07 19:26:52.978] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:26:52.978] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:26:52.991] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:26:52.991] [AppDelegate.swift:332] TIMING: [t=12ms] refreshWindows done, 18 windows
-[2026-08-07 19:26:53.002] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=10ms
-[2026-08-07 19:26:53.009] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=7ms
-[2026-08-07 19:26:53.016] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=6ms
-[2026-08-07 19:26:53.023] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=7ms
-[2026-08-07 19:26:53.032] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=8ms
-[2026-08-07 19:26:53.040] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-07 19:26:53.047] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:26:53.047] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=55ms
-[2026-08-07 19:26:53.047] [AppDelegate.swift:344] TIMING: [t=68ms] preload visible done (capture=56ms, hit=0, miss=7)
-[2026-08-07 19:26:53.047] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:26:53.047] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:26:53.051] [AppDelegate.swift:352] TIMING: [t=73ms] overlay shown (UI=4ms, total=73ms)
-[2026-08-07 19:26:53.051] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=73ms
-[2026-08-07 19:26:53.064] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=12ms
-[2026-08-07 19:26:53.066] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:26:53.070] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=6ms
-[2026-08-07 19:26:53.077] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=6ms
-[2026-08-07 19:26:53.124] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=46ms
-[2026-08-07 19:26:53.130] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=6ms
-[2026-08-07 19:26:53.136] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=5ms
-[2026-08-07 19:26:53.143] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=6ms
-[2026-08-07 19:26:53.149] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[2026-08-07 19:26:53.157] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=7ms
-[2026-08-07 19:26:53.164] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[2026-08-07 19:26:53.171] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=6ms
-[2026-08-07 19:26:53.171] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=119ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.484,y=0.252
-[WS] CB6: count=3 frame=4264
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.6747,x=0.490,y=0.259 [1]st=1,ty=0,fl=0,z=0.0000,x=0.573,y=0.794 [2]st=3,ty=3,fl=-1,z=0.0000,x=0.453,y=0.574
-[WS] CB6: count=3 frame=4265
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.5844,x=0.486,y=0.261 [1]st=3,ty=4,fl=1,z=-0.1131,x=0.572,y=0.786 [2]st=4,ty=2,fl=1,z=-0.6331,x=0.448,y=0.575
-[WS] CB6: count=3 frame=4266
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=1,fl=-1,z=-0.2221,x=0.485,y=0.261 [1]st=4,ty=1,fl=1,z=-0.3716,x=0.569,y=0.788 [2]st=4,ty=2,fl=-1,z=-0.2138,x=0.446,y=0.576
-[WS-DBG] STATE: IDLE -> TRACKING [session=6] (touchdown 16ms, prevFinger=2)
-[WS] CB6: count=3 frame=4267
-[WS] CB6: count=3 frame=4268
-[WS] CB6: count=3 frame=4269
-[WS] CB6: count=3 frame=4270
-[WS] CB6: count=3 frame=4271
-[WS] CB6: count=3 frame=4272
-[WS] CB6: count=3 frame=4273
-[WS] CB6: count=3 frame=4274
-[WS] CB6: count=3 frame=4275
-[WS] CB6: count=3 frame=4276
-[WS-DBG] processContactData: ALIVE frame=4276 count=3
-[WS] CB6: count=3 frame=4277
-[WS] CB6: count=3 frame=4278
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=-1,z=0.0976,x=0.489,y=0.255 [1]st=7,ty=0,fl=0,z=0.0000,x=0.568,y=0.787
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=-1,z=0.0000,x=0.489,y=0.255
-[WS-DBG] GESTURE: Three-finger tap [session=6] (112ms, postSettleDisp=0.0364)
-[2026-08-07 19:26:53.889] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:26:53.889] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=true
-[2026-08-07 19:26:53.889] [OverlayWindowController.swift:164] OVERLAY-SELECT: window=终端 — WindowSwitcher — -zsh — 112×34
-[2026-08-07 19:26:53.889] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[2026-08-07 19:26:53.891] [WindowManager.swift:203] ACTIVATE-DIAG: [终端] pid=8243 bid=com.apple.Terminal isActive=false needsActivate=true frontmostBefore=WindowSwitcher window=17079
-[2026-08-07 19:26:53.892] [WindowManager.swift:210] AX: 终端 has 1 AX windows, target=[WindowSwitcher — -zsh — 112×34] frame=(0.0, 38.0, 1466.0, 911.0)
-[2026-08-07 19:26:53.892] [WindowManager.swift:215] AX:   [0][WindowSwitcher — -zsh — 112×34] frame=(0.0, 38.0, 1466.0, 911.0)
-[2026-08-07 19:26:53.892] [WindowManager.swift:231] AX: raised [终端] idx=0 title="WindowSwitcher — -zsh — 112×34"
-[2026-08-07 19:26:53.892] [WindowManager.swift:244] ACTIVATE-DIAG: calling app.activate() for [终端] pid=8243
-[2026-08-07 19:26:53.897] [WindowManager.swift:247] ACTIVATE-DIAG: app.activate() returned true for [终端]
-[2026-08-07 19:26:53.897] [LRUOrderingEngine.swift:129] LRU-SELECT: [终端 — WindowSwitcher — -zsh — 112×34] cursor→0, order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索] (unchanged=true)
-[2026-08-07 19:26:53.897] [WindowManager.swift:263] ACTIVATE-DONE: window=终端 — WindowSwitcher — -zsh — 112×34 idx=0 cursorAfter=0 orderedIDs[0]=终端 — WindowSwitcher — -zsh — 112×34 isActivating=true
-[2026-08-07 19:26:53.898] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:26:53.898] [WindowManager.swift:60] ActivationHistory: suppressed programmatic activation pid=8243
-[2026-08-07 19:26:54.207] [WindowManager.swift:575] MAPPING-OK: window=17079 focused="WindowSwitcher — -zsh — 112×34"
-[2026-08-07 19:26:54.208] [WindowManager.swift:254] ACTIVATE-DIAG: after 300ms frontmost=终端 [终端] isActiveNow=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.490,y=0.244
-[WS] CB6: count=3 frame=4364
-[WS] CB6: count=3 frame=4365
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.3321,x=0.500,y=0.249 [1]st=3,ty=4,fl=1,z=1.0836,x=0.575,y=0.759 [2]st=3,ty=2,fl=1,z=-0.0249,x=0.465,y=0.572
-[WS] CB6: count=3 frame=4366
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.4328,x=0.497,y=0.252 [1]st=4,ty=4,fl=1,z=-0.1598,x=0.573,y=0.761 [2]st=4,ty=2,fl=1,z=-0.4256,x=0.461,y=0.574
-[WS-DBG] STATE: IDLE -> TRACKING [session=7] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=4367
-[WS] CB6: count=3 frame=4368
-[WS] CB6: count=3 frame=4369
-[WS] CB6: count=3 frame=4370
-[WS] CB6: count=3 frame=4371
-[WS] CB6: count=3 frame=4372
-[WS] CB6: count=3 frame=4373
-[WS] CB6: count=3 frame=4374
-[WS] CB6: count=3 frame=4375
-[WS] CB6: count=3 frame=4376
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=6,ty=1,fl=1,z=0.0343,x=0.499,y=0.245 [1]st=5,ty=2,fl=1,z=-0.0114,x=0.569,y=0.758
-[2026-08-07 19:26:54.665] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-07 19:26:54.666] [AppDelegate.swift:283] ElasticDrag: begin [session=1], progress=0.313, dirRight=false
-[2026-08-07 19:26:54.666] [AppDelegate.swift:489] ElasticDrag: cached boundary origin = (0.0, 38.0)
-[2026-08-07 19:26:54.666] [AppDelegate.swift:496] ElasticDrag: began [session=1], gen=3, dragRef=(0.0, 38.0), cachedOrigin=(0.0, 38.0), title=WindowSwitcher — -zsh — 112×34
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.570,y=0.757
-[WS-DBG] GESTURE: Three-finger tap [session=7] (104ms, postSettleDisp=0.0358)
-[2026-08-07 19:26:54.681] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:26:54.681] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:26:54.681] [AppDelegate.swift:218] ElasticDrag: tap intercepted [session=1], triggering spring-back
-[2026-08-07 19:26:54.681] [AppDelegate.swift:550] ElasticDrag: finish [session=1], target=(0.0, 38.0)
-[2026-08-07 19:26:54.699] [AppDelegate.swift:584] ElasticDrag: spring-back [session=1, gen=3] from x=12.0 to x=0.0
-[2026-08-07 19:26:55.013] [AppDelegate.swift:603] ElasticDrag: spring-back DONE [session=1, gen=3], step=12, finalX=0.0, targetX=0.0, delta=0.0
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.509,y=0.438 [1]st=1,ty=0,fl=0,z=0.0000,x=0.554,y=0.171
-[WS] CB6: count=3 frame=4472
-[WS] CB6: count=3 frame=4473
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0695,x=0.517,y=0.439 [1]st=4,ty=3,fl=1,z=-0.3218,x=0.545,y=0.173 [2]st=3,ty=4,fl=1,z=0.2024,x=0.609,y=0.611
-[WS] CB6: count=3 frame=4474
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1640,x=0.515,y=0.440 [1]st=4,ty=3,fl=1,z=-0.1380,x=0.543,y=0.174 [2]st=4,ty=4,fl=1,z=-0.0861,x=0.608,y=0.611
-[WS-DBG] STATE: IDLE -> TRACKING [session=8] (touchdown 8ms, prevFinger=2)
-[WS] CB6: count=3 frame=4475
-[WS] CB6: count=3 frame=4476
-[WS] CB6: count=3 frame=4477
-[WS] CB6: count=3 frame=4478
-[WS] CB6: count=3 frame=4479
-[WS] CB6: count=3 frame=4480
-[WS] CB6: count=3 frame=4481
-[WS] CB6: count=3 frame=4482
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=6,ty=1,fl=1,z=0.0509,x=0.545,y=0.168 [1]st=5,ty=2,fl=1,z=-0.0789,x=0.606,y=0.606
-[WS] CB6: count=3 frame=4612
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.481,y=0.495 [1]st=1,ty=0,fl=0,z=0.0000,x=0.579,y=0.671 [2]st=1,ty=0,fl=0,z=0.0000,x=0.531,y=0.191
-[WS-DBG] STATE: TRACKING -> IDLE [session=8] (lift after 1104ms > 200ms) GestureEnd fired
-[2026-08-07 19:26:56.546] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 19:26:56.546] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=4613
-[WS] CB6: count=3 frame=4614
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0913,x=0.575,y=0.283
+[WS] CB6: count=3 frame=151
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=3)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.514,y=0.283 [1]st=1,ty=0,fl=0,z=0.0000,x=0.612,y=0.451 [2]st=1,ty=0,fl=0,z=0.0000,x=0.561,y=0.020
+[WS] CB6: count=3 frame=152
+[WS] CB6: count=3 frame=153
 [WS-DBG] fingerCount: 0 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.2211,x=0.485,y=0.497 [1]st=4,ty=4,fl=1,z=-0.0934,x=0.576,y=0.668 [2]st=4,ty=3,fl=1,z=-0.5283,x=0.526,y=0.194
-[WS-DBG] STATE: IDLE -> TRACKING [session=9] (touchdown 0ms, prevFinger=0)
-[WS] CB6: count=3 frame=4615
-[WS] CB6: count=3 frame=4616
-[WS] CB6: count=3 frame=4617
-[WS] CB6: count=3 frame=4618
-[WS] CB6: count=3 frame=4619
-[WS] CB6: count=3 frame=4620
-[WS] CB6: count=3 frame=4621
-[WS] CB6: count=3 frame=4622
-[WS] CB6: count=3 frame=4623
-[WS] CB6: count=3 frame=4624
-[WS] CB6: count=3 frame=4625
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.574,y=0.671 [1]st=7,ty=1,fl=1,z=0.0000,x=0.524,y=0.192
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.524,y=0.448
-[WS-DBG] STATE: TRACKING -> IDLE [session=9] (lift after 1104ms > 200ms) GestureEnd fired
-[2026-08-07 19:26:57.664] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 19:26:57.664] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=4752
-[WS] CB6: count=3 frame=4753
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0706,x=0.525,y=0.448 [1]st=3,ty=3,fl=1,z=0.4027,x=0.551,y=0.170 [2]st=3,ty=4,fl=1,z=0.0644,x=0.608,y=0.606
-[WS] CB6: count=3 frame=4754
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0042,x=0.525,y=0.448 [1]st=4,ty=3,fl=1,z=-0.5179,x=0.546,y=0.175 [2]st=4,ty=4,fl=1,z=-0.1671,x=0.607,y=0.608
-[WS-DBG] STATE: IDLE -> TRACKING [session=10] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=4755
-[WS] CB6: count=3 frame=4756
-[WS] CB6: count=3 frame=4757
-[WS] CB6: count=3 frame=4758
-[WS] CB6: count=3 frame=4759
-[WS] CB6: count=3 frame=4760
-[WS] CB6: count=3 frame=4761
-[WS] CB6: count=3 frame=4762
-[WS] CB6: count=3 frame=4763
-[WS] CB6: count=3 frame=4764
-[WS] CB6: count=3 frame=4765
-[WS] CB6: count=3 frame=4766
-[WS] CB6: count=3 frame=4767
-[WS] CB6: count=3 frame=4768
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=1,z=0.1048,x=0.547,y=0.171 [1]st=7,ty=0,fl=0,z=0.0000,x=0.603,y=0.602
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=2,fl=1,z=0.0695,x=0.547,y=0.169
-[WS-DBG] GESTURE: Three-finger tap [session=10] (128ms, postSettleDisp=0.0299)
-[2026-08-07 19:26:57.816] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:26:57.816] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:26:57.816] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:26:57.826] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:26:57.826] [AppDelegate.swift:332] TIMING: [t=10ms] refreshWindows done, 18 windows
-[2026-08-07 19:26:57.838] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=11ms
-[2026-08-07 19:26:57.861] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=22ms
-[2026-08-07 19:26:57.869] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=8ms
-[2026-08-07 19:26:57.880] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=10ms
-[2026-08-07 19:26:57.889] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=9ms
-[2026-08-07 19:26:57.897] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-07 19:26:57.904] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:26:57.905] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=78ms
-[2026-08-07 19:26:57.905] [AppDelegate.swift:344] TIMING: [t=88ms] preload visible done (capture=78ms, hit=0, miss=7)
-[2026-08-07 19:26:57.905] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:26:57.905] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:26:57.912] [AppDelegate.swift:352] TIMING: [t=95ms] overlay shown (UI=6ms, total=95ms)
-[2026-08-07 19:26:57.912] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=95ms
-[2026-08-07 19:26:57.912] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:26:57.913] [AXFocusObserver.swift:26] AXFocusObserver: already observing pid=15609
-[2026-08-07 19:26:57.926] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=12ms
-[2026-08-07 19:26:57.929] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:26:57.935] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=9ms
-[2026-08-07 19:26:57.996] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=60ms
-[2026-08-07 19:26:58.007] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=11ms
-[2026-08-07 19:26:58.015] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=7ms
-[2026-08-07 19:26:58.022] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=7ms
-[2026-08-07 19:26:58.029] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=6ms
-[2026-08-07 19:26:58.035] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[2026-08-07 19:26:58.044] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=8ms
-[2026-08-07 19:26:58.052] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[2026-08-07 19:26:58.070] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=18ms
-[2026-08-07 19:26:58.071] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=156ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.540,y=0.187
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.6549,x=0.534,y=0.197
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=0.1837,x=0.491,y=0.528 [1]st=4,ty=2,fl=-1,z=-0.1837,x=0.529,y=0.205
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0093,x=0.529,y=0.205
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.501,y=0.504
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0280,x=0.507,y=0.508
-[2026-08-07 19:26:59.707] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.525,y=0.193
-[WS] CB6: count=3 frame=5154
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.471,y=0.492 [1]st=1,ty=0,fl=0,z=0.0000,x=0.573,y=0.667 [2]st=4,ty=2,fl=1,z=0.0727,x=0.529,y=0.195
-[WS] CB6: count=3 frame=5155
-[WS] CB6: count=3 frame=5156
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.4899,x=0.480,y=0.496 [1]st=4,ty=1,fl=1,z=0.2294,x=0.576,y=0.668 [2]st=4,ty=1,fl=-1,z=-0.2481,x=0.527,y=0.195
-[WS-DBG] STATE: IDLE -> TRACKING [session=11] (touchdown 16ms, prevFinger=1)
-[WS] CB6: count=3 frame=5157
-[WS] CB6: count=3 frame=5158
-[WS] CB6: count=3 frame=5159
-[WS] CB6: count=3 frame=5160
-[WS] CB6: count=3 frame=5161
-[WS] CB6: count=3 frame=5162
-[WS] CB6: count=3 frame=5163
-[WS] CB6: count=3 frame=5164
-[WS] CB6: count=3 frame=5165
-[WS-DBG] processContactData: ALIVE frame=5165 count=3
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=1,z=-0.1920,x=0.571,y=0.667 [1]st=5,ty=1,fl=1,z=-0.0218,x=0.525,y=0.195
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.478,y=0.475
-[WS-DBG] STATE: TRACKING -> IDLE [session=11] (lift after 1056ms > 200ms) GestureEnd fired
-[2026-08-07 19:27:01.958] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #16, type=7, progress=0.0
-[2026-08-07 19:27:01.959] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 19:27:01.959] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS] CB6: count=3 frame=5288
-[WS] CB6: count=3 frame=5289
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1931,x=0.480,y=0.493 [1]st=3,ty=4,fl=1,z=0.0893,x=0.580,y=0.662 [2]st=3,ty=3,fl=1,z=1.7386,x=0.517,y=0.195
-[WS] CB6: count=3 frame=5290
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0477,x=0.480,y=0.494 [1]st=4,ty=3,fl=1,z=-0.1495,x=0.579,y=0.664 [2]st=4,ty=1,fl=1,z=-0.0976,x=0.516,y=0.198
-[WS-DBG] STATE: IDLE -> TRACKING [session=12] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=5291
-[WS] CB6: count=3 frame=5292
-[WS] CB6: count=3 frame=5293
-[WS] CB6: count=3 frame=5294
-[WS] CB6: count=3 frame=5295
-[WS] CB6: count=3 frame=5296
-[WS] CB6: count=3 frame=5297
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1017,x=0.575,y=0.659 [1]st=4,ty=1,fl=1,z=0.1069,x=0.518,y=0.195
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=2,fl=1,z=0.0467,x=0.519,y=0.191
-[WS-DBG] GESTURE: Three-finger tap [session=12] (88ms, postSettleDisp=0.0006)
-[2026-08-07 19:27:02.070] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:27:02.070] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:27:02.070] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:27:02.079] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:27:02.080] [AppDelegate.swift:332] TIMING: [t=9ms] refreshWindows done, 18 windows
-[2026-08-07 19:27:02.096] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=16ms
-[2026-08-07 19:27:02.103] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=7ms
-[2026-08-07 19:27:02.110] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=6ms
-[2026-08-07 19:27:02.116] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=6ms
-[2026-08-07 19:27:02.126] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=9ms
-[2026-08-07 19:27:02.134] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=8ms
-[2026-08-07 19:27:02.142] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:27:02.142] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=62ms
-[2026-08-07 19:27:02.142] [AppDelegate.swift:344] TIMING: [t=71ms] preload visible done (capture=62ms, hit=0, miss=7)
-[2026-08-07 19:27:02.142] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:27:02.142] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:27:02.147] [AppDelegate.swift:352] TIMING: [t=76ms] overlay shown (UI=4ms, total=76ms)
-[2026-08-07 19:27:02.147] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=76ms
-[2026-08-07 19:27:02.156] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=9ms
-[2026-08-07 19:27:02.161] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:27:02.163] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=6ms
-[2026-08-07 19:27:02.169] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=6ms
-[2026-08-07 19:27:02.176] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=6ms
-[2026-08-07 19:27:02.183] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=7ms
-[2026-08-07 19:27:02.223] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=39ms
-[2026-08-07 19:27:02.229] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=6ms
-[2026-08-07 19:27:02.236] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[2026-08-07 19:27:02.242] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=6ms
-[2026-08-07 19:27:02.249] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[2026-08-07 19:27:02.257] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=7ms
-[2026-08-07 19:27:02.257] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=110ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.473,y=0.516
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0955,x=0.477,y=0.522
-[2026-08-07 19:27:02.894] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.415,y=0.562
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1775,x=0.418,y=0.563
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.505,y=0.535
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.2128,x=0.505,y=0.541
-[WS-DBG] processContactData: ALIVE frame=5531 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.445,y=0.450
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.2958,x=0.451,y=0.457
-[WS-DBG] processContactData: ALIVE frame=5683 count=1
-[2026-08-07 19:27:05.304] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:05.304] [AppDelegate.swift:149] onInteraction fired for window 17079
-[WS-DBG] processContactData: ALIVE frame=5803 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.657,y=0.364
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1256,x=0.656,y=0.360
-[WS-DBG] processContactData: ALIVE frame=5948 count=1
-[2026-08-07 19:27:07.390] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:07.390] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 19:27:07.392] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:27:07.395] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:27:07.416] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.463,y=0.466
-[WS] CB6: count=3 frame=6043
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.559,y=0.691 [1]st=3,ty=2,fl=-1,z=0.6508,x=0.513,y=0.205 [2]st=4,ty=3,fl=-1,z=0.0000,x=0.463,y=0.492
-[WS] CB6: count=3 frame=6044
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=-1,z=0.2398,x=0.561,y=0.683 [1]st=4,ty=3,fl=-1,z=0.1526,x=0.514,y=0.201 [2]st=4,ty=4,fl=-1,z=-0.1412,x=0.461,y=0.491
-[WS] CB6: count=3 frame=6045
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1951,x=0.560,y=0.685 [1]st=4,ty=3,fl=-1,z=-0.2543,x=0.512,y=0.203 [2]st=4,ty=4,fl=-1,z=-0.1848,x=0.460,y=0.491
-[WS-DBG] STATE: IDLE -> TRACKING [session=13] (touchdown 16ms, prevFinger=2)
-[WS] CB6: count=3 frame=6046
-[WS] CB6: count=3 frame=6047
-[WS] CB6: count=3 frame=6048
-[WS] CB6: count=3 frame=6049
-[WS] CB6: count=3 frame=6050
-[WS] CB6: count=3 frame=6051
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=1,z=-0.0903,x=0.557,y=0.685 [1]st=4,ty=1,fl=1,z=0.0322,x=0.512,y=0.197
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0332,x=0.512,y=0.193
-[WS-DBG] GESTURE: Three-finger tap [session=13] (72ms, postSettleDisp=0.0000)
-[2026-08-07 19:27:08.100] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:27:08.100] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:27:08.100] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:27:08.116] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:27:08.116] [AppDelegate.swift:332] TIMING: [t=15ms] refreshWindows done, 18 windows
-[2026-08-07 19:27:08.132] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=16ms
-[2026-08-07 19:27:08.142] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=9ms
-[2026-08-07 19:27:08.149] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=7ms
-[2026-08-07 19:27:08.156] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=6ms
-[2026-08-07 19:27:08.166] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=10ms
-[2026-08-07 19:27:08.175] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=8ms
-[2026-08-07 19:27:08.183] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=8ms
-[2026-08-07 19:27:08.183] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=67ms
-[2026-08-07 19:27:08.183] [AppDelegate.swift:344] TIMING: [t=82ms] preload visible done (capture=67ms, hit=0, miss=7)
-[2026-08-07 19:27:08.183] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:27:08.183] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:27:08.190] [AppDelegate.swift:352] TIMING: [t=90ms] overlay shown (UI=7ms, total=90ms)
-[2026-08-07 19:27:08.191] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=90ms
-[2026-08-07 19:27:08.191] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:27:08.200] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=8ms
-[2026-08-07 19:27:08.204] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:27:08.204] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:27:08.209] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=8ms
-[2026-08-07 19:27:08.217] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=8ms
-[2026-08-07 19:27:08.218] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:27:08.225] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=7ms
-[2026-08-07 19:27:08.233] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=8ms
-[2026-08-07 19:27:08.282] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=49ms
-[2026-08-07 19:27:08.293] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=10ms
-[2026-08-07 19:27:08.311] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=18ms
-[2026-08-07 19:27:08.327] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=15ms
-[2026-08-07 19:27:08.335] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=8ms
-[2026-08-07 19:27:08.342] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=7ms
-[2026-08-07 19:27:08.343] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=150ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.482,y=0.333
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.3872,x=0.487,y=0.331
-[WS-DBG] processContactData: ALIVE frame=6251 count=1
-[WS-DBG] processContactData: ALIVE frame=6371 count=1
-[2026-08-07 19:27:11.224] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.501,y=0.246 [1]st=1,ty=0,fl=0,z=0.0000,x=0.590,y=0.745
-[WS] CB6: count=3 frame=6498
-[WS] CB6: count=3 frame=6499
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=1,z=0.5325,x=0.478,y=0.572 [1]st=4,ty=3,fl=1,z=-0.5896,x=0.505,y=0.250 [2]st=4,ty=4,fl=1,z=-0.3415,x=0.596,y=0.744
-[WS] CB6: count=3 frame=6500
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1951,x=0.477,y=0.573 [1]st=4,ty=1,fl=1,z=-0.4681,x=0.502,y=0.251 [2]st=4,ty=3,fl=1,z=-0.0249,x=0.596,y=0.743
-[WS-DBG] STATE: IDLE -> TRACKING [session=14] (touchdown 8ms, prevFinger=2)
-[WS] CB6: count=3 frame=6501
-[WS] CB6: count=3 frame=6502
-[WS] CB6: count=3 frame=6503
-[WS] CB6: count=3 frame=6504
-[WS] CB6: count=3 frame=6505
-[WS] CB6: count=3 frame=6506
-[WS] CB6: count=3 frame=6507
-[WS] CB6: count=3 frame=6508
-[WS] CB6: count=3 frame=6509
-[WS] CB6: count=3 frame=6510
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=1,z=0.0685,x=0.504,y=0.241 [1]st=7,ty=0,fl=0,z=0.0000,x=0.594,y=0.743
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.504,y=0.241
-[WS-DBG] GESTURE: Three-finger tap [session=14] (96ms, postSettleDisp=0.0371)
-[2026-08-07 19:27:11.770] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:27:11.776] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:27:11.776] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:27:11.780] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:27:11.780] [AppDelegate.swift:332] TIMING: [t=4ms] refreshWindows done, 18 windows
-[2026-08-07 19:27:11.790] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=9ms
-[2026-08-07 19:27:11.798] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=7ms
-[2026-08-07 19:27:11.805] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=6ms
-[2026-08-07 19:27:11.813] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=7ms
-[2026-08-07 19:27:11.821] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=8ms
-[2026-08-07 19:27:11.829] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-07 19:27:11.837] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=8ms
-[2026-08-07 19:27:11.837] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=56ms
-[2026-08-07 19:27:11.837] [AppDelegate.swift:344] TIMING: [t=61ms] preload visible done (capture=57ms, hit=0, miss=7)
-[2026-08-07 19:27:11.837] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:27:11.838] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:27:11.842] [AppDelegate.swift:352] TIMING: [t=66ms] overlay shown (UI=4ms, total=66ms)
-[2026-08-07 19:27:11.842] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=66ms
-[2026-08-07 19:27:11.851] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=8ms
-[2026-08-07 19:27:11.857] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:27:11.858] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=6ms
-[2026-08-07 19:27:11.865] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=7ms
-[2026-08-07 19:27:11.875] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=9ms
-[2026-08-07 19:27:11.883] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=8ms
-[2026-08-07 19:27:11.919] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=36ms
-[2026-08-07 19:27:11.927] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=7ms
-[2026-08-07 19:27:11.933] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[2026-08-07 19:27:11.940] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=6ms
-[2026-08-07 19:27:11.948] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[2026-08-07 19:27:11.954] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=6ms
-[2026-08-07 19:27:11.954] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=111ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.488,y=0.534
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.3737,x=0.500,y=0.533
-[2026-08-07 19:27:12.645] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.464,y=0.560 [1]st=1,ty=0,fl=0,z=0.0000,x=0.483,y=0.216
-[WS] CB6: count=3 frame=6702
-[WS] CB6: count=3 frame=6703
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0955,x=0.466,y=0.559 [1]st=4,ty=3,fl=1,z=-0.2647,x=0.493,y=0.211 [2]st=3,ty=4,fl=1,z=0.1775,x=0.585,y=0.743
-[WS] CB6: count=3 frame=6704
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.2989,x=0.464,y=0.561 [1]st=4,ty=1,fl=1,z=-0.5252,x=0.488,y=0.214 [2]st=4,ty=3,fl=1,z=-0.1837,x=0.583,y=0.745
-[WS-DBG] STATE: IDLE -> TRACKING [session=15] (touchdown 8ms, prevFinger=2)
-[WS] CB6: count=3 frame=6705
-[WS] CB6: count=3 frame=6706
-[WS] CB6: count=3 frame=6707
-[WS] CB6: count=3 frame=6708
-[WS] CB6: count=3 frame=6709
-[WS] CB6: count=3 frame=6710
-[WS] CB6: count=3 frame=6711
-[WS] CB6: count=3 frame=6712
-[WS] CB6: count=3 frame=6713
-[WS-DBG] processContactData: ALIVE frame=6713 count=3
-[WS] CB6: count=3 frame=6714
-[WS] CB6: count=3 frame=6715
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=1,z=0.0488,x=0.490,y=0.206 [1]st=7,ty=0,fl=0,z=0.0000,x=0.582,y=0.745
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.490,y=0.206
-[WS-DBG] GESTURE: Three-finger tap [session=15] (104ms, postSettleDisp=0.0382)
-[2026-08-07 19:27:13.410] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #20, type=1, progress=0.0
-[2026-08-07 19:27:13.410] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:27:13.410] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:27:13.410] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:27:13.419] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:27:13.420] [AppDelegate.swift:332] TIMING: [t=9ms] refreshWindows done, 18 windows
-[2026-08-07 19:27:13.432] [WindowManager.swift:155] CAPTURE: OK [终端 — WindowSwitcher — -zsh — 112×34] win=17079 size=2932x1822 dt=11ms
-[2026-08-07 19:27:13.439] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=7ms
-[2026-08-07 19:27:13.445] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=6ms
-[2026-08-07 19:27:13.451] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=5ms
-[2026-08-07 19:27:13.461] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=10ms
-[2026-08-07 19:27:13.468] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-07 19:27:13.475] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=6ms
-[2026-08-07 19:27:13.475] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=55ms
-[2026-08-07 19:27:13.475] [AppDelegate.swift:344] TIMING: [t=65ms] preload visible done (capture=55ms, hit=0, miss=7)
-[2026-08-07 19:27:13.476] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:27:13.476] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:27:13.479] [AppDelegate.swift:352] TIMING: [t=69ms] overlay shown (UI=3ms, total=69ms)
-[2026-08-07 19:27:13.479] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=69ms
-[2026-08-07 19:27:13.487] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=7ms
-[2026-08-07 19:27:13.493] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:27:13.493] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=6ms
-[2026-08-07 19:27:13.500] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=6ms
-[2026-08-07 19:27:13.506] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=6ms
-[2026-08-07 19:27:13.516] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=9ms
-[2026-08-07 19:27:13.555] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=38ms
-[2026-08-07 19:27:13.562] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=7ms
-[2026-08-07 19:27:13.568] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[2026-08-07 19:27:13.576] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=7ms
-[2026-08-07 19:27:13.583] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=6ms
-[2026-08-07 19:27:13.589] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=5ms
-[2026-08-07 19:27:13.589] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=109ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.477,y=0.529
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.3934,x=0.487,y=0.532
-[2026-08-07 19:27:14.264] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.364,y=0.564
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0259,x=0.366,y=0.559
-[WS-DBG] processContactData: ALIVE frame=7056 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.500,y=0.651
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.3259,x=0.504,y=0.651
-[WS-DBG] processContactData: ALIVE frame=7205 count=1
-[WS-DBG] processContactData: ALIVE frame=7325 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.694,y=0.615
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0913,x=0.695,y=0.607
-[WS-DBG] processContactData: ALIVE frame=7476 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.497,y=0.724
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1557,x=0.502,y=0.734
-[2026-08-07 19:27:20.174] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:20.174] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 19:27:20.179] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:27:20.182] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:27:20.209] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.477,y=0.294
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0945,x=0.475,y=0.289
-[WS-DBG] processContactData: ALIVE frame=7666 count=1
-[2026-08-07 19:27:21.457] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:21.457] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 19:27:21.856] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:21.856] [AppDelegate.swift:149] onInteraction fired for window 17079
-[WS-DBG] processContactData: ALIVE frame=7828 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.920,y=0.585
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.923,y=0.570
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.884,y=0.612
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.884,y=0.615
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.234,y=0.248
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1619,x=0.235,y=0.258
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.357,y=0.482
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.6207,x=0.350,y=0.484
-[2026-08-07 19:27:26.289] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:26.290] [AppDelegate.swift:149] onInteraction fired for window 17079
-[WS-DBG] processContactData: ALIVE frame=8200 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.260,y=0.703
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0249,x=0.262,y=0.705
-[2026-08-07 19:27:27.158] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:27.158] [AppDelegate.swift:149] onInteraction fired for window 17079
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.276,y=0.245
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1567,x=0.281,y=0.248
-[WS-DBG] processContactData: ALIVE frame=8367 count=1
-[WS-DBG] processContactData: ALIVE frame=8487 count=1
-[2026-08-07 19:27:28.918] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
-[2026-08-07 19:27:28.918] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.921] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.921] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.921] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.921] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.923] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.924] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:28.924] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.270,y=0.753
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1951,x=0.274,y=0.761
-[2026-08-07 19:27:29.806] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:29.807] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:29.807] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] processContactData: ALIVE frame=8636 count=1
-[2026-08-07 19:27:30.223] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:30.224] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:30.224] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:30.232] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[WS-DBG] processContactData: ALIVE frame=8756 count=1
-[2026-08-07 19:27:30.779] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:27:30.792] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:27:30.792] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.012] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:27:31.022] [AXFocusObserver.swift:92] AXFocusObserver: callback - focus changed pid=15609
-[2026-08-07 19:27:31.025] [WindowManager.swift:392] AXFocusChange: pid=15609 title="WindowSwitcher 设置" frame=(525.0, 131.0, 420.0, 546.0)
-[2026-08-07 19:27:31.025] [WindowManager.swift:395] AXFocusChange: NO MATCH for pid=15609 title="WindowSwitcher 设置"
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.412,y=0.446
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0498,x=0.414,y=0.444
-[WS-DBG] processContactData: ALIVE frame=8930 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.407,y=0.411
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1931,x=0.402,y=0.404
-[WS-DBG] processContactData: ALIVE frame=9086 count=1
-[2026-08-07 19:27:33.889] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:27:33.889] [AppDelegate.swift:149] onInteraction fired for window 17079
-[2026-08-07 19:27:33.912] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:27:33.932] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:27:33.936] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.932,y=0.574
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.929,y=0.589
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.925,y=0.596
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.925,y=0.596
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.926,y=0.608
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.927,y=0.616
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.942,y=0.576
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.0882,x=0.945,y=0.572
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.933,y=0.501
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.4608,x=0.950,y=0.501
-[WS-DBG] processContactData: ALIVE frame=9517 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=3,ty=7,fl=1,z=-0.2533,x=0.908,y=0.656
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.2014,x=0.906,y=0.659
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.883,y=0.749
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.894,y=0.770
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.957,y=0.347
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.957,y=0.349
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.506
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.0135,x=0.988,y=0.515
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.974,y=0.525
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.965,y=0.540
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.946,y=0.567
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.0073,x=0.950,y=0.579
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.955,y=0.581
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.3041,x=0.951,y=0.575
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.977,y=0.594
-[WS-DBG] processContactData: ALIVE frame=9718 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.0768,x=0.983,y=0.584
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.910,y=0.517
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.917,y=0.535
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.933,y=0.522
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.925,y=0.529
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.987,y=0.575
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.0010,x=0.990,y=0.570
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.980,y=0.549
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.983,y=0.539
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.982,y=0.537
-[WS-DBG] processContactData: ALIVE frame=10071 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.969,y=0.558
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.966,y=0.562
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.1412,x=0.944,y=0.567
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.987,y=0.488
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.988,y=0.500
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.885,y=0.766
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.887,y=0.781
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.936,y=0.651
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.931,y=0.664
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.980,y=0.545
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.991,y=0.565
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.990,y=0.530
-[WS-DBG] processContactData: ALIVE frame=10538 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.989,y=0.513
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.751,y=0.736
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.738,y=0.761
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.986,y=0.380
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.987,y=0.385
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.378
-[WS-DBG] processContactData: ALIVE frame=10752 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.986,y=0.382
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.964,y=0.453
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.959,y=0.477
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.408,y=0.449
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1526,x=0.409,y=0.454
-[WS-DBG] processContactData: ALIVE frame=10935 count=1
-[2026-08-07 19:28:31.088] [LRUOrderingEngine.swift:106] LRU-INTERACT: id=5828 name=? NOT FOUND in orderedIDs (count=18)
-[2026-08-07 19:28:31.089] [AppDelegate.swift:149] onInteraction fired for window 5828
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.247,y=0.326
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0976,x=0.251,y=0.331
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.444,y=0.461
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.4671,x=0.439,y=0.465
-[WS-DBG] processContactData: ALIVE frame=11142 count=1
-[2026-08-07 19:28:32.771] [LRUOrderingEngine.swift:106] LRU-INTERACT: id=5828 name=? NOT FOUND in orderedIDs (count=18)
-[2026-08-07 19:28:32.771] [AppDelegate.swift:149] onInteraction fired for window 5828
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.481,y=0.743
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0457,x=0.481,y=0.725
-[2026-08-07 19:28:33.222] [LRUOrderingEngine.swift:106] LRU-INTERACT: id=5828 name=? NOT FOUND in orderedIDs (count=18)
-[2026-08-07 19:28:33.222] [AppDelegate.swift:149] onInteraction fired for window 5828
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.227
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.980,y=0.212
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.972,y=0.407
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.972,y=0.416
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.982,y=0.429
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.981,y=0.448
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.439
-[WS-DBG] processContactData: ALIVE frame=11562 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.988,y=0.430
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.245,y=0.965
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=-1,z=0.0000,x=0.253,y=0.964
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.938,y=0.161
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.1111,x=0.937,y=0.180
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.349
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.985,y=0.363
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.974,y=0.418
-[WS-DBG] processContactData: ALIVE frame=11884 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.974,y=0.431
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.977,y=0.389
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.979,y=0.393
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.399
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.982,y=0.402
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.986,y=0.402
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.988,y=0.390
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.972,y=0.290
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.1038,x=0.985,y=0.291
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.984,y=0.007
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.0208,x=0.989,y=0.002
-[WS-DBG] processContactData: ALIVE frame=12172 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.510,y=0.337
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1079,x=0.508,y=0.343
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.466,y=0.188
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0664,x=0.467,y=0.186
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.566,y=0.458
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1598,x=0.568,y=0.463
-[WS-DBG] processContactData: ALIVE frame=12414 count=1
-[2026-08-07 19:29:51.820] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
-[2026-08-07 19:29:51.821] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.821] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.821] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.821] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.821] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.823] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.823] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:51.823] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.574,y=0.883
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.2823,x=0.580,y=0.899
-[2026-08-07 19:29:52.722] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:29:52.772] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[WS-DBG] processContactData: ALIVE frame=12582 count=1
-[2026-08-07 19:29:53.073] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-07 19:29:53.408] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:29:53.420] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:29:53.420] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:29:53.642] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.643] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-07 19:29:53.656] [AXFocusObserver.swift:92] AXFocusObserver: callback - focus changed pid=15609
-[2026-08-07 19:29:53.658] [WindowManager.swift:392] AXFocusChange: pid=15609 title="WindowSwitcher 设置" frame=(525.0, 131.0, 420.0, 546.0)
-[2026-08-07 19:29:53.658] [WindowManager.swift:395] AXFocusChange: NO MATCH for pid=15609 title="WindowSwitcher 设置"
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.669,y=0.384
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0934,x=0.667,y=0.386
-[WS-DBG] processContactData: ALIVE frame=12756 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.682,y=0.253
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0332,x=0.682,y=0.255
-[WS-DBG] processContactData: ALIVE frame=13036 count=1
-[WS-DBG] processContactData: ALIVE frame=13156 count=1
-[WS-DBG] processContactData: ALIVE frame=13276 count=1
-[WS-DBG] processContactData: ALIVE frame=13396 count=1
-[WS-DBG] processContactData: ALIVE frame=13516 count=1
-[WS-DBG] processContactData: ALIVE frame=13636 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.762,y=0.512
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.1287,x=0.756,y=0.513
-[WS-DBG] processContactData: ALIVE frame=13876 count=1
-[WS-DBG] processContactData: ALIVE frame=13996 count=1
-[WS-DBG] processContactData: ALIVE frame=14116 count=1
-[WS-DBG] processContactData: ALIVE frame=14236 count=1
-[WS-DBG] processContactData: ALIVE frame=14356 count=1
-[2026-08-07 19:30:13.771] [LRUOrderingEngine.swift:106] LRU-INTERACT: id=24167 name=? NOT FOUND in orderedIDs (count=18)
-[2026-08-07 19:30:13.771] [AppDelegate.swift:149] onInteraction fired for window 24167
-[2026-08-07 19:30:13.794] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:30:13.806] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:30:13.806] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] processContactData: ALIVE frame=14476 count=1
-[WS-DBG] processContactData: ALIVE frame=14596 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.535,y=0.432
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0073,x=0.537,y=0.433
-[WS-DBG] processContactData: ALIVE frame=14759 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.476,y=0.578 [1]st=1,ty=0,fl=0,z=0.0000,x=0.581,y=0.810
-[WS] CB6: count=3 frame=14872
-[WS] CB6: count=3 frame=14873
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=0.1806,x=0.467,y=0.579 [1]st=4,ty=1,fl=1,z=-0.0301,x=0.577,y=0.812 [2]st=3,ty=2,fl=-1,z=-0.1723,x=0.528,y=0.264
-[WS] CB6: count=3 frame=14874
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1453,x=0.466,y=0.580 [1]st=4,ty=1,fl=1,z=-0.0778,x=0.577,y=0.812 [2]st=4,ty=1,fl=-1,z=-0.4577,x=0.524,y=0.265
-[WS-DBG] STATE: IDLE -> TRACKING [session=16] (touchdown 8ms, prevFinger=2)
-[WS] CB6: count=3 frame=14875
-[WS] CB6: count=3 frame=14876
-[WS] CB6: count=3 frame=14877
-[WS] CB6: count=3 frame=14878
-[WS] CB6: count=3 frame=14879
-[WS] CB6: count=3 frame=14880
-[WS] CB6: count=3 frame=14881
-[WS] CB6: count=3 frame=14882
-[WS] CB6: count=3 frame=14883
-[WS] CB6: count=3 frame=14884
-[WS] CB6: count=3 frame=14885
-[WS] CB6: count=3 frame=14886
-[WS] CB6: count=3 frame=14887
-[WS] CB6: count=3 frame=14888
-[WS] CB6: count=3 frame=14889
-[WS] CB6: count=3 frame=14890
-[WS] CB6: count=3 frame=14891
-[WS] CB6: count=3 frame=14892
-[WS] CB6: count=3 frame=14893
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.576,y=0.817 [1]st=5,ty=2,fl=-1,z=-0.0083,x=0.523,y=0.257
-[2026-08-07 19:30:30.335] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #21, type=6, progress=0.35134628
-[2026-08-07 19:30:30.335] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-07 19:30:30.335] [AppDelegate.swift:283] ElasticDrag: begin [session=2], progress=0.351, dirRight=false
-[2026-08-07 19:30:30.335] [AppDelegate.swift:452] ElasticDrag: begin FAILED [session=2] — no window info
-[2026-08-07 19:30:30.335] [AppDelegate.swift:509] ElasticDrag: apply skipped [session=1] — axWin=nil, origin=nil, cached=ok
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=2,fl=-1,z=0.0467,x=0.523,y=0.255
-[WS-DBG] GESTURE: Three-finger tap [session=16] (168ms, postSettleDisp=0.0324)
-[2026-08-07 19:30:30.343] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:30:30.343] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:30:30.343] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:30:30.354] [LRUOrderingEngine.swift:63] LRU: sync - removed 1 windows
-[2026-08-07 19:30:30.354] [LRUOrderingEngine.swift:71] LRU: sync - added 1 windows at front
-[2026-08-07 19:30:30.354] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:30:30.354] [AppDelegate.swift:332] TIMING: [t=11ms] refreshWindows done, 18 windows
-[2026-08-07 19:30:30.378] [WindowManager.swift:155] CAPTURE: OK [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] win=5828 size=2932x1822 dt=23ms
-[2026-08-07 19:30:30.395] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=17ms
-[2026-08-07 19:30:30.404] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=8ms
-[2026-08-07 19:30:30.417] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=12ms
-[2026-08-07 19:30:30.425] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=7ms
-[2026-08-07 19:30:30.435] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=10ms
-[2026-08-07 19:30:30.443] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:30:30.443] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=88ms
-[2026-08-07 19:30:30.443] [AppDelegate.swift:344] TIMING: [t=99ms] preload visible done (capture=88ms, hit=0, miss=7)
-[2026-08-07 19:30:30.443] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:30:30.443] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:30:30.449] [AppDelegate.swift:352] TIMING: [t=106ms] overlay shown (UI=6ms, total=106ms)
-[2026-08-07 19:30:30.449] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=106ms
-[2026-08-07 19:30:30.449] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:30:30.467] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=17ms
-[2026-08-07 19:30:30.471] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:30:30.471] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:30:30.475] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=7ms
-[2026-08-07 19:30:30.483] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=8ms
-[2026-08-07 19:30:30.486] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:30:30.491] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=8ms
-[2026-08-07 19:30:30.505] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=13ms
-[2026-08-07 19:30:30.563] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=58ms
-[2026-08-07 19:30:30.572] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=8ms
-[2026-08-07 19:30:30.579] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=7ms
-[2026-08-07 19:30:30.594] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=14ms
-[2026-08-07 19:30:30.608] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=14ms
-[2026-08-07 19:30:30.620] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=11ms
-[2026-08-07 19:30:30.620] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=170ms
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.592,y=0.291
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0093,x=0.595,y=0.284
-[WS-DBG] processContactData: ALIVE frame=15094 count=1
-[2026-08-07 19:30:32.102] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.525,y=0.605
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0550,x=0.530,y=0.599
-[2026-08-07 19:30:32.918] [LRUOrderingEngine.swift:106] LRU-INTERACT: id=24167 name=? NOT FOUND in orderedIDs (count=18)
-[2026-08-07 19:30:32.918] [AppDelegate.swift:149] onInteraction fired for window 24167
-[2026-08-07 19:30:32.920] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:30:32.923] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:30:32.944] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.431,y=0.336
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0000,x=0.429,y=0.332 [1]st=1,ty=0,fl=0,z=0.0000,x=0.395,y=0.647
-[WS] CB6: count=3 frame=15456
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.1401,x=0.426,y=0.332 [1]st=4,ty=3,fl=-1,z=0.0000,x=0.394,y=0.630 [2]st=1,ty=0,fl=0,z=0.0000,x=0.484,y=0.766
-[WS] CB6: count=3 frame=15457
-[WS] CB6: count=3 frame=15458
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=1,fl=1,z=-0.1131,x=0.425,y=0.332 [1]st=4,ty=1,fl=-1,z=-0.1100,x=0.393,y=0.635 [2]st=4,ty=2,fl=1,z=0.3301,x=0.491,y=0.765
-[WS-DBG] STATE: IDLE -> TRACKING [session=17] (touchdown 32ms, prevFinger=2)
-[WS] CB6: count=3 frame=15459
-[WS] CB6: count=3 frame=15460
-[WS] CB6: count=3 frame=15461
-[WS] CB6: count=3 frame=15462
-[WS] CB6: count=3 frame=15463
-[WS] CB6: count=3 frame=15464
-[WS] CB6: count=3 frame=15465
-[WS] CB6: count=3 frame=15466
-[WS] CB6: count=3 frame=15467
-[WS] CB6: count=3 frame=15468
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=-1,z=0.3083,x=0.515,y=0.287 [1]st=4,ty=1,fl=1,z=0.0893,x=0.614,y=0.456 [2]st=4,ty=2,fl=-1,z=-0.0976,x=0.566,y=0.018
+[WS-DBG] STATE: IDLE -> TRACKING [session=1] (touchdown 0ms, prevFinger=0)
+[WS] CB6: count=3 frame=154
+[WS] CB6: count=3 frame=155
+[WS] CB6: count=3 frame=156
+[WS] CB6: count=3 frame=157
+[WS] CB6: count=3 frame=158
+[WS] CB6: count=3 frame=159
+[WS] CB6: count=3 frame=160
+[WS] CB6: count=3 frame=161
+[WS] CB6: count=3 frame=162
+[WS] CB6: count=3 frame=163
+[WS] CB6: count=3 frame=164
+[WS] CB6: count=3 frame=165
+[WS] CB6: count=3 frame=166
+[WS] CB6: count=3 frame=167
+[WS] CB6: count=3 frame=168
+[WS] CB6: count=3 frame=169
+[WS-DBG] TRACK postSettle: dispX=-0.0003 dispY=0.0192 |dX|=0.0003 |dY|=0.0192 swipeMinDisp=0.0800 elapsed=48ms
+[WS] CB6: count=3 frame=170
+[WS] CB6: count=3 frame=171
+[WS] CB6: count=3 frame=172
+[WS] CB6: count=3 frame=173
+[WS] CB6: count=3 frame=174
+[WS-DBG] GESTURE: UP candidate [session=1] dX=0.0090 dY=0.1261 |dX/dY|=0.07
+[WS] CB6: count=3 frame=175
+[WS] CB6: count=3 frame=176
+[WS] CB6: count=3 frame=177
+[WS] CB6: count=3 frame=178
+[WS] CB6: count=3 frame=179
+[WS] CB6: count=3 frame=180
+[WS] CB6: count=3 frame=181
+[WS] CB6: count=3 frame=182
+[WS-DBG] GESTURE: swipe UP confirmed [session=1] dX=0.0318 dY=0.3244 |dX/dY|=0.10 confirm=64ms
+[2026-08-07 20:28:18.798] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #1, type=4, progress=1.0
+[2026-08-07 20:28:18.798] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
+[2026-08-07 20:28:18.798] [AppDelegate.swift:230] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 20:28:18.798] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
+[WS] CB6: count=3 frame=183
+[2026-08-07 20:28:18.806] [WindowManager.swift:143] WindowManager: refreshed 18 windows
+[2026-08-07 20:28:18.806] [AppDelegate.swift:332] TIMING: [t=8ms] refreshWindows done, 18 windows
+[WS] CB6: count=3 frame=184
+[WS] CB6: count=3 frame=185
+[WS] CB6: count=3 frame=186
+[WS] CB6: count=3 frame=187
+[WS] CB6: count=3 frame=188
+[WS] CB6: count=3 frame=189
+[WS] CB6: count=3 frame=190
+[WS] CB6: count=3 frame=191
+[WS] CB6: count=3 frame=192
+[WS] CB6: count=3 frame=193
+[WS] CB6: count=3 frame=194
+[WS] CB6: count=3 frame=195
+[WS] CB6: count=3 frame=196
+[WS] CB6: count=3 frame=197
+[WS] CB6: count=3 frame=198
+[WS] CB6: count=3 frame=199
+[WS] CB6: count=3 frame=200
+[WS] CB6: count=3 frame=201
+[WS-DBG] processContactData: ALIVE frame=201 count=3
+[WS] CB6: count=3 frame=202
+[WS] CB6: count=3 frame=203
+[2026-08-07 20:28:18.968] [WindowManager.swift:164] CAPTURE: OK [?] win=17079 size=2932x1822 dt=161ms
+[WS] CB6: count=3 frame=204
+[2026-08-07 20:28:18.976] [WindowManager.swift:164] CAPTURE: OK [?] win=16219 size=2940x1836 dt=7ms
+[WS] CB6: count=3 frame=205
+[2026-08-07 20:28:18.983] [WindowManager.swift:164] CAPTURE: OK [?] win=16224 size=2940x1836 dt=7ms
+[WS] CB6: count=3 frame=206
+[2026-08-07 20:28:18.990] [WindowManager.swift:164] CAPTURE: OK [?] win=16229 size=2940x1836 dt=6ms
+[2026-08-07 20:28:18.997] [WindowManager.swift:164] CAPTURE: OK [?] win=40 size=2940x1836 dt=7ms
+[WS] CB6: count=3 frame=207
+[WS] CB6: count=3 frame=208
+[WS] CB6: count=3 frame=209
+[2026-08-07 20:28:19.013] [WindowManager.swift:164] CAPTURE: OK [?] win=14251 size=2940x1836 dt=16ms
+[2026-08-07 20:28:19.021] [WindowManager.swift:164] CAPTURE: OK [?] win=14250 size=2940x1836 dt=6ms
+[2026-08-07 20:28:19.021] [WindowManager.swift:187] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=214ms
+[2026-08-07 20:28:19.021] [AppDelegate.swift:344] TIMING: [t=222ms] preload visible done (capture=214ms, hit=0, miss=7)
+[2026-08-07 20:28:19.021] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Google Chrome → [2]Google Chrome → [3]Google Chrome → [4]访达 → [5]Obsidian → [6]Obsidian → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
+[WS] CB6: count=3 frame=210
+[WS] CB6: count=3 frame=211
+[WS] CB6: count=3 frame=212
+[2026-08-07 20:28:19.039] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
+[WS] CB6: count=3 frame=213
+[2026-08-07 20:28:19.047] [AppDelegate.swift:352] TIMING: [t=249ms] overlay shown (UI=26ms, total=249ms)
+[2026-08-07 20:28:19.047] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=249ms
+[2026-08-07 20:28:19.048] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=25841
+[2026-08-07 20:28:19.051] [AXFocusObserver.swift:58] AXFocusObserver: started pid=25841
+[WS] CB6: count=3 frame=214
+[WS] CB6: count=3 frame=215
+[2026-08-07 20:28:19.067] [WindowManager.swift:164] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=18ms
+[WS] CB6: count=3 frame=216
+[WS] CB6: count=3 frame=217
+[2026-08-07 20:28:19.078] [WindowManager.swift:164] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=10ms
+[2026-08-07 20:28:19.079] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[WS] CB6: count=3 frame=218
+[2026-08-07 20:28:19.088] [WindowManager.swift:164] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=9ms
+[WS] CB6: count=3 frame=219
+[2026-08-07 20:28:19.097] [WindowManager.swift:164] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=8ms
+[WS] CB6: count=3 frame=220
+[WS] CB6: count=3 frame=221
+[WS] CB6: count=3 frame=222
+[WS] CB6: count=3 frame=223
+[WS] CB6: count=3 frame=224
+[WS] CB6: count=3 frame=225
+[2026-08-07 20:28:19.145] [WindowManager.swift:164] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=47ms
+[WS] CB6: count=3 frame=226
+[2026-08-07 20:28:19.152] [WindowManager.swift:164] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=7ms
+[WS] CB6: count=3 frame=227
+[2026-08-07 20:28:19.161] [WindowManager.swift:164] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=9ms
+[WS] CB6: count=3 frame=228
+[2026-08-07 20:28:19.168] [WindowManager.swift:164] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
+[WS] CB6: count=3 frame=229
+[2026-08-07 20:28:19.179] [WindowManager.swift:164] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=10ms
+[WS] CB6: count=3 frame=230
+[2026-08-07 20:28:19.187] [WindowManager.swift:164] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
+[WS] CB6: count=3 frame=231
+[2026-08-07 20:28:19.194] [WindowManager.swift:164] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=7ms
+[2026-08-07 20:28:19.195] [AppDelegate.swift:381] CAPTURE: background capture complete, captured=11/11, dt=146ms
+[WS] CB6: count=3 frame=232
+[WS] CB6: count=3 frame=233
+[WS] CB6: count=3 frame=234
+[WS] CB6: count=3 frame=235
+[WS] CB6: count=3 frame=236
+[WS] CB6: count=3 frame=237
+[WS] CB6: count=3 frame=238
+[WS] CB6: count=3 frame=239
+[WS] CB6: count=3 frame=240
+[WS] CB6: count=3 frame=241
+[WS] CB6: count=3 frame=242
+[WS] CB6: count=3 frame=243
+[WS] CB6: count=3 frame=244
+[WS] CB6: count=3 frame=245
+[WS] CB6: count=3 frame=246
+[WS] CB6: count=3 frame=247
+[WS] CB6: count=3 frame=248
+[WS] CB6: count=3 frame=249
+[WS] CB6: count=3 frame=250
+[WS] CB6: count=3 frame=251
+[WS] CB6: count=3 frame=252
+[WS] CB6: count=3 frame=253
+[WS] CB6: count=3 frame=254
 [WS-DBG] fingerCount: 3 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=5,ty=2,fl=-1,z=-0.0166,x=0.424,y=0.324
-[WS-DBG] GESTURE: Three-finger tap [session=17] (88ms, postSettleDisp=0.0004)
-[2026-08-07 19:30:34.942] [GestureEngineWrapper.swift:108] GestureEngine(C): TAP detected, progress=0.0
-[2026-08-07 19:30:34.942] [AppDelegate.swift:215] GESTURE: threeFingerTap, overlayVisible=false
-[2026-08-07 19:30:34.942] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 19:30:34.950] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:30:34.950] [AppDelegate.swift:332] TIMING: [t=8ms] refreshWindows done, 18 windows
-[2026-08-07 19:30:34.971] [WindowManager.swift:155] CAPTURE: OK [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] win=5828 size=2932x1822 dt=20ms
-[2026-08-07 19:30:34.980] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=8ms
-[2026-08-07 19:30:35.004] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=23ms
-[2026-08-07 19:30:35.012] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=7ms
-[2026-08-07 19:30:35.026] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=13ms
-[2026-08-07 19:30:35.036] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=10ms
-[2026-08-07 19:30:35.044] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=8ms
-[2026-08-07 19:30:35.045] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=94ms
-[2026-08-07 19:30:35.045] [AppDelegate.swift:344] TIMING: [t=102ms] preload visible done (capture=94ms, hit=0, miss=7)
-[2026-08-07 19:30:35.045] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:30:35.045] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[2026-08-07 19:30:35.053] [AppDelegate.swift:352] TIMING: [t=110ms] overlay shown (UI=8ms, total=110ms)
-[2026-08-07 19:30:35.053] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=110ms
-[2026-08-07 19:30:35.053] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=15609
-[2026-08-07 19:30:35.070] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=16ms
-[2026-08-07 19:30:35.074] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:30:35.074] [AXFocusObserver.swift:58] AXFocusObserver: started pid=15609
-[2026-08-07 19:30:35.079] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=9ms
-[2026-08-07 19:30:35.089] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:30:35.089] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=9ms
-[2026-08-07 19:30:35.097] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=7ms
-[2026-08-07 19:30:35.151] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=54ms
-[2026-08-07 19:30:35.159] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=7ms
-[2026-08-07 19:30:35.174] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=15ms
-[2026-08-07 19:30:35.182] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=7ms
-[2026-08-07 19:30:35.190] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=8ms
-[2026-08-07 19:30:35.198] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=7ms
-[2026-08-07 19:30:35.205] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=7ms
-[2026-08-07 19:30:35.206] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=152ms
+[WS-DBG]   RAW: [0]st=5,ty=3,fl=1,z=-0.2315,x=0.698,y=0.876
+[WS-DBG] TRAJECTORY: swipe-end [session=1] dX=0.1325 dY=0.6186 |dX/dY|=0.21
+[WS-DBG] STATE: SWIPING -> IDLE [session=1] (lift, fingerCount=1) GestureEnd fired
+[2026-08-07 20:28:19.381] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 20:28:19.381] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.387,y=0.411
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.569,y=0.682
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0042,x=0.390,y=0.407
-[WS-DBG] processContactData: ALIVE frame=15626 count=1
-[WS-DBG] processContactData: ALIVE frame=15746 count=1
-[2026-08-07 19:30:37.735] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0560,x=0.569,y=0.681
+[2026-08-07 20:28:20.213] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.400,y=0.686
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.549,y=0.148
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0405,x=0.404,y=0.678
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0457,x=0.552,y=0.139
+[WS-DBG] processContactData: ALIVE frame=392 count=1
+[2026-08-07 20:28:21.103] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
+[2026-08-07 20:28:21.103] [AppDelegate.swift:149] onInteraction fired for window 17079
+[2026-08-07 20:28:21.119] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-07 20:28:21.120] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-07 20:28:21.151] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[WS-DBG] processContactData: ALIVE frame=512 count=1
+[2026-08-07 20:28:21.612] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
+[2026-08-07 20:28:21.613] [AppDelegate.swift:149] onInteraction fired for window 17079
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.378,y=0.369
-[WS] CB6: count=3 frame=15902
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=-1,z=0.3685,x=0.476,y=0.518 [1]st=4,ty=3,fl=-1,z=0.0000,x=0.370,y=0.366 [2]st=1,ty=0,fl=0,z=0.0000,x=0.420,y=0.095
-[WS] CB6: count=3 frame=15903
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1266,x=0.475,y=0.524 [1]st=4,ty=1,fl=-1,z=0.0903,x=0.370,y=0.373 [2]st=3,ty=1,fl=1,z=0.1079,x=0.421,y=0.092
-[WS] CB6: count=3 frame=15904
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0612,x=0.475,y=0.528 [1]st=4,ty=1,fl=-1,z=-0.0010,x=0.370,y=0.376 [2]st=4,ty=1,fl=1,z=-0.4048,x=0.418,y=0.094
-[WS-DBG] STATE: IDLE -> TRACKING [session=18] (touchdown 16ms, prevFinger=2)
-[WS] CB6: count=3 frame=15905
-[WS] CB6: count=3 frame=15906
-[WS] CB6: count=3 frame=15907
-[WS] CB6: count=3 frame=15908
-[WS] CB6: count=3 frame=15909
-[WS-DBG] processContactData: ALIVE frame=15909 count=3
-[WS] CB6: count=3 frame=15910
-[WS] CB6: count=3 frame=15911
-[WS] CB6: count=3 frame=15912
-[WS] CB6: count=3 frame=15913
-[WS] CB6: count=3 frame=15914
-[WS] CB6: count=3 frame=15915
-[WS] CB6: count=3 frame=15916
-[WS] CB6: count=3 frame=15917
-[WS] CB6: count=3 frame=15918
-[WS] CB6: count=3 frame=15919
-[WS] CB6: count=3 frame=15920
-[WS] CB6: count=3 frame=15921
-[WS-DBG] GESTURE: Three-finger swipe UP [session=18] (dispY=0.1174)
-[2026-08-07 19:30:38.564] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
-[2026-08-07 19:30:38.564] [AppDelegate.swift:230] GESTURE: threeFingerSwipeUp, overlayVisible=false
-[2026-08-07 19:30:38.564] [AppDelegate.swift:328] TIMING: [t=0ms] showImmersiveOverlay called
-[WS] CB6: count=3 frame=15922
-[2026-08-07 19:30:38.574] [WindowManager.swift:136] WindowManager: refreshed 18 windows
-[2026-08-07 19:30:38.574] [AppDelegate.swift:332] TIMING: [t=9ms] refreshWindows done, 18 windows
-[WS] CB6: count=3 frame=15923
-[WS] CB6: count=3 frame=15924
-[2026-08-07 19:30:38.589] [WindowManager.swift:155] CAPTURE: OK [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] win=5828 size=2932x1822 dt=14ms
-[WS] CB6: count=3 frame=15925
-[2026-08-07 19:30:38.596] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4] win=14251 size=2940x1836 dt=7ms
-[WS] CB6: count=3 frame=15926
-[2026-08-07 19:30:38.604] [WindowManager.swift:155] CAPTURE: OK [Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4] win=14250 size=2940x1836 dt=7ms
-[2026-08-07 19:30:38.611] [WindowManager.swift:155] CAPTURE: OK [访达 — WindowSwitcher] win=40 size=2940x1836 dt=6ms
-[WS] CB6: count=3 frame=15927
-[WS] CB6: count=3 frame=15928
-[2026-08-07 19:30:38.623] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 全国睡眠舒适度地图_百度搜索] win=16219 size=2940x1836 dt=12ms
-[WS] CB6: count=3 frame=15929
-[2026-08-07 19:30:38.631] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[WS] CB6: count=3 frame=15930
-[2026-08-07 19:30:38.639] [WindowManager.swift:155] CAPTURE: OK [Google Chrome — 新标签页] win=16229 size=2940x1836 dt=7ms
-[2026-08-07 19:30:38.639] [WindowManager.swift:178] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=64ms
-[2026-08-07 19:30:38.639] [AppDelegate.swift:344] TIMING: [t=74ms] preload visible done (capture=64ms, hit=0, miss=7)
-[2026-08-07 19:30:38.639] [AppDelegate.swift:349] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]访达 → [4]Google Chrome → [5]Google Chrome → [6]Google Chrome → [7]坚果云 → [8]时钟 → [9]CodeBuddy CN → [10]青山 → [11]网易有道翻译 → [12]系统设置 → [13]HibernateModeManager → [14]活动监视器 → [15]微信读书 → [16]微信 → [17]微信
-[2026-08-07 19:30:38.639] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=18, withThumbnails=7
-[WS] CB6: count=3 frame=15931
-[2026-08-07 19:30:38.644] [AppDelegate.swift:352] TIMING: [t=79ms] overlay shown (UI=5ms, total=79ms)
-[2026-08-07 19:30:38.644] [AppDelegate.swift:357] CAPTURE: background capture starting, remaining=11, overlay shown at t=79ms
-[WS] CB6: count=3 frame=15932
-[2026-08-07 19:30:38.653] [WindowManager.swift:155] CAPTURE: OK [坚果云 — 坚果云] win=15794 size=900x1360 dt=8ms
-[2026-08-07 19:30:38.659] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[2026-08-07 19:30:38.659] [WindowManager.swift:155] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=6ms
-[WS] CB6: count=3 frame=15933
-[2026-08-07 19:30:38.666] [WindowManager.swift:155] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=6ms
-[WS] CB6: count=3 frame=15934
-[2026-08-07 19:30:38.674] [WindowManager.swift:155] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=8ms
-[WS] CB6: count=3 frame=15935
-[WS] CB6: count=3 frame=15936
-[WS] CB6: count=3 frame=15937
-[WS] CB6: count=3 frame=15938
-[WS] CB6: count=3 frame=15939
-[WS] CB6: count=3 frame=15940
-[2026-08-07 19:30:38.716] [WindowManager.swift:155] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=42ms
-[WS] CB6: count=3 frame=15941
-[2026-08-07 19:30:38.723] [WindowManager.swift:155] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=6ms
-[2026-08-07 19:30:38.730] [WindowManager.swift:155] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=6ms
-[WS] CB6: count=3 frame=15942
-[2026-08-07 19:30:38.737] [WindowManager.swift:155] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=6ms
-[WS] CB6: count=3 frame=15943
-[2026-08-07 19:30:38.743] [WindowManager.swift:155] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=6ms
-[WS] CB6: count=3 frame=15944
-[2026-08-07 19:30:38.753] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信] win=158 size=1760x1280 dt=9ms
-[WS] CB6: count=3 frame=15945
-[2026-08-07 19:30:38.760] [WindowManager.swift:155] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=6ms
-[2026-08-07 19:30:38.760] [AppDelegate.swift:375] CAPTURE: background capture complete, captured=11/11, dt=115ms
-[WS] CB6: count=3 frame=15946
-[WS] CB6: count=3 frame=15947
-[WS] CB6: count=3 frame=15948
-[WS] CB6: count=3 frame=15949
-[WS] CB6: count=3 frame=15950
-[WS] CB6: count=3 frame=15951
-[WS] CB6: count=3 frame=15952
-[WS] CB6: count=3 frame=15953
-[WS] CB6: count=3 frame=15954
-[WS] CB6: count=3 frame=15955
-[WS] CB6: count=3 frame=15956
-[WS] CB6: count=3 frame=15957
-[WS] CB6: count=3 frame=15958
-[WS] CB6: count=3 frame=15959
-[WS] CB6: count=3 frame=15960
-[WS] CB6: count=3 frame=15961
-[WS] CB6: count=3 frame=15962
-[WS] CB6: count=3 frame=15963
-[WS] CB6: count=3 frame=15964
-[WS] CB6: count=3 frame=15965
-[WS] CB6: count=3 frame=15966
-[WS] CB6: count=3 frame=15967
-[WS] CB6: count=3 frame=15968
-[WS] CB6: count=3 frame=15969
-[WS] CB6: count=3 frame=15970
-[WS] CB6: count=3 frame=15971
-[WS] CB6: count=3 frame=15972
-[WS] CB6: count=3 frame=15973
-[WS] CB6: count=3 frame=15974
-[WS] CB6: count=3 frame=15975
-[WS] CB6: count=3 frame=15976
-[WS] CB6: count=3 frame=15977
-[WS] CB6: count=3 frame=15978
-[WS] CB6: count=3 frame=15979
-[WS] CB6: count=3 frame=15980
-[WS] CB6: count=3 frame=15981
-[WS] CB6: count=3 frame=15982
-[WS] CB6: count=3 frame=15983
-[WS] CB6: count=3 frame=15984
-[WS] CB6: count=3 frame=15985
-[WS] CB6: count=3 frame=15986
-[WS] CB6: count=3 frame=15987
-[WS] CB6: count=3 frame=15988
-[WS] CB6: count=3 frame=15989
-[WS] CB6: count=3 frame=15990
-[WS] CB6: count=3 frame=15991
-[WS] CB6: count=3 frame=15992
-[WS] CB6: count=3 frame=15993
-[WS] CB6: count=3 frame=15994
-[WS] CB6: count=3 frame=15995
-[WS] CB6: count=3 frame=15996
-[WS] CB6: count=3 frame=15997
-[WS] CB6: count=3 frame=15998
-[WS] CB6: count=3 frame=15999
-[WS] CB6: count=3 frame=16000
-[WS] CB6: count=3 frame=16001
-[WS] CB6: count=3 frame=16002
-[WS] CB6: count=3 frame=16003
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=6,ty=2,fl=1,z=-0.0778,x=0.537,y=0.851 [1]st=5,ty=1,fl=1,z=-0.0062,x=0.408,y=0.357
-[WS-DBG] STATE: SWIPING -> IDLE [session=18] (lift, fingerCount=2) GestureEnd fired
-[2026-08-07 19:30:39.227] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 19:30:39.227] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.377,y=0.378
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.2574,x=0.385,y=0.383
+[WS-DBG] processContactData: ALIVE frame=724 count=1
+[2026-08-07 20:28:23.179] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
+[2026-08-07 20:28:23.179] [AppDelegate.swift:149] onInteraction fired for window 17079
+[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.574,y=0.792
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.473,y=0.664 [1]st=4,ty=2,fl=1,z=0.0000,x=0.583,y=0.812
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1796,x=0.480,y=0.663 [1]st=4,ty=3,fl=1,z=0.0633,x=0.583,y=0.814
 [WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=2,fl=1,z=-0.0384,x=0.408,y=0.354
+[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.527,y=0.575
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.405,y=0.344
-[WS] CB6: count=3 frame=16020
-[WS] CB6: count=3 frame=16021
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=4,fl=1,z=-0.2190,x=0.531,y=0.848 [1]st=3,ty=3,fl=1,z=0.0498,x=0.413,y=0.721 [2]st=4,ty=2,fl=1,z=0.1412,x=0.411,y=0.352
-[WS] CB6: count=3 frame=16022
-[WS-DBG] fingerCount: 1 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=4,fl=1,z=0.1329,x=0.532,y=0.846 [1]st=4,ty=3,fl=1,z=-0.0820,x=0.413,y=0.717 [2]st=4,ty=2,fl=1,z=-0.0125,x=0.411,y=0.351
-[WS-DBG] STATE: IDLE -> TRACKING [session=19] (touchdown 8ms, prevFinger=1)
-[WS] CB6: count=3 frame=16023
-[WS] CB6: count=3 frame=16024
-[WS] CB6: count=3 frame=16025
-[WS] CB6: count=3 frame=16026
-[WS] CB6: count=3 frame=16027
-[WS] CB6: count=3 frame=16028
-[WS] CB6: count=3 frame=16029
-[WS] CB6: count=3 frame=16030
-[WS] CB6: count=3 frame=16031
-[WS] CB6: count=3 frame=16032
-[WS] CB6: count=3 frame=16033
-[WS] CB6: count=3 frame=16034
-[WS] CB6: count=3 frame=16035
-[WS] CB6: count=3 frame=16036
-[WS] CB6: count=3 frame=16037
-[WS] CB6: count=3 frame=16038
-[WS-DBG] processContactData: ALIVE frame=16038 count=3
-[WS] CB6: count=3 frame=16039
-[WS-DBG] GESTURE: Three-finger swipe DOWN [session=19] (dispY=-0.1038)
-[2026-08-07 19:30:39.507] [GestureEngineWrapper.swift:120] GestureEngine(C): SWIPE DOWN detected
-[2026-08-07 19:30:39.508] [AppDelegate.swift:242] GESTURE: threeFingerSwipeDown, overlayVisible=true
-[2026-08-07 19:30:39.508] [OverlayWindowController.swift:127] CAPTURE-UI: overlay hide called, isVisible=true
-[WS] CB6: count=3 frame=16040
-[2026-08-07 19:30:39.520] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16041
-[2026-08-07 19:30:39.523] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16042
-[2026-08-07 19:30:39.532] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16043
-[2026-08-07 19:30:39.539] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16044
-[2026-08-07 19:30:39.547] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16045
-[2026-08-07 19:30:39.555] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16046
-[2026-08-07 19:30:39.563] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16047
-[2026-08-07 19:30:39.571] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16048
-[2026-08-07 19:30:39.580] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16049
-[2026-08-07 19:30:39.587] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16050
-[2026-08-07 19:30:39.595] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16051
-[2026-08-07 19:30:39.603] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16052
-[2026-08-07 19:30:39.611] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #121, type=6, progress=-0.30654037
-[2026-08-07 19:30:39.612] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16053
-[2026-08-07 19:30:39.619] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16054
-[2026-08-07 19:30:39.628] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16055
-[2026-08-07 19:30:39.635] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16056
-[2026-08-07 19:30:39.643] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16057
-[2026-08-07 19:30:39.651] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16058
-[2026-08-07 19:30:39.659] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16059
-[2026-08-07 19:30:39.668] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16060
-[2026-08-07 19:30:39.675] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16061
-[2026-08-07 19:30:39.684] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16062
-[2026-08-07 19:30:39.692] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16063
-[2026-08-07 19:30:39.699] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16064
-[2026-08-07 19:30:39.707] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16065
-[2026-08-07 19:30:39.715] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16066
-[2026-08-07 19:30:39.724] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16067
-[2026-08-07 19:30:39.731] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16068
-[2026-08-07 19:30:39.740] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16069
-[2026-08-07 19:30:39.747] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16070
-[2026-08-07 19:30:39.757] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16071
-[2026-08-07 19:30:39.763] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16072
-[2026-08-07 19:30:39.771] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16073
-[2026-08-07 19:30:39.779] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16074
-[2026-08-07 19:30:39.787] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16075
-[2026-08-07 19:30:39.795] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16076
-[2026-08-07 19:30:39.803] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16077
-[2026-08-07 19:30:39.811] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16078
-[2026-08-07 19:30:39.819] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16079
-[2026-08-07 19:30:39.827] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16080
-[2026-08-07 19:30:39.835] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16081
-[2026-08-07 19:30:39.843] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16082
-[2026-08-07 19:30:39.851] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16083
-[2026-08-07 19:30:39.859] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16084
-[2026-08-07 19:30:39.868] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16085
-[2026-08-07 19:30:39.875] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=16086
-[2026-08-07 19:30:39.883] [AppDelegate.swift:437] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=4,fl=1,z=-0.0644,x=0.479,y=0.589 [1]st=6,ty=3,fl=1,z=-0.0986,x=0.371,y=0.436
-[WS-DBG] STATE: SWIPING -> IDLE [session=19] (lift, fingerCount=2) GestureEnd fired
-[2026-08-07 19:30:39.891] [AppDelegate.swift:298] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 19:30:39.891] [AppDelegate.swift:319] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.422,y=0.171
+[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0311,x=0.424,y=0.164
+[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0239,x=0.424,y=0.195 [1]st=4,ty=3,fl=1,z=0.2356,x=0.517,y=0.406
+[WS-DBG] processContactData: ALIVE frame=913 count=2
 [WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=3,fl=1,z=-0.0830,x=0.477,y=0.588
+[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=0.5937,x=0.621,y=0.862
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.631,y=0.511
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.425,y=0.276
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.1713,x=0.630,y=0.518
-[WS-DBG] processContactData: ALIVE frame=16250 count=1
-[2026-08-07 19:30:45.885] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:30:45.885] [AppDelegate.swift:149] onInteraction fired for window 5828
-[2026-08-07 19:30:45.887] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 19:30:45.890] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 19:30:45.910] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0799,x=0.428,y=0.275
+[WS-DBG] processContactData: ALIVE frame=1098 count=1
+[2026-08-07 20:28:26.828] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
+[2026-08-07 20:28:26.828] [AppDelegate.swift:149] onInteraction fired for window 17079
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.499,y=0.437
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.600,y=0.840
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1796,x=0.503,y=0.439
-[2026-08-07 19:30:46.586] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:30:46.586] [AppDelegate.swift:149] onInteraction fired for window 5828
+[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=-0.0695,x=0.595,y=0.825
+[WS-DBG] processContactData: ALIVE frame=1230 count=1
+[2026-08-07 20:28:27.361] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Google Chrome — iPhone18Pro十二大升级：灵动…ax机身更厚、电池容量将增大近10% → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换 → 访达 — WindowSwitcher]
+[2026-08-07 20:28:27.361] [AppDelegate.swift:149] onInteraction fired for window 17079
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.372,y=0.198
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.943,y=0.487
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0477,x=0.372,y=0.205
-[WS-DBG] processContactData: ALIVE frame=16400 count=1
+[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.4224,x=0.965,y=0.490
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.533,y=0.400
+[WS-DBG]   RAW: [0]st=3,ty=7,fl=1,z=0.1920,x=0.982,y=0.511
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1951,x=0.535,y=0.399
-[2026-08-07 19:30:47.384] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:30:47.385] [AppDelegate.swift:149] onInteraction fired for window 5828
+[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.1619,x=0.983,y=0.511
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.582,y=0.676
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.970,y=0.253
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0249,x=0.584,y=0.666
-[2026-08-07 19:30:47.818] [LRUOrderingEngine.swift:117] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 访达 — WindowSwitcher → Google Chrome — 全国睡眠舒适度地图_百度搜索]
-[2026-08-07 19:30:47.818] [AppDelegate.swift:149] onInteraction fired for window 5828
+[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.971,y=0.253
 [WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.981,y=0.508
-[WS-DBG] processContactData: ALIVE frame=16614 count=1
+[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.980,y=0.427
 [WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.979,y=0.495
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.984,y=0.493
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.984,y=0.493
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.973,y=0.390
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.973,y=0.391
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.985,y=0.435
-[WS-DBG] processContactData: ALIVE frame=16954 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.987,y=0.450
+[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.980,y=0.427
