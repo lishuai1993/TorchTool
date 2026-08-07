@@ -100,14 +100,6 @@ struct OverlayView: View {
                         proxy.scrollTo(newIdx, anchor: .center)
                     }
                 }
-                .onChange(of: viewModel.snapToIndex) { oldIdx, newIdx in
-                    logDebug("SNAP-VIEW: onChange old=\(oldIdx.map(String.init) ?? "nil") new=\(newIdx.map(String.init) ?? "nil")")
-                    guard let idx = newIdx else { return }
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        proxy.scrollTo(idx, anchor: .center)
-                    }
-                    logDebug("SNAP-VIEW: scrollTo(\(idx), anchor: .center) called")
-                }
             }
 
             if let idx = viewModel.hoveredIndex ?? (displayIdx < viewModel.windows.count ? displayIdx : nil),

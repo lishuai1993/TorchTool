@@ -5,6 +5,7 @@ struct HelpPanelView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 headerSection
+                gestureSection
                 serviceControlSection
                 modeToggleSection
                 elasticDragSection
@@ -13,7 +14,7 @@ struct HelpPanelView: View {
             }
             .padding(24)
         }
-        .frame(minWidth: 460, maxWidth: 560, minHeight: 520)
+        .frame(minWidth: 460, maxWidth: 560, minHeight: 620)
     }
 
     // MARK: - Header
@@ -26,6 +27,27 @@ struct HelpPanelView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             Divider()
+        }
+    }
+
+    // MARK: - Gesture
+
+    private var gestureSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("手势说明")
+
+            helpItem(
+                title: "滑动方向定义",
+                detail: "以风向类比：手指在触控板上从左向右滑动称为「左滑」（起点在左），从右向左滑动称为「右滑」（起点在右）。方向以手指运动的起点为准，与风向命名规则一致。"
+            )
+            helpItem(
+                title: "窗口列表模型",
+                detail: "所有窗口按活跃时间从左向右排列：最左侧（索引 0）为最近使用的窗口，越久远未使用的窗口越靠右。列表始终保持此 LRU（最近最少使用）顺序。"
+            )
+            helpItem(
+                title: "手势操作对象",
+                detail: "三指滑动操作的是窗口列表本身，而非一个在列表上移动的焦点指针。窗口列表随手势同方向滑动——左滑则列表右移，左侧较新的窗口进入视野（切换到上一个窗口）；右滑则列表左移，右侧较旧的窗口进入视野（切换到下一个窗口）。这与 iOS 主屏幕左右滑动的交互模型一致。"
+            )
         }
     }
 

@@ -11,9 +11,6 @@ final class OverlayWindowController {
     private var scrollWheelMonitor: Any?
     var isVisible: Bool { panel?.isVisible ?? false }
 
-    var onWindowSelected: ((WindowInfo) -> Void)?
-    var onDismiss: (() -> Void)?
-
     private init() {}
 
     // MARK: - Show / Hide
@@ -142,14 +139,12 @@ final class OverlayWindowController {
         }
         panel?.orderOut(nil)
         viewModel.hide()
-        onDismiss?()
     }
 
     // MARK: - Thumbnail refresh
 
     func refreshThumbnails() {
-        let orderedIDs = WindowManager.shared.orderingEngine.orderedIDs
-        viewModel.windows = orderedIDs.compactMap { WindowManager.shared.windows[$0] }
+        viewModel.windows = WindowManager.shared.orderedWindows
     }
 
     // MARK: - Navigation
@@ -169,7 +164,6 @@ final class OverlayWindowController {
         logDebug("OVERLAY-SELECT: window=\(window.ownerName) — \(window.windowTitle)")
         hide()
         WindowManager.shared.activateWindow(window.id)
-        onWindowSelected?(window)
     }
 
     /// Align focusedIndex to wherever the user's mouse is pointing (hoveredIndex).
@@ -180,25 +174,6 @@ final class OverlayWindowController {
             viewModel.focusedIndex = h
         }
         viewModel.hoveredIndex = nil
-    }
-
-    /// Sync focusedIndex to the current frontmost window's position in the LRU list.
-    /// Keeps keyboard arrow focus and gesture-driven focus on the same baseline.
-    func syncFocusedIndex() {
-        let orderedIDs = WindowManager.shared.orderingEngine.orderedIDs
-        let oldIdx = viewModel.focusedIndex
-        guard let frontID = WindowManager.shared.frontmostWindowID,
-              let idx = orderedIDs.firstIndex(of: frontID) else {
-            logDebug("FOCUS-SYNC: frontID=\(WindowManager.shared.frontmostWindowID?.description ?? "nil"), orderedIDs.count=\(orderedIDs.count), NOT synced")
-            return
-        }
-        logDebug("FOCUS-SYNC: oldFocused=\(oldIdx) → newFocused=\(idx), frontID=\(frontID), hovered=\(String(describing: viewModel.hoveredIndex))")
-        viewModel.focusedIndex = idx
-        viewModel.hoveredIndex = nil
-    }
-
-    func updateProgress(_ progress: Float) {
-        // Continuous swipe tracking — reserved for future use.
     }
 
     // MARK: - Helpers
@@ -242,7 +217,6 @@ final class OverlayWindowController {
                 logDebug("OVERLAY-CLICK: window=\(window.ownerName) — \(window.windowTitle)")
                 self?.hide()
                 WindowManager.shared.activateWindow(window.id)
-                self?.onWindowSelected?(window)
             },
             onDismiss: { [weak self] in
                 self?.hide()

@@ -12,9 +12,6 @@ final class OverlayViewModel: ObservableObject {
     /// Weak ref to backing NSScrollView for forwarding scrollWheel events.
     weak var scrollView: NSScrollView?
 
-    /// Snap target — view scrolls to this index on finger lift.
-    @Published var snapToIndex: Int?
-
     var displayIndex: Int { hoveredIndex ?? focusedIndex }
 
     var isEmpty: Bool { windows.isEmpty }
@@ -23,7 +20,6 @@ final class OverlayViewModel: ObservableObject {
         self.windows = windows
         self.focusedIndex = 0
         self.hoveredIndex = nil
-        self.snapToIndex = nil
         self.cardFrames = [:]
     }
 
@@ -31,7 +27,6 @@ final class OverlayViewModel: ObservableObject {
         windows = []
         focusedIndex = 0
         hoveredIndex = nil
-        snapToIndex = nil
         cardFrames = [:]
     }
 

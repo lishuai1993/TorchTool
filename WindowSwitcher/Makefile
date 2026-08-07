@@ -134,6 +134,7 @@ $(BUILD_DIR)/WindowSwitcherTests: $(TEST_SOURCES)
 	@mkdir -p $(BUILD_DIR)
 	swiftc \
 		$(TEST_SOURCES) \
+		-D DEBUG \
 		-framework AppKit -framework CoreGraphics \
 		-sdk $(SDK) \
 		-target $(TARGET) \

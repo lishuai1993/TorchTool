@@ -12,6 +12,11 @@ final class WindowManager: @unchecked Sendable {
     /// Current snapshot of visible windows, keyed by CGWindowID.
     private(set) var windows: [CGWindowID: WindowInfo] = [:]
 
+    /// Windows in LRU order (convenience for display reconstruction).
+    var orderedWindows: [WindowInfo] {
+        orderingEngine.orderedIDs.compactMap { windows[$0] }
+    }
+
     /// Current frontmost window ID.
     private(set) var frontmostWindowID: CGWindowID?
 
@@ -592,8 +597,7 @@ final class WindowManager: @unchecked Sendable {
         guard let windowID = dict[kCGWindowNumber as String] as? Int,
               let ownerPID = dict[kCGWindowOwnerPID as String] as? pid_t,
               let ownerName = dict[kCGWindowOwnerName as String] as? String,
-              let bounds = dict[kCGWindowBounds as String] as? [String: Any],
-              let layer = dict[kCGWindowLayer as String] as? Int
+              let bounds = dict[kCGWindowBounds as String] as? [String: Any]
         else { return nil }
 
         if ownerPID == ProcessInfo.processInfo.processIdentifier {
@@ -619,14 +623,11 @@ final class WindowManager: @unchecked Sendable {
 
         return WindowInfo(
             id: CGWindowID(windowID),
-            windowNumber: windowID,
             ownerPid: ownerPID,
             ownerName: ownerName,
             ownerBundleID: bundleID,
             windowTitle: (dict[kCGWindowName as String] as? String) ?? "",
-            frame: frame,
-            isOnScreen: true,
-            windowLayer: layer
+            frame: frame
         )
     }
 }

@@ -9,12 +9,6 @@ final class LRUOrderingEngine {
     /// Ordered window IDs, index 0 = most recently active.
     private(set) var orderedIDs: [CGWindowID] = []
 
-    /// Timestamp of last substantial interaction per window.
-    private var lastInteraction: [CGWindowID: Date] = [:]
-
-    /// Window ID of the currently focused window.
-    private var focusedWindowID: CGWindowID?
-
     /// Cursor pointing to the current position in the LRU list.
     /// Always reflects the most-recently-activated window (index 0 after activation).
     private(set) var currentIndex: Int = 0
@@ -69,9 +63,6 @@ final class LRUOrderingEngine {
             logDebug("LRU: sync - removed \(removed.count) windows")
         }
         orderedIDs.removeAll { removed.contains($0) }
-        for id in removed {
-            lastInteraction.removeValue(forKey: id)
-        }
 
         // Prepend new windows in reverse CGWindowList order so the final
         // order matches the z-order snapshot.  Must iterate over `windowIDs`
@@ -92,14 +83,13 @@ final class LRUOrderingEngine {
     }
 
     /// Call when a window receives focus (e.g. via Cmd+Tab or click).
-    /// Does NOT reorder — only records the focus target.
-    func windowDidFocus(_ id: CGWindowID) {
-        focusedWindowID = id
-    }
+    /// Does NOT reorder. Placeholder for future focus-tracking logic.
+    func windowDidFocus(_ id: CGWindowID) {}
 
     /// Move a window to the front of the list in response to an external app
     /// activation event (Cmd+Tab, Dock click).  Unlike `windowDidInteract`,
     /// this does NOT record an interaction timestamp — it only reorders.
+#if DEBUG
     func moveToFront(_ id: CGWindowID) {
         guard let idx = orderedIDs.firstIndex(of: id), idx > 0 else { return }
         orderedIDs.remove(at: idx)
@@ -107,11 +97,11 @@ final class LRUOrderingEngine {
         currentIndex = 0
         logDebug("LRU: moveToFront [\(windowNames[id] ?? "?")] from [\(idx)] → [0]")
     }
+#endif
 
     /// Call when a "substantial interaction" (click, key, scroll) occurs in a window.
     /// Moves the window to the front of the LRU list and resets cursor to 0.
     func windowDidInteract(_ id: CGWindowID) {
-        lastInteraction[id] = Date()
         guard let idx = orderedIDs.firstIndex(of: id) else {
             logDebug("LRU-INTERACT: id=\(id) name=\(windowNames[id] ?? "?") NOT FOUND in orderedIDs (count=\(orderedIDs.count))")
             return
@@ -152,17 +142,21 @@ final class LRUOrderingEngine {
     }
 
     /// Returns the window ID that is "to the left" (more recent) relative to `id`.
+#if DEBUG
     func moreRecent(than id: CGWindowID) -> CGWindowID? {
         guard let idx = orderedIDs.firstIndex(of: id), idx > 0 else { return nil }
         return orderedIDs[idx - 1]
     }
+#endif
 
     /// Returns the window ID that is "to the right" (less recent) relative to `id`.
+#if DEBUG
     func lessRecent(than id: CGWindowID) -> CGWindowID? {
         guard let idx = orderedIDs.firstIndex(of: id),
               idx + 1 < orderedIDs.count else { return nil }
         return orderedIDs[idx + 1]
     }
+#endif
 
     /// Advances the cursor in the given direction and returns the target window.
     /// When `cyclic` is false and the cursor is at the boundary, returns nil

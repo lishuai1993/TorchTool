@@ -11,8 +11,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowManager = WindowManager.shared
     private let overlayController = OverlayWindowController.shared
     private let menuBar = MenuBarController.shared
-    private var currentQuickSwitchIndex: Int = 0
-
     // MARK: - NSApplicationDelegate
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -60,12 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         wireCallbacks()
         logDebug("Step 5: Callbacks wired OK")
 
-        // Step 6: Settings observer
-        logDebug("Step 6: Setting up settings observer...")
-        setupSettingsObserver()
-        logDebug("Step 6: OK")
-
-        // Step 6.5: Session observers — re-register the MultitouchSupport
+        // Step 6: Session observers — re-register the MultitouchSupport
         // device after lock/unlock or sleep/wake interrupts its contact stream.
         logDebug("Step 6.5: Setting up session observers...")
         setupSessionObservers()
@@ -79,8 +72,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // This is where v1 logAppZOrder got the correct Cmd+Tab order.
         _ = windowManager.refreshWindows()
         logDebug("Initial LRU order:\n\(windowManager.orderingEngine.dumpLRU())")
+#if DEBUG
         logAppZOrder()
         checkOrderConsistency()
+#endif
 
         logDebug("=== applicationDidFinishLaunching END (SUCCESS) ===")
     }
@@ -349,7 +344,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logDebug("TIMING: [t=\(Int((t2 - t0) * 1000))ms] preload visible done (capture=\(Int((t2 - t1) * 1000))ms, hit=\(cachedCount), miss=\(visibleCount - cachedCount))")
 
         let orderedIDs = windowManager.orderingEngine.orderedIDs
-        let windowsWithThumbnails = orderedIDs.compactMap { windowManager.windows[$0] }
+        let windowsWithThumbnails = windowManager.orderedWindows
         let names = orderedIDs.compactMap { windowManager.windows[$0]?.ownerName }
         logDebug("IMMERSIVE-SHOW: LRU order = \(names.enumerated().map { "[\($0)]\($1)" }.joined(separator: " → "))")
         overlayController.show(with: windowsWithThumbnails)
@@ -450,7 +445,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if elasticDragInProgress {
             logDebug("ElasticDrag: begin WARNING — already in progress [session=\(elasticDragSessionID)], overwriting")
-            elasticDragStaleTimer?.cancel()
         }
 
         guard let currentID = windowManager.frontmostWindowID,
@@ -494,15 +488,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         elasticDragInProgress = true
         logDebug("ElasticDrag: began [session=\(elasticDragSessionID)], gen=\(gen), dragRef=(\(String(format: "%.1f", currentPos.x)), \(String(format: "%.1f", currentPos.y))), cachedOrigin=(\(String(format: "%.1f", cachedBoundaryOrigin!.x)), \(String(format: "%.1f", cachedBoundaryOrigin!.y))), title=\(info.windowTitle)")
 
-        // Stale-state watchdog: if GestureEnd hasn't arrived within 3s, log it.
-        let sid = elasticDragSessionID
-        let work = DispatchWorkItem { [weak self] in
-            guard let self = self, self.elasticDragInProgress, self.elasticDragSessionID == sid else { return }
-            logDebug("ElasticDrag: STALE STATE [session=\(sid)] — elasticDragInProgress still true after 3s!")
-        }
-        elasticDragStaleTimer = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: work)
-
         // Callback-stream watchdog: if no .swipeUpdate arrives within 200ms,
         // the MultitouchSupport callback stream is likely interrupted.
         // Spring back immediately rather than waiting for a .gestureEnd that
@@ -544,8 +529,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func finishElasticDrag() {
         let sid = elasticDragSessionID
         elasticDragInProgress = false
-        elasticDragStaleTimer?.cancel()
-        elasticDragStaleTimer = nil
         elasticDragWatchdog?.cancel()
         elasticDragWatchdog = nil
 
@@ -664,7 +647,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var elasticDragAxWindow: AXUIElement?
     private var elasticDragOrigin: CGPoint?
     private var elasticDragSessionID = 0
-    private var elasticDragStaleTimer: DispatchWorkItem?
     private var elasticDragWatchdog: DispatchWorkItem?
 
     // Animation generation counter. Incremented each beginElasticDrag so stale
@@ -730,15 +712,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         hintDismissWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: work)
-    }
-
-    // MARK: - Settings observer
-
-    private var settingsObserver: NSObjectProtocol?
-
-    private func setupSettingsObserver() {
-        // Reserved for future dynamic settings updates.
-        // Sensitivity is currently handled within the NSEvent-based GestureEngine.
     }
 
     // MARK: - Session observers (MT stream recovery)
@@ -830,6 +803,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Diagnostics
 
+#if DEBUG
     /// Log the app-level z-order derived from the SAME CGWindowList snapshot as the LRU.
     private func logAppZOrder() {
         let orderedIDs = windowManager.orderingEngine.orderedIDs
@@ -907,6 +881,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         logDebug("=== END ===")
     }
+#endif
 }
 
 // MARK: - Quick Switch Hint View
