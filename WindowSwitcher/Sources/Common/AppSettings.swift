@@ -47,6 +47,10 @@ final class AppSettings: ObservableObject {
     @Published var sensitivityLevel: Int {
         didSet { defaults.set(sensitivityLevel, forKey: Keys.sensitivityLevel) }
     }
+    /// 三指同步触地检测时间窗口（秒）
+    @Published var touchdownWindow: Double {
+        didSet { defaults.set(touchdownWindow, forKey: Keys.touchdownWindow) }
+    }
     /// 三指轻点激活沉浸预览模式
     @Published var threeFingerTapEnabled: Bool {
         didSet { defaults.set(threeFingerTapEnabled, forKey: Keys.threeFingerTapEnabled) }
@@ -118,6 +122,7 @@ final class AppSettings: ObservableObject {
             Keys.quickSwitchHintEnabled: Constants.defaultQuickSwitchHintEnabled,
             Keys.cyclicScrollEnabled: true,
             Keys.sensitivityLevel: Constants.defaultSensitivityLevel,
+            Keys.touchdownWindow: Constants.defaultTouchdownWindow,
             Keys.serviceEnabled: true,
             Keys.elasticDragEnabled: Constants.defaultElasticDragEnabled,
             Keys.hintShakeEnabled: Constants.defaultHintShakeEnabled,
@@ -139,6 +144,7 @@ final class AppSettings: ObservableObject {
         _quickSwitchHintEnabled = .init(initialValue: defaults.bool(forKey: Keys.quickSwitchHintEnabled))
         _cyclicScrollEnabled = .init(initialValue: defaults.bool(forKey: Keys.cyclicScrollEnabled))
         _sensitivityLevel = .init(initialValue: defaults.integer(forKey: Keys.sensitivityLevel))
+        _touchdownWindow = .init(initialValue: defaults.double(forKey: Keys.touchdownWindow))
         _serviceEnabled = .init(initialValue: defaults.bool(forKey: Keys.serviceEnabled))
         _elasticDragEnabled = .init(initialValue: defaults.bool(forKey: Keys.elasticDragEnabled))
         _hintShakeEnabled = .init(initialValue: defaults.bool(forKey: Keys.hintShakeEnabled))
@@ -161,6 +167,7 @@ final class AppSettings: ObservableObject {
         quickSwitchHintEnabled = Constants.defaultQuickSwitchHintEnabled
         cyclicScrollEnabled = true
         sensitivityLevel = Constants.defaultSensitivityLevel
+        touchdownWindow = Constants.defaultTouchdownWindow
         serviceEnabled = true
         elasticDragEnabled = Constants.defaultElasticDragEnabled
         hintShakeEnabled = Constants.defaultHintShakeEnabled
@@ -185,6 +192,7 @@ private enum Keys {
     static let quickSwitchHintEnabled = "quickSwitchHintEnabled"
     static let cyclicScrollEnabled = "cyclicScrollEnabled"
     static let sensitivityLevel = "sensitivityLevel"
+    static let touchdownWindow = "touchdownWindow"
     static let threeFingerTapEnabled = "threeFingerTapEnabled"
     static let threeFingerSwipeUpEnabled = "threeFingerSwipeUpEnabled"
     static let centerFocusEnabled = "centerFocusEnabled"

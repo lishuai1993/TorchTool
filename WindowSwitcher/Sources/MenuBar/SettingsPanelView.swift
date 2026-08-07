@@ -77,6 +77,15 @@ struct SettingsPanelView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 200)
+
+                labeledSlider("三指触地检测窗口",
+                              value: Binding<CGFloat>(
+                                  get: { CGFloat(settings.touchdownWindow * 1000) },
+                                  set: { settings.touchdownWindow = Double($0) / 1000.0 }
+                              ),
+                              range: CGFloat(Constants.touchdownWindowMin * 1000)...CGFloat(Constants.touchdownWindowMax * 1000),
+                              step: CGFloat(Constants.touchdownWindowStep * 1000),
+                              format: "%.0f ms")
             }
         }
         .padding(.vertical, 8)

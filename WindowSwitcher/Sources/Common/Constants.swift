@@ -25,6 +25,10 @@ enum Constants {
     static let defaultSwipeMinDisplacement: Float = 0.08        // normalized
     static let defaultSwipeMinDuration: TimeInterval = 0.05
     static let defaultSensitivityLevel: Int = 1                 // 0=low, 1=medium, 2=high
+    static let touchdownWindowMin: Double = 0.050               // 50ms
+    static let touchdownWindowMax: Double = 0.500               // 500ms
+    static let touchdownWindowStep: Double = 0.010              // 10ms
+    static let defaultTouchdownWindow: Double = 0.500           // 500ms
 
     // MARK: - Mode defaults
     static let defaultImmersiveModeEnabled: Bool = true

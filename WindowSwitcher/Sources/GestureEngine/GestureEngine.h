@@ -37,5 +37,6 @@ void gesture_engine_reset_log(void);
 // Values are in normalized coordinates [0,1] and seconds.
 void gesture_engine_set_sensitivity(float tapDuration, float tapDisp,
                                      float swipeDisp, float swipeDur);
+void gesture_engine_set_touchdown_window(double windowSec);
 
 #endif

@@ -1,5 +1,10 @@
 import AppKit
 
+// File-level counters for the C→Swift callback bridge — must be at file scope
+// because the C function pointer closure cannot capture context.
+private var cCallbackCount: Int = 0
+private var cCallbackLastLogTime: Double = 0
+
 enum GestureEvent {
     case threeFingerTap
     case threeFingerSwipeLeft
@@ -52,6 +57,8 @@ final class GestureEngine: @unchecked Sendable {
         let swipeMinDisp = settings.swipeMinDisplacement
         logDebug("GestureEngine: sensitivity — tapMaxDur=\(tapMaxD) tapMaxDisp=\(tapMaxDisp) swipeMinDisp=\(swipeMinDisp)")
         gesture_engine_set_sensitivity(tapMaxD, tapMaxDisp, swipeMinDisp, 0.05)
+        gesture_engine_set_touchdown_window(settings.touchdownWindow)
+        logDebug("GestureEngine: sensitivity — touchdownWindow=\(String(format: "%.0f", settings.touchdownWindow * 1000))ms")
         logDebug("GestureEngine: starting C engine (MultitouchSupport)...")
         let logPath = "/Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt"
         gesture_engine_set_log_path(logPath)
@@ -82,7 +89,18 @@ final class GestureEngine: @unchecked Sendable {
     }
 
     private func makeCallback() -> GestureCallback {
+        // NOTE: This closure must NOT capture self or any local context,
+        // as it's passed to C as a function pointer.
         { cType, progress in
+            // Rate-limited heartbeat: log every 120 callbacks to prove C→Swift bridge is alive.
+            // Uses file-level vars (no capture allowed in C function pointer closures).
+            cCallbackCount += 1
+            let now = CACurrentMediaTime()
+            if cCallbackCount % 120 == 1 || now - cCallbackLastLogTime > 10.0 {
+                cCallbackLastLogTime = now
+                logDebug("GestureEngine(Swift): callback #\(cCallbackCount), type=\(cType.rawValue), progress=\(progress)")
+            }
+
             let event: GestureEvent
             switch cType {
             case GestureThreeFingerTap:

@@ -132,8 +132,14 @@ static GestureState gState = GS_IDLE;
 // to account for natural finger flattening/centroid drift.
 #define SETTLING_DURATION 0.080
 
+// Simultaneous touchdown window: all three fingers must land within this
+// duration of the first finger appearing, otherwise treated as rolling touchdown.
+// Configurable via gesture_engine_set_touchdown_window(), default 500ms.
+static double maxTouchdownWindow = 0.500;
+
 // Tracking data
 static double  touchStartTime      = 0;
+static double  touchdownStartTime  = 0;  // timestamp of first finger contact
 static double  settlingEndTime     = 0;
 static float   touchStartCentroidX = 0;
 static float   touchStartCentroidY = 0;
@@ -144,6 +150,10 @@ static float   maxPostSettleDisp   = 0;  // max displacement after settling
 static int     activeFingerCount   = 0;
 static bool    swipeActionFired    = false;
 static int     lastFrame           = 0;   // for detecting callback interruption
+
+// Per-frame finger count tracking (reset on engine start).
+static int     prevFingerCount     = 0;
+static int     lastFingerCount     = 0;
 
 // Sensitivity
 static float   tapMaxDurationSec   = 0.350;  // 350ms from first touch
@@ -211,6 +221,11 @@ void gesture_engine_set_sensitivity(float tapDuration, float tapDisp,
     tapMaxDisplacement  = tapDisp;
     swipeMinDisplacement = swipeDisp;
     swipeMinDuration    = swipeDur;
+}
+
+void gesture_engine_set_touchdown_window(double windowSec) {
+    if (windowSec < 0.001) windowSec = 0.001;
+    maxTouchdownWindow = windowSec;
 }
 
 int gesture_engine_start_safe(void) {
@@ -332,6 +347,17 @@ int gesture_engine_start(GestureCallback callback) {
     userCallback = callback;
     callbackCallCount = 0;
     callbackErrorCount = 0;
+    // Reset gesture state machine. Static variables survive stop/start
+    // cycles — clear them defensively so stale values don't break detection.
+    gState = GS_IDLE;
+    gestureSessionID = 0;
+    prevFingerCount = 0;
+    lastFingerCount = 0;
+    touchdownStartTime = 0;
+    touchStartTime = 0;
+    settlingEndTime = 0;
+    swipeActionFired = false;
+    lastFrame = 0;
 
     // ── Strategy: stop device, register callback, then start device ──
     // Some macOS versions need the device to be freshly started after
@@ -459,10 +485,24 @@ static void processContactData(int deviceIndex, void *data,
     pthread_mutex_lock(&stateLock);
     bool streamAlive = engineRunning && (userCallback != NULL);
     pthread_mutex_unlock(&stateLock);
-    if (!streamAlive) return;
+    if (!streamAlive) {
+        // Rate-limited: log only once per 120 frames when stream is dead
+        static int deadStreamLogCounter = 0;
+        if (++deadStreamLogCounter % 120 == 1) {
+            ws_log("[WS-DBG] processContactData: stream NOT alive (engineRunning=%d callback=%p)\n",
+                   engineRunning, (void*)userCallback);
+        }
+        return;
+    }
     if (count <= 0 || !data) return;
 
     const uint8_t *contacts = (const uint8_t *)data;
+
+    // Rate-limited heartbeat log — proves callbacks are arriving
+    static int heartbeatCounter = 0;
+    if (++heartbeatCounter % 120 == 1) {
+        ws_log("[WS-DBG] processContactData: ALIVE frame=%d count=%d\n", frame, count);
+    }
 
     // Count active fingers and compute centroid
     int fingerCount = 0;
@@ -470,8 +510,8 @@ static void processContactData(int deviceIndex, void *data,
     for (int i = 0; i < count && i < 20; i++) {
         const uint8_t *c = contacts + i * CONTACT_STRUCT_SIZE;
         int32_t state = contact_read_int32(c, CONTACT_OFFSET_STATE);
-        // State values observed: 0=not touching, non-zero = touching/hovering
-        if (state != 0) {
+        // State >= 4 = actual touch (st=1/2/3 are hover/proximity ghosts).
+        if (state >= 4) {
             float x = contact_read_float(c, CONTACT_OFFSET_POS_X);
             float y = contact_read_float(c, CONTACT_OFFSET_POS_Y);
             sumX += x;
@@ -480,12 +520,26 @@ static void processContactData(int deviceIndex, void *data,
         }
     }
 
-    // Log when finger count changes (for debugging)
-    static int lastFingerCount = 0;
+    // Log when finger count changes, with raw contact fields to distinguish
+    // hover (proximity) from actual touch.
     if (fingerCount != lastFingerCount) {
-        ws_log("[WS-DBG] fingerCount: %d -> %d (count=%d)\n",
-                lastFingerCount, fingerCount, count);
-    
+        ws_log("[WS-DBG] fingerCount: %d -> %d (totalContacts=%d)\n",
+               lastFingerCount, fingerCount, count);
+        // Dump raw fields for every contact slot to see hover vs touch values.
+        ws_log("[WS-DBG]   RAW: ");
+        for (int i = 0; i < count && i < 10; i++) {
+            const uint8_t *rc = contacts + i * CONTACT_STRUCT_SIZE;
+            int32_t st  = contact_read_int32(rc, CONTACT_OFFSET_STATE);
+            int32_t ty  = contact_read_int32(rc, CONTACT_OFFSET_TYPE);
+            int32_t fl  = contact_read_int32(rc, CONTACT_OFFSET_FLAGS);
+            float   pz  = contact_read_float(rc, CONTACT_OFFSET_POS_Z);
+            float   px  = contact_read_float(rc, CONTACT_OFFSET_POS_X);
+            float   py  = contact_read_float(rc, CONTACT_OFFSET_POS_Y);
+            ws_log("[%d]st=%d,ty=%d,fl=%d,z=%.4f,x=%.3f,y=%.3f%s",
+                   i, st, ty, fl, pz, px, py,
+                   (i + 1 < count ? " " : ""));
+        }
+        ws_log("\n");
         lastFingerCount = fingerCount;
     }
 
@@ -496,20 +550,46 @@ static void processContactData(int deviceIndex, void *data,
 
     switch (gState) {
     case GS_IDLE:
+        // Track when the first finger appears (0→>0 transition).
+        if (fingerCount > 0 && prevFingerCount == 0) {
+            touchdownStartTime = timestamp;
+        }
+        // Reset window when all fingers lift.
+        if (fingerCount == 0) {
+            touchdownStartTime = 0;
+        }
+
         if (fingerCount == 3) {
-            gState = GS_TRACKING;
-            gestureSessionID++;
-            touchStartTime = timestamp;
-            settlingEndTime = timestamp + SETTLING_DURATION;
-            touchStartCentroidX = centroidX;
-            touchStartCentroidY = centroidY;
-            settledCentroidX = centroidX;  // will update after settling
-            settledCentroidY = centroidY;
-            lastCentroidX = centroidX;
-            maxPostSettleDisp = 0;
-            activeFingerCount = fingerCount;
-            ws_log("[WS-DBG] STATE: IDLE -> TRACKING [session=%d] (%d fingers)\n",
-                   gestureSessionID, fingerCount);
+            // If no 0→>0 transition was observed (engine just started, or
+            // touchdownStartTime was reset), treat this frame as simultaneous.
+            if (touchdownStartTime == 0) {
+                touchdownStartTime = timestamp;
+            }
+            double sinceFirst = timestamp - touchdownStartTime;
+            if (sinceFirst <= maxTouchdownWindow) {
+                // Valid: all three fingers arrived within the touchdown window.
+                gState = GS_TRACKING;
+                gestureSessionID++;
+                touchStartTime = timestamp;
+                settlingEndTime = timestamp + SETTLING_DURATION;
+                touchStartCentroidX = centroidX;
+                touchStartCentroidY = centroidY;
+                settledCentroidX = centroidX;
+                settledCentroidY = centroidY;
+                lastCentroidX = centroidX;
+                maxPostSettleDisp = 0;
+                activeFingerCount = fingerCount;
+                ws_log("[WS-DBG] STATE: IDLE -> TRACKING [session=%d] "
+                       "(touchdown %.0fms, prevFinger=%d)\n",
+                       gestureSessionID, sinceFirst * 1000, prevFingerCount);
+            } else {
+                // Rolling touchdown: took too long for all 3 to arrive,
+                // or fingers were already resting on trackpad.
+                ws_log("[WS-DBG] GESTURE: REJECTED rolling touchdown "
+                       "(%.0fms > %.0fms window, prevFinger=%d)\n",
+                       sinceFirst * 1000, maxTouchdownWindow * 1000,
+                       prevFingerCount);
+            }
         }
         break;
 
@@ -626,5 +706,6 @@ static void processContactData(int deviceIndex, void *data,
     }
 
     lastFrame = frame;
+    prevFingerCount = fingerCount;
     pthread_mutex_unlock(&stateLock);
 }
