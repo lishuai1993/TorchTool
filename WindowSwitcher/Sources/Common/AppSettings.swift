@@ -55,6 +55,10 @@ final class AppSettings: ObservableObject {
     @Published var threeFingerSwipeUpEnabled: Bool {
         didSet { defaults.set(threeFingerSwipeUpEnabled, forKey: Keys.threeFingerSwipeUpEnabled) }
     }
+    /// 焦点居中模式：卡片对齐屏幕中心而非光标位置
+    @Published var centerFocusEnabled: Bool {
+        didSet { defaults.set(centerFocusEnabled, forKey: Keys.centerFocusEnabled) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -120,6 +124,7 @@ final class AppSettings: ObservableObject {
             Keys.elasticDragMaxDisplacement: Constants.defaultElasticDragMaxDisplacement,
             Keys.threeFingerTapEnabled: true,
             Keys.threeFingerSwipeUpEnabled: false,
+            Keys.centerFocusEnabled: false,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -140,6 +145,7 @@ final class AppSettings: ObservableObject {
         _elasticDragMaxDisplacement = .init(initialValue: defaults.integer(forKey: Keys.elasticDragMaxDisplacement))
         _threeFingerTapEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerTapEnabled))
         _threeFingerSwipeUpEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerSwipeUpEnabled))
+        _centerFocusEnabled = .init(initialValue: defaults.bool(forKey: Keys.centerFocusEnabled))
     }
 
     func resetToDefaults() {
@@ -161,6 +167,7 @@ final class AppSettings: ObservableObject {
         elasticDragMaxDisplacement = Constants.defaultElasticDragMaxDisplacement
         threeFingerTapEnabled = true
         threeFingerSwipeUpEnabled = false
+        centerFocusEnabled = false
     }
 }
 
@@ -180,6 +187,7 @@ private enum Keys {
     static let sensitivityLevel = "sensitivityLevel"
     static let threeFingerTapEnabled = "threeFingerTapEnabled"
     static let threeFingerSwipeUpEnabled = "threeFingerSwipeUpEnabled"
+    static let centerFocusEnabled = "centerFocusEnabled"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

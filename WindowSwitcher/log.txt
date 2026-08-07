@@ -1,20 +1,20 @@
-[2026-08-07 00:19:58.435] [Logger.swift:23] ══════════════════════════════════════
-[2026-08-07 00:19:58.441] [Logger.swift:24] WindowSwitcher logger initialized
-[2026-08-07 00:19:58.442] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
-[2026-08-07 00:19:58.442] [Logger.swift:26] PID: 27820
-[2026-08-07 00:19:58.442] [Logger.swift:27] ══════════════════════════════════════
-[2026-08-07 00:19:58.442] [main.swift:3] main.swift: entry point
-[2026-08-07 00:19:58.488] [main.swift:8] main.swift: starting run loop...
-[2026-08-07 00:19:58.499] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
-[2026-08-07 00:19:58.499] [AppDelegate.swift:22] Step 0: Ensuring single instance...
-[2026-08-07 00:19:58.565] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
-[2026-08-07 00:19:58.565] [AppDelegate.swift:31] Step 1: OK
-[2026-08-07 00:19:58.565] [AppDelegate.swift:34] Step 2: Setting up menu bar...
-[2026-08-07 00:19:58.594] [AppDelegate.swift:36] Step 2: Menu bar OK
+[2026-08-07 13:36:28.712] [Logger.swift:23] ══════════════════════════════════════
+[2026-08-07 13:36:28.718] [Logger.swift:24] WindowSwitcher logger initialized
+[2026-08-07 13:36:28.718] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
+[2026-08-07 13:36:28.719] [Logger.swift:26] PID: 63207
+[2026-08-07 13:36:28.719] [Logger.swift:27] ══════════════════════════════════════
+[2026-08-07 13:36:28.719] [main.swift:3] main.swift: entry point
+[2026-08-07 13:36:28.758] [main.swift:8] main.swift: starting run loop...
+[2026-08-07 13:36:28.769] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
+[2026-08-07 13:36:28.769] [AppDelegate.swift:22] Step 0: Ensuring single instance...
+[2026-08-07 13:36:28.835] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
+[2026-08-07 13:36:28.835] [AppDelegate.swift:31] Step 1: OK
+[2026-08-07 13:36:28.835] [AppDelegate.swift:34] Step 2: Setting up menu bar...
+[2026-08-07 13:36:28.866] [AppDelegate.swift:36] Step 2: Menu bar OK
 [WS] C engine logging to: /Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt
-[2026-08-07 00:19:58.594] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
-[2026-08-07 00:19:58.594] [GestureEngineWrapper.swift:53] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
-[2026-08-07 00:19:58.594] [GestureEngineWrapper.swift:55] GestureEngine: starting C engine (MultitouchSupport)...
+[2026-08-07 13:36:28.866] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
+[2026-08-07 13:36:28.866] [GestureEngineWrapper.swift:53] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
+[2026-08-07 13:36:28.866] [GestureEngineWrapper.swift:55] GestureEngine: starting C engine (MultitouchSupport)...
 [WS] Symbol resolution:
 [WS]   MTDeviceCreateDefault    => 0x193b9b338
 [WS]   MTDeviceCreateList       => 0x193b9ad48
@@ -24,42 +24,42 @@
 [WS]   MTRegisterContactFrameCallbackWithRefcon => 0x193baa740
 [WS]   MTUnregisterContactFrameCallback          => 0x193baa78c
 [WS]   MTUnregisterContactFrameCallbackWithRefcon => 0x0
-[WS] MTDeviceCreateDefault => 0x12c859e00
+[WS] MTDeviceCreateDefault => 0x152071800
 [WS] MTDeviceStop => -536870195 (0xe00002cd)
 [WS] Registering 6-param callback (WithRefcon)...
 [WS] MTRegisterContactFrameCallbackWithRefcon => 1 (0x1)
 [WS] Calling MTDeviceStart(mtDevice, 0)...
 [WS] MTDeviceStart => 0 (0x0)
 [WS] Gesture engine started (reg=1, start=0). Waiting for callbacks...
-[2026-08-07 00:19:58.595] [GestureEngineWrapper.swift:61] GestureEngine: C engine started OK (result=0)
-[2026-08-07 00:19:58.595] [AppDelegate.swift:42] Step 3: Gesture engine started OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
-[2026-08-07 00:19:58.596] [ActivationHistory.swift:13] ActivationHistory: starting observation
-[2026-08-07 00:19:58.596] [ActivationHistory.swift:30] ActivationHistory: started OK
-[2026-08-07 00:19:58.596] [WindowManager.swift:292] WindowManager: NSEvent monitors registered OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:59] Step 5: Wiring callbacks...
-[2026-08-07 00:19:58.596] [AppDelegate.swift:61] Step 5: Callbacks wired OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:64] Step 6: Setting up settings observer...
-[2026-08-07 00:19:58.596] [AppDelegate.swift:66] Step 6: OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:70] Step 6.5: Setting up session observers...
-[2026-08-07 00:19:58.596] [AppDelegate.swift:72] Step 6.5: OK
-[2026-08-07 00:19:58.596] [AppDelegate.swift:75] Step 7: Checking permissions...
-[2026-08-07 00:19:58.599] [AppDelegate.swift:755] Permission check: Accessibility = true
-[2026-08-07 00:19:58.610] [LRUOrderingEngine.swift:80] LRU: sync - added 18 windows at front
-[2026-08-07 00:19:58.610] [WindowManager.swift:124] WindowManager: refreshed 18 windows
-[2026-08-07 00:19:58.610] [AppDelegate.swift:81] Initial LRU order:
+[2026-08-07 13:36:28.868] [GestureEngineWrapper.swift:61] GestureEngine: C engine started OK (result=0)
+[2026-08-07 13:36:28.868] [AppDelegate.swift:42] Step 3: Gesture engine started OK
+[2026-08-07 13:36:28.868] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
+[2026-08-07 13:36:28.868] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-07 13:36:28.868] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-07 13:36:28.869] [WindowManager.swift:292] WindowManager: NSEvent monitors registered OK
+[2026-08-07 13:36:28.869] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
+[2026-08-07 13:36:28.869] [AppDelegate.swift:59] Step 5: Wiring callbacks...
+[2026-08-07 13:36:28.869] [AppDelegate.swift:61] Step 5: Callbacks wired OK
+[2026-08-07 13:36:28.869] [AppDelegate.swift:64] Step 6: Setting up settings observer...
+[2026-08-07 13:36:28.869] [AppDelegate.swift:66] Step 6: OK
+[2026-08-07 13:36:28.869] [AppDelegate.swift:70] Step 6.5: Setting up session observers...
+[2026-08-07 13:36:28.870] [AppDelegate.swift:72] Step 6.5: OK
+[2026-08-07 13:36:28.870] [AppDelegate.swift:75] Step 7: Checking permissions...
+[2026-08-07 13:36:28.873] [AppDelegate.swift:755] Permission check: Accessibility = true
+[2026-08-07 13:36:28.885] [LRUOrderingEngine.swift:80] LRU: sync - added 18 windows at front
+[2026-08-07 13:36:28.885] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-07 13:36:28.885] [AppDelegate.swift:81] Initial LRU order:
   [0] 终端 — WindowSwitcher — -zsh — 112×34 ← 游标
   [1] Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4
   [2] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
-  [3] 活动监视器 — 活动监视器
-  [4] 系统设置 — 辅助功能
-  [5] Google Chrome — 中传王牌专业取消艺考 释放什么信号_百度搜索
-  [6] Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换
-  [7] Google Chrome — 「深演智能招聘」2026年深演智能招聘信息-BOSS直聘
-  [8] HibernateModeManager — HibernateMode Manager
-  [9] 微信读书 — 微信读书
-  [10] 微信 — 微信
+  [3] Google Chrome — ▶ Superman
+  [4] Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换
+  [5] Google Chrome — 「深演智能招聘」2026年深演智能招聘信息-BOSS直聘
+  [6] HibernateModeManager — HibernateMode Manager
+  [7] 微信 — 微信
+  [8] 活动监视器 — 活动监视器
+  [9] 系统设置 — 辅助功能
+  [10] 微信读书 — 微信读书
   [11] 微信 — 微信 (窗口)
   [12] 网易有道翻译 — 网易有道翻译
   [13] 访达 — WindowSwitcher
@@ -67,649 +67,471 @@
   [15] 青山 — 青山
   [16] CodeBuddy CN — 20260723112900
   [17] 时钟 — 时钟
-[2026-08-07 00:19:58.610] [AppDelegate.swift:798] App z-order v2 (from same snapshot), 14 apps:
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [0] 终端
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [1] Obsidian
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [2] 活动监视器
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [3] 系统设置
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [4] Google Chrome
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [5] HibernateModeManager
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [6] 微信读书
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [7] 微信
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [8] 网易有道翻译
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [9] 访达
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [10] 坚果云
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [11] 青山
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [12] CodeBuddy CN
-[2026-08-07 00:19:58.610] [AppDelegate.swift:800]   [13] 时钟
-[2026-08-07 00:19:58.610] [AppDelegate.swift:849] === ORDER CONSISTENCY CHECK ===
-[2026-08-07 00:19:58.610] [AppDelegate.swift:851] PASS
-[2026-08-07 00:19:58.610] [AppDelegate.swift:852]   app-order: 终端 → Obsidian → 活动监视器 → 系统设置 → Google Chrome → HibernateModeManager → 微信读书 → 微信 → 网易有道翻译 → 访达 → 坚果云 → 青山 → CodeBuddy CN → 时钟
-[2026-08-07 00:19:58.610] [AppDelegate.swift:853]   frontmost: match
-[2026-08-07 00:19:58.610] [AppDelegate.swift:854]   interleaving: none
-[2026-08-07 00:19:58.610] [AppDelegate.swift:861] === END ===
-[2026-08-07 00:19:58.610] [AppDelegate.swift:85] === applicationDidFinishLaunching END (SUCCESS) ===
+[2026-08-07 13:36:28.885] [AppDelegate.swift:798] App z-order v2 (from same snapshot), 14 apps:
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [0] 终端
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [1] Obsidian
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [2] Google Chrome
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [3] HibernateModeManager
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [4] 微信
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [5] 活动监视器
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [6] 系统设置
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [7] 微信读书
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [8] 网易有道翻译
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [9] 访达
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [10] 坚果云
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [11] 青山
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [12] CodeBuddy CN
+[2026-08-07 13:36:28.885] [AppDelegate.swift:800]   [13] 时钟
+[2026-08-07 13:36:28.885] [AppDelegate.swift:849] === ORDER CONSISTENCY CHECK ===
+[2026-08-07 13:36:28.885] [AppDelegate.swift:856] FAIL (1 issues):
+[2026-08-07 13:36:28.885] [AppDelegate.swift:858]   - interleaved: [微信] at [7]&[11], but [8]=[活动监视器]
+[2026-08-07 13:36:28.885] [AppDelegate.swift:861] === END ===
+[2026-08-07 13:36:28.885] [AppDelegate.swift:85] === applicationDidFinishLaunching END (SUCCESS) ===
 [WS-DBG] fingerCount: 0 -> 1 (count=1)
-[2026-08-07 00:19:59.793] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:19:59.793] [AppDelegate.swift:154] onInteraction fired for window 17079
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS] CB6: count=3 frame=411
-[WS-DBG] fingerCount: 2 -> 3 (count=3)
+[2026-08-07 13:36:29.811] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:29.811] [AppDelegate.swift:154] onInteraction fired for window 17079
+[WS] CB6: count=3 frame=397
+[WS-DBG] fingerCount: 1 -> 3 (count=3)
 [WS-DBG] STATE: IDLE -> TRACKING [session=1] (3 fingers)
+[WS] CB6: count=3 frame=398
+[WS] CB6: count=3 frame=399
+[WS] CB6: count=3 frame=400
+[WS] CB6: count=3 frame=401
+[WS] CB6: count=3 frame=402
+[WS] CB6: count=3 frame=403
+[WS] CB6: count=3 frame=404
+[WS] CB6: count=3 frame=405
+[WS] CB6: count=3 frame=406
+[WS] CB6: count=3 frame=407
+[2026-08-07 13:36:30.675] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:30.676] [AppDelegate.swift:154] onInteraction fired for window 17079
+[WS] CB6: count=3 frame=408
+[WS] CB6: count=3 frame=409
+[WS-DBG] TRACK postSettle: dispX=0.0012 dispY=0.0171 |dX|=0.0012 |dY|=0.0171 swipeMinDisp=0.0800 elapsed=16ms
+[2026-08-07 13:36:30.692] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:30.692] [AppDelegate.swift:154] onInteraction fired for window 17079
+[WS] CB6: count=3 frame=410
+[WS] CB6: count=3 frame=411
 [WS] CB6: count=3 frame=412
+[2026-08-07 13:36:30.709] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:30.709] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=413
 [WS] CB6: count=3 frame=414
+[WS-DBG] GESTURE: Three-finger swipe UP [session=1] (dispY=0.0914)
+[2026-08-07 13:36:30.725] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:30.725] [AppDelegate.swift:154] onInteraction fired for window 17079
+[2026-08-07 13:36:30.725] [GestureEngineWrapper.swift:99] GestureEngine(C): SWIPE UP detected
+[2026-08-07 13:36:30.725] [AppDelegate.swift:235] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 13:36:30.726] [AppDelegate.swift:330] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-07 13:36:30.729] [LRUOrderingEngine.swift:69] LRU: sync - removed 1 windows
+[2026-08-07 13:36:30.729] [LRUOrderingEngine.swift:80] LRU: sync - added 1 windows at front
+[2026-08-07 13:36:30.729] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-07 13:36:30.730] [AppDelegate.swift:334] TIMING: [t=4ms] refreshWindows done, 18 windows
 [WS] CB6: count=3 frame=415
 [WS] CB6: count=3 frame=416
-[2026-08-07 00:20:00.609] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.609] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=417
 [WS] CB6: count=3 frame=418
-[2026-08-07 00:20:00.626] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.626] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=419
 [WS] CB6: count=3 frame=420
-[2026-08-07 00:20:00.642] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.642] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=421
-[WS-DBG] TRACK postSettle: dispX=0.0000 dispY=0.0160 |dX|=0.0000 |dY|=0.0160 swipeMinDisp=0.0800 elapsed=0ms
 [WS] CB6: count=3 frame=422
 [WS] CB6: count=3 frame=423
-[2026-08-07 00:20:00.659] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.659] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=424
 [WS] CB6: count=3 frame=425
-[2026-08-07 00:20:00.676] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.676] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=426
 [WS] CB6: count=3 frame=427
-[2026-08-07 00:20:00.692] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — WindowSwitcher — -zsh — 112×34] already at idx=0, no-op. order=[终端 — WindowSwitcher — -zsh — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.692] [AppDelegate.swift:154] onInteraction fired for window 17079
 [WS] CB6: count=3 frame=428
-[WS-DBG] GESTURE: Three-finger swipe UP [session=1] (dispY=0.1604)
-[2026-08-07 00:20:00.699] [GestureEngineWrapper.swift:99] GestureEngine(C): SWIPE UP detected
-[2026-08-07 00:20:00.699] [AppDelegate.swift:235] GESTURE: threeFingerSwipeUp, overlayVisible=false
-[2026-08-07 00:20:00.699] [AppDelegate.swift:330] TIMING: [t=0ms] showImmersiveOverlay called
-[2026-08-07 00:20:00.704] [LRUOrderingEngine.swift:69] LRU: sync - removed 1 windows
-[2026-08-07 00:20:00.704] [LRUOrderingEngine.swift:80] LRU: sync - added 1 windows at front
-[2026-08-07 00:20:00.704] [WindowManager.swift:124] WindowManager: refreshed 18 windows
-[2026-08-07 00:20:00.705] [AppDelegate.swift:334] TIMING: [t=5ms] refreshWindows done, 18 windows
 [WS] CB6: count=3 frame=429
 [WS] CB6: count=3 frame=430
+[2026-08-07 13:36:30.858] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-07 13:36:30.858] [AppDelegate.swift:346] TIMING: [t=132ms] preload visible done (capture=128ms, hit=0, miss=11)
+[2026-08-07 13:36:30.858] [AppDelegate.swift:351] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]Google Chrome → [4]Google Chrome → [5]Google Chrome → [6]HibernateModeManager → [7]微信 → [8]活动监视器 → [9]系统设置 → [10]微信读书 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
 [WS] CB6: count=3 frame=431
 [WS] CB6: count=3 frame=432
 [WS] CB6: count=3 frame=433
+[2026-08-07 13:36:30.884] [AppDelegate.swift:354] TIMING: [t=158ms] overlay shown (UI=25ms, total=158ms)
+[2026-08-07 13:36:30.884] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=63207
+[2026-08-07 13:36:30.886] [AXFocusObserver.swift:58] AXFocusObserver: started pid=63207
 [WS] CB6: count=3 frame=434
 [WS] CB6: count=3 frame=435
 [WS] CB6: count=3 frame=436
 [WS] CB6: count=3 frame=437
+[2026-08-07 13:36:30.916] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
 [WS] CB6: count=3 frame=438
 [WS] CB6: count=3 frame=439
 [WS] CB6: count=3 frame=440
 [WS] CB6: count=3 frame=441
+[2026-08-07 13:36:30.946] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:30.946] [AppDelegate.swift:154] onInteraction fired for window 5828
 [WS] CB6: count=3 frame=442
 [WS] CB6: count=3 frame=443
 [WS] CB6: count=3 frame=444
 [WS] CB6: count=3 frame=445
 [WS] CB6: count=3 frame=446
 [WS] CB6: count=3 frame=447
+[2026-08-07 13:36:30.990] [AppDelegate.swift:374] TIMING: background preload complete, captured 7 thumbnails
 [WS] CB6: count=3 frame=448
-[2026-08-07 00:20:00.861] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
-[2026-08-07 00:20:00.862] [AppDelegate.swift:346] TIMING: [t=162ms] preload visible done (capture=156ms, hit=0, miss=11)
-[2026-08-07 00:20:00.862] [AppDelegate.swift:351] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]活动监视器 → [4]系统设置 → [5]Google Chrome → [6]Google Chrome → [7]Google Chrome → [8]HibernateModeManager → [9]微信读书 → [10]微信 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
 [WS] CB6: count=3 frame=449
 [WS] CB6: count=3 frame=450
-[2026-08-07 00:20:00.880] [AppDelegate.swift:354] TIMING: [t=180ms] overlay shown (UI=18ms, total=180ms)
-[2026-08-07 00:20:00.880] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=27820
-[2026-08-07 00:20:00.881] [AXFocusObserver.swift:58] AXFocusObserver: started pid=27820
 [WS] CB6: count=3 frame=451
 [WS] CB6: count=3 frame=452
 [WS] CB6: count=3 frame=453
-[2026-08-07 00:20:00.899] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[WS] CB6: count=3 frame=454
-[WS] CB6: count=3 frame=455
-[2026-08-07 00:20:00.920] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:00.920] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=456
-[WS] CB6: count=3 frame=457
-[WS] CB6: count=3 frame=458
-[WS] CB6: count=3 frame=459
-[2026-08-07 00:20:00.951] [AppDelegate.swift:374] TIMING: background preload complete, captured 7 thumbnails
-[WS] CB6: count=3 frame=460
-[WS] CB6: count=3 frame=461
-[WS] CB6: count=3 frame=462
-[WS] CB6: count=3 frame=463
-[WS] CB6: count=3 frame=464
-[WS] CB6: count=3 frame=465
-[WS] CB6: count=3 frame=466
-[WS] CB6: count=3 frame=467
-[WS] CB6: count=3 frame=468
-[WS] CB6: count=3 frame=469
-[WS] CB6: count=3 frame=470
-[WS] CB6: count=3 frame=471
-[WS] CB6: count=3 frame=472
-[WS] CB6: count=3 frame=473
 [WS-DBG] fingerCount: 3 -> 2 (count=2)
 [WS-DBG] STATE: SWIPING -> IDLE [session=1] (lift, fingerCount=2) GestureEnd fired
-[2026-08-07 00:20:01.066] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-07 00:20:01.066] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
+[2026-08-07 13:36:31.045] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 13:36:31.045] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
+[2026-08-07 13:36:31.060] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:36:31.061] [AppDelegate.swift:154] onInteraction fired for window 5828
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
-[2026-08-07 00:20:01.075] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:01.075] [AppDelegate.swift:154] onInteraction fired for window 5828
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS] CB6: count=3 frame=680
+[2026-08-07 13:36:32.396] [OverlayWindowController.swift:84] SNAP: idx=2 currentX=126 targetX=99 delta=-26 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:33.486] [OverlayWindowController.swift:84] SNAP: idx=4 currentX=630 targetX=727 delta=96 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:34.297] [OverlayWindowController.swift:84] SNAP: idx=5 currentX=964 targetX=1041 delta=77 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:35.466] [OverlayWindowController.swift:84] SNAP: idx=8 currentX=1962 targetX=1908 delta=-53 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:36.364] [OverlayWindowController.swift:84] SNAP: idx=9 currentX=2182 targetX=2151 delta=-30 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:37.494] [OverlayWindowController.swift:84] SNAP: idx=10 currentX=2500 targetX=2364 delta=-135 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:38.462] [OverlayWindowController.swift:84] SNAP: idx=11 currentX=2680 targetX=2650 delta=-29 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:39.655] [OverlayWindowController.swift:84] SNAP: idx=11 currentX=2715 targetX=2650 delta=-64 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:40.411] [OverlayWindowController.swift:84] SNAP: idx=10 currentX=2282 targetX=2364 delta=82 centerFocus=true
+[2026-08-07 13:36:41.548] [OverlayWindowController.swift:84] SNAP: idx=8 currentX=1974 targetX=1908 delta=-65 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:42.294] [OverlayWindowController.swift:84] SNAP: idx=7 currentX=1558 targetX=1615 delta=57 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:43.416] [OverlayWindowController.swift:84] SNAP: idx=6 currentX=1246 targetX=1338 delta=92 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:44.311] [OverlayWindowController.swift:84] SNAP: idx=5 currentX=1080 targetX=1041 delta=-38 centerFocus=true
+[2026-08-07 13:36:45.455] [OverlayWindowController.swift:84] SNAP: idx=3 currentX=423 targetX=413 delta=-9 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:47.095] [OverlayWindowController.swift:84] SNAP: idx=4 currentX=805 targetX=727 delta=-77 centerFocus=true
+[2026-08-07 13:36:48.346] [OverlayWindowController.swift:84] SNAP: idx=8 currentX=1776 targetX=1908 delta=132 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:49.246] [OverlayWindowController.swift:84] SNAP: idx=10 currentX=2345 targetX=2364 delta=19 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:50.547] [OverlayWindowController.swift:84] SNAP: idx=15 currentX=3742 targetX=3716 delta=-25 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:51.813] [OverlayWindowController.swift:84] SNAP: idx=12 currentX=3099 targetX=2953 delta=-145 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:52.937] [OverlayWindowController.swift:84] SNAP: idx=11 currentX=2730 targetX=2650 delta=-79 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:36:53.247] [OverlayWindowController.swift:84] SNAP: idx=10 currentX=2357 targetX=2364 delta=7 centerFocus=true
+[2026-08-07 13:36:54.474] [OverlayWindowController.swift:84] SNAP: idx=6 currentX=1278 targetX=1338 delta=60 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:36:58.131] [OverlayWindowController.swift:84] SNAP: idx=9 currentX=2121 targetX=2151 delta=29 centerFocus=true
+[2026-08-07 13:36:59.484] [OverlayWindowController.swift:84] SNAP: idx=15 currentX=3742 targetX=3716 delta=-25 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:37:00.911] [OverlayWindowController.swift:84] SNAP: idx=13 currentX=3372 targetX=3256 delta=-115 centerFocus=true
+[2026-08-07 13:37:02.157] [OverlayWindowController.swift:84] SNAP: idx=7 currentX=1639 targetX=1615 delta=-23 centerFocus=true
+[2026-08-07 13:37:05.961] [OverlayWindowController.swift:84] SNAP: idx=9 currentX=2045 targetX=2151 delta=106 centerFocus=true
+[2026-08-07 13:37:07.125] [OverlayWindowController.swift:84] SNAP: idx=11 currentX=2562 targetX=2650 delta=88 centerFocus=true
+[2026-08-07 13:37:08.049] [OverlayWindowController.swift:84] SNAP: idx=12 currentX=2969 targetX=2953 delta=-15 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:37:09.205] [OverlayWindowController.swift:84] SNAP: idx=13 currentX=3309 targetX=3256 delta=-52 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:37:11.380] [OverlayWindowController.swift:84] SNAP: idx=16 currentX=3881 targetX=3742 delta=-139 centerFocus=true
+[2026-08-07 13:37:12.247] [OverlayWindowController.swift:84] SNAP: idx=15 currentX=3742 targetX=3716 delta=-25 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[2026-08-07 13:37:12.412] [OverlayWindowController.swift:84] SNAP: idx=15 currentX=3617 targetX=3716 delta=99 centerFocus=true
+[WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:37:13.628] [OverlayWindowController.swift:84] SNAP: idx=11 currentX=2517 targetX=2650 delta=133 centerFocus=true
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS] CB6: count=3 frame=3516
 [WS-DBG] fingerCount: 2 -> 3 (count=3)
 [WS-DBG] STATE: IDLE -> TRACKING [session=2] (3 fingers)
-[WS] CB6: count=3 frame=681
-[WS] CB6: count=3 frame=682
-[WS] CB6: count=3 frame=683
-[WS] CB6: count=3 frame=684
-[WS] CB6: count=3 frame=685
-[WS] CB6: count=3 frame=686
-[WS] CB6: count=3 frame=687
-[WS] CB6: count=3 frame=688
-[WS] CB6: count=3 frame=689
-[WS] CB6: count=3 frame=690
-[WS] CB6: count=3 frame=691
-[WS] CB6: count=3 frame=692
-[WS] CB6: count=3 frame=693
-[WS] CB6: count=3 frame=694
-[WS] CB6: count=3 frame=695
-[WS] CB6: count=3 frame=696
-[WS] CB6: count=3 frame=697
-[WS] CB6: count=3 frame=698
-[WS-DBG] GESTURE: Three-finger swipe DOWN [session=2] (dispY=-0.0890)
-[2026-08-07 00:20:02.857] [GestureEngineWrapper.swift:102] GestureEngine(C): SWIPE DOWN detected
-[2026-08-07 00:20:02.857] [AppDelegate.swift:247] GESTURE: threeFingerSwipeDown, overlayVisible=true
-[WS] CB6: count=3 frame=699
-[2026-08-07 00:20:02.865] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=700
-[2026-08-07 00:20:02.878] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=701
-[2026-08-07 00:20:02.881] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=702
-[2026-08-07 00:20:02.889] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=703
-[2026-08-07 00:20:02.897] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=704
-[2026-08-07 00:20:02.905] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=705
-[2026-08-07 00:20:02.913] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=706
-[2026-08-07 00:20:02.921] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=707
-[2026-08-07 00:20:02.929] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=708
-[2026-08-07 00:20:02.937] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=709
-[2026-08-07 00:20:02.945] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=710
-[2026-08-07 00:20:02.953] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=711
-[2026-08-07 00:20:02.961] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=712
-[2026-08-07 00:20:02.969] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=713
-[2026-08-07 00:20:02.977] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=714
-[2026-08-07 00:20:02.985] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=715
-[2026-08-07 00:20:02.993] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=716
-[2026-08-07 00:20:03.001] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=717
-[2026-08-07 00:20:03.009] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=718
-[2026-08-07 00:20:03.017] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=719
-[2026-08-07 00:20:03.026] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=720
-[2026-08-07 00:20:03.033] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=721
-[2026-08-07 00:20:03.041] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=722
-[2026-08-07 00:20:03.049] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=723
-[2026-08-07 00:20:03.057] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=724
-[2026-08-07 00:20:03.066] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=725
-[2026-08-07 00:20:03.073] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=726
-[2026-08-07 00:20:03.082] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=727
-[2026-08-07 00:20:03.089] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=728
-[2026-08-07 00:20:03.097] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=729
-[2026-08-07 00:20:03.105] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=730
-[2026-08-07 00:20:03.113] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=731
-[2026-08-07 00:20:03.121] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=732
-[2026-08-07 00:20:03.129] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=733
-[2026-08-07 00:20:03.137] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=734
-[2026-08-07 00:20:03.145] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=735
-[2026-08-07 00:20:03.153] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=736
-[2026-08-07 00:20:03.161] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=737
-[2026-08-07 00:20:03.169] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=738
-[2026-08-07 00:20:03.177] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=739
-[2026-08-07 00:20:03.185] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=740
-[2026-08-07 00:20:03.193] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=741
-[2026-08-07 00:20:03.201] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=742
-[2026-08-07 00:20:03.209] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=743
-[2026-08-07 00:20:03.217] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=744
-[2026-08-07 00:20:03.225] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=745
-[2026-08-07 00:20:03.233] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=746
-[2026-08-07 00:20:03.241] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=747
-[2026-08-07 00:20:03.249] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=748
-[2026-08-07 00:20:03.257] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=749
-[2026-08-07 00:20:03.265] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=750
-[2026-08-07 00:20:03.273] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=751
-[2026-08-07 00:20:03.281] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=752
-[2026-08-07 00:20:03.289] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=753
-[2026-08-07 00:20:03.298] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=754
-[2026-08-07 00:20:03.305] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=755
-[2026-08-07 00:20:03.313] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=756
-[2026-08-07 00:20:03.321] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=757
-[2026-08-07 00:20:03.329] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=758
-[2026-08-07 00:20:03.337] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=759
-[2026-08-07 00:20:03.345] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=760
-[2026-08-07 00:20:03.353] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=761
-[2026-08-07 00:20:03.361] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=762
-[2026-08-07 00:20:03.369] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=763
-[2026-08-07 00:20:03.377] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=764
-[2026-08-07 00:20:03.385] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=765
-[2026-08-07 00:20:03.393] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=766
-[2026-08-07 00:20:03.401] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=767
-[2026-08-07 00:20:03.409] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=768
-[2026-08-07 00:20:03.417] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=769
-[2026-08-07 00:20:03.425] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=770
-[2026-08-07 00:20:03.433] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=771
-[2026-08-07 00:20:03.441] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=772
-[2026-08-07 00:20:03.449] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=773
-[2026-08-07 00:20:03.457] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=774
-[2026-08-07 00:20:03.465] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=775
-[2026-08-07 00:20:03.473] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=776
-[2026-08-07 00:20:03.481] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=777
-[2026-08-07 00:20:03.489] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=778
-[2026-08-07 00:20:03.499] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=779
-[2026-08-07 00:20:03.505] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=780
-[2026-08-07 00:20:03.513] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=781
-[2026-08-07 00:20:03.521] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=782
-[2026-08-07 00:20:03.529] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=783
-[2026-08-07 00:20:03.537] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=784
-[2026-08-07 00:20:03.545] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=785
-[2026-08-07 00:20:03.553] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=786
-[2026-08-07 00:20:03.561] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=787
-[2026-08-07 00:20:03.569] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
-[WS] CB6: count=3 frame=788
-[2026-08-07 00:20:03.577] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=false) → true, count=18
-[2026-08-07 00:20:03.577] [AppDelegate.swift:288] ElasticDrag: begin [session=1], progress=0.012, dirRight=false
-[WS] CB6: count=3 frame=789
-[WS] CB6: count=3 frame=790
-[2026-08-07 00:20:03.598] [AppDelegate.swift:463] ElasticDrag: cached boundary origin = (0.0, 38.0)
-[2026-08-07 00:20:03.598] [AppDelegate.swift:470] ElasticDrag: began [session=1], gen=1, dragRef=(0.0, 38.0), cachedOrigin=(0.0, 38.0), title=TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34
-[WS] CB6: count=3 frame=791
-[WS] CB6: count=3 frame=792
-[WS] CB6: count=3 frame=793
-[WS] CB6: count=3 frame=794
-[WS] CB6: count=3 frame=795
-[WS] CB6: count=3 frame=796
-[WS] CB6: count=3 frame=797
-[WS] CB6: count=3 frame=798
-[WS] CB6: count=3 frame=799
-[WS] CB6: count=3 frame=800
-[WS] CB6: count=3 frame=801
-[WS] CB6: count=3 frame=802
-[WS] CB6: count=3 frame=803
-[WS] CB6: count=3 frame=804
-[WS] CB6: count=3 frame=805
-[WS] CB6: count=3 frame=806
-[WS] CB6: count=3 frame=807
-[WS] CB6: count=3 frame=808
-[WS] CB6: count=3 frame=809
-[WS] CB6: count=3 frame=810
-[WS] CB6: count=3 frame=811
-[WS] CB6: count=3 frame=812
-[WS] CB6: count=3 frame=813
-[WS] CB6: count=3 frame=814
-[WS] CB6: count=3 frame=815
-[WS] CB6: count=3 frame=816
-[WS] CB6: count=3 frame=817
-[WS] CB6: count=3 frame=818
-[WS] CB6: count=3 frame=819
-[WS] CB6: count=3 frame=820
-[WS] CB6: count=3 frame=821
-[WS] CB6: count=3 frame=822
-[WS] CB6: count=3 frame=823
-[WS] CB6: count=3 frame=824
-[WS] CB6: count=3 frame=825
-[WS] CB6: count=3 frame=826
-[WS] CB6: count=3 frame=827
-[WS] CB6: count=3 frame=828
-[WS] CB6: count=3 frame=829
-[WS] CB6: count=3 frame=830
-[WS] CB6: count=3 frame=831
-[WS] CB6: count=3 frame=832
-[WS] CB6: count=3 frame=833
-[WS] CB6: count=3 frame=834
-[WS] CB6: count=3 frame=835
-[WS] CB6: count=3 frame=836
-[WS] CB6: count=3 frame=837
-[WS] CB6: count=3 frame=838
-[WS] CB6: count=3 frame=839
-[WS] CB6: count=3 frame=840
-[WS] CB6: count=3 frame=841
-[WS] CB6: count=3 frame=842
+[WS] CB6: count=3 frame=3517
+[WS] CB6: count=3 frame=3518
+[WS] CB6: count=3 frame=3519
+[WS] CB6: count=3 frame=3520
+[WS] CB6: count=3 frame=3521
+[WS] CB6: count=3 frame=3522
+[WS] CB6: count=3 frame=3523
+[WS] CB6: count=3 frame=3524
+[WS] CB6: count=3 frame=3525
+[WS] CB6: count=3 frame=3526
+[2026-08-07 13:37:19.676] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:19.676] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 13:37:19.676] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:19.676] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3527
+[WS] CB6: count=3 frame=3528
+[2026-08-07 13:37:19.692] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:19.692] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3529
+[WS] CB6: count=3 frame=3530
+[2026-08-07 13:37:19.711] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:19.711] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3531
+[WS] CB6: count=3 frame=3532
+[2026-08-07 13:37:19.728] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[WS] CB6: count=3 frame=3533
+[WS-DBG] GESTURE: Three-finger swipe UP [session=2] (dispY=0.1838)
+[2026-08-07 13:37:19.728] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 13:37:19.728] [GestureEngineWrapper.swift:99] GestureEngine(C): SWIPE UP detected
+[2026-08-07 13:37:19.728] [AppDelegate.swift:235] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 13:37:19.728] [AppDelegate.swift:330] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-07 13:37:19.732] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-07 13:37:19.733] [AppDelegate.swift:334] TIMING: [t=4ms] refreshWindows done, 18 windows
+[WS] CB6: count=3 frame=3534
+[WS] CB6: count=3 frame=3535
+[WS] CB6: count=3 frame=3536
+[WS] CB6: count=3 frame=3537
+[WS] CB6: count=3 frame=3538
+[WS] CB6: count=3 frame=3539
+[WS] CB6: count=3 frame=3540
+[WS] CB6: count=3 frame=3541
+[WS] CB6: count=3 frame=3542
+[WS] CB6: count=3 frame=3543
+[WS] CB6: count=3 frame=3544
+[2026-08-07 13:37:19.818] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-07 13:37:19.818] [AppDelegate.swift:346] TIMING: [t=89ms] preload visible done (capture=85ms, hit=0, miss=11)
+[2026-08-07 13:37:19.818] [AppDelegate.swift:351] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]Google Chrome → [4]Google Chrome → [5]Google Chrome → [6]HibernateModeManager → [7]微信 → [8]活动监视器 → [9]系统设置 → [10]微信读书 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
+[2026-08-07 13:37:19.823] [AppDelegate.swift:354] TIMING: [t=94ms] overlay shown (UI=4ms, total=94ms)
+[WS] CB6: count=3 frame=3545
+[WS] CB6: count=3 frame=3546
+[2026-08-07 13:37:19.835] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[WS] CB6: count=3 frame=3547
+[2026-08-07 13:37:19.845] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:19.845] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3548
+[WS] CB6: count=3 frame=3549
+[WS] CB6: count=3 frame=3550
+[WS] CB6: count=3 frame=3551
+[WS] CB6: count=3 frame=3552
+[WS] CB6: count=3 frame=3553
+[WS] CB6: count=3 frame=3554
+[WS] CB6: count=3 frame=3555
+[WS] CB6: count=3 frame=3556
+[WS] CB6: count=3 frame=3557
+[2026-08-07 13:37:19.924] [AppDelegate.swift:374] TIMING: background preload complete, captured 7 thumbnails
+[WS] CB6: count=3 frame=3558
+[WS] CB6: count=3 frame=3559
+[WS] CB6: count=3 frame=3560
+[WS] CB6: count=3 frame=3561
+[WS] CB6: count=3 frame=3562
+[WS] CB6: count=3 frame=3563
+[WS] CB6: count=3 frame=3564
 [WS-DBG] fingerCount: 3 -> 2 (count=2)
 [WS-DBG] STATE: SWIPING -> IDLE [session=2] (lift, fingerCount=2) GestureEnd fired
-[2026-08-07 00:20:04.016] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=true, session=1
-[2026-08-07 00:20:04.016] [AppDelegate.swift:514] ElasticDrag: finish [session=1], target=(0.0, 38.0)
-[2026-08-07 00:20:04.027] [AppDelegate.swift:544] ElasticDrag: spring-back [session=1, gen=1] from x=6.0 to x=0.0
-[2026-08-07 00:20:04.341] [AppDelegate.swift:563] ElasticDrag: spring-back DONE [session=1, gen=1], step=12, finalX=0.0, targetX=0.0, delta=0.0
+[2026-08-07 13:37:19.984] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 13:37:19.984] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
+[2026-08-07 13:37:20.025] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:20.025] [AppDelegate.swift:154] onInteraction fired for window 5828
 [WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS] CB6: count=3 frame=896
+[WS] CB6: count=3 frame=3617
 [WS-DBG] fingerCount: 2 -> 3 (count=3)
 [WS-DBG] STATE: IDLE -> TRACKING [session=3] (3 fingers)
-[WS] CB6: count=3 frame=897
-[WS] CB6: count=3 frame=898
-[WS] CB6: count=3 frame=899
-[WS] CB6: count=3 frame=900
-[WS] CB6: count=3 frame=901
-[2026-08-07 00:20:04.492] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.492] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=902
-[WS] CB6: count=3 frame=903
-[2026-08-07 00:20:04.509] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.509] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=904
-[WS] CB6: count=3 frame=905
-[WS] CB6: count=3 frame=906
-[2026-08-07 00:20:04.532] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.532] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=907
-[2026-08-07 00:20:04.543] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.543] [AppDelegate.swift:154] onInteraction fired for window 5828
-[2026-08-07 00:20:04.543] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[WS] CB6: count=3 frame=908
-[2026-08-07 00:20:04.543] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=909
-[2026-08-07 00:20:04.559] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.559] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=911
-[WS] CB6: count=3 frame=912
-[2026-08-07 00:20:04.581] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.582] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=913
-[WS-DBG] GESTURE: Three-finger swipe UP [session=3] (dispY=0.1415)
-[2026-08-07 00:20:04.584] [GestureEngineWrapper.swift:99] GestureEngine(C): SWIPE UP detected
-[2026-08-07 00:20:04.584] [AppDelegate.swift:235] GESTURE: threeFingerSwipeUp, overlayVisible=false
-[2026-08-07 00:20:04.584] [AppDelegate.swift:330] TIMING: [t=0ms] showImmersiveOverlay called
-[WS] CB6: count=3 frame=914
-[2026-08-07 00:20:04.592] [WindowManager.swift:124] WindowManager: refreshed 18 windows
-[2026-08-07 00:20:04.592] [AppDelegate.swift:334] TIMING: [t=8ms] refreshWindows done, 18 windows
-[WS] CB6: count=3 frame=915
-[WS] CB6: count=3 frame=916
-[WS] CB6: count=3 frame=917
-[WS] CB6: count=3 frame=918
-[WS] CB6: count=3 frame=919
-[WS] CB6: count=3 frame=920
-[WS] CB6: count=3 frame=921
-[WS] CB6: count=3 frame=922
-[WS] CB6: count=3 frame=923
-[2026-08-07 00:20:04.669] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
-[2026-08-07 00:20:04.669] [AppDelegate.swift:346] TIMING: [t=84ms] preload visible done (capture=76ms, hit=0, miss=11)
-[2026-08-07 00:20:04.669] [AppDelegate.swift:351] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]活动监视器 → [4]系统设置 → [5]Google Chrome → [6]Google Chrome → [7]Google Chrome → [8]HibernateModeManager → [9]微信读书 → [10]微信 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
-[2026-08-07 00:20:04.670] [AppDelegate.swift:354] TIMING: [t=86ms] overlay shown (UI=1ms, total=86ms)
-[WS] CB6: count=3 frame=924
-[2026-08-07 00:20:04.677] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
-[WS] CB6: count=3 frame=925
-[2026-08-07 00:20:04.683] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:04.683] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS] CB6: count=3 frame=926
-[WS] CB6: count=3 frame=927
-[WS] CB6: count=3 frame=928
-[WS] CB6: count=3 frame=929
-[WS] CB6: count=3 frame=930
-[WS] CB6: count=3 frame=931
-[WS] CB6: count=3 frame=932
-[WS] CB6: count=3 frame=933
-[2026-08-07 00:20:04.746] [AppDelegate.swift:374] TIMING: background preload complete, captured 7 thumbnails
-[WS] CB6: count=3 frame=934
-[WS] CB6: count=3 frame=935
-[WS] CB6: count=3 frame=936
-[WS] CB6: count=3 frame=937
-[WS] CB6: count=3 frame=938
-[WS] CB6: count=3 frame=939
-[WS] CB6: count=3 frame=940
-[WS] CB6: count=3 frame=941
-[WS] CB6: count=3 frame=942
-[WS] CB6: count=3 frame=943
-[WS] CB6: count=3 frame=944
-[WS] CB6: count=3 frame=945
-[WS] CB6: count=3 frame=946
-[WS] CB6: count=3 frame=947
-[WS] CB6: count=3 frame=948
-[WS] CB6: count=3 frame=949
-[WS] CB6: count=3 frame=950
-[WS] CB6: count=3 frame=951
-[WS] CB6: count=3 frame=952
-[WS] CB6: count=3 frame=953
-[WS] CB6: count=3 frame=954
-[WS] CB6: count=3 frame=955
-[WS] CB6: count=3 frame=956
-[WS] CB6: count=3 frame=957
-[WS] CB6: count=3 frame=958
-[WS] CB6: count=3 frame=959
-[WS] CB6: count=3 frame=960
-[WS] CB6: count=3 frame=961
-[WS] CB6: count=3 frame=962
-[WS] CB6: count=3 frame=963
-[WS] CB6: count=3 frame=964
-[WS] CB6: count=3 frame=965
-[WS] CB6: count=3 frame=966
-[WS] CB6: count=3 frame=967
-[WS] CB6: count=3 frame=968
-[WS] CB6: count=3 frame=969
-[WS] CB6: count=3 frame=970
-[WS] CB6: count=3 frame=971
-[WS] CB6: count=3 frame=972
-[WS] CB6: count=3 frame=973
-[WS] CB6: count=3 frame=974
-[WS] CB6: count=3 frame=975
-[WS] CB6: count=3 frame=976
-[WS] CB6: count=3 frame=977
-[WS] CB6: count=3 frame=978
-[WS] CB6: count=3 frame=979
-[WS] CB6: count=3 frame=980
-[WS] CB6: count=3 frame=981
-[WS] CB6: count=3 frame=982
-[WS] CB6: count=3 frame=983
-[WS] CB6: count=3 frame=984
-[WS] CB6: count=3 frame=985
-[WS] CB6: count=3 frame=986
-[WS] CB6: count=3 frame=987
-[WS] CB6: count=3 frame=988
-[WS] CB6: count=3 frame=989
-[WS] CB6: count=3 frame=990
-[WS] CB6: count=3 frame=991
-[WS] CB6: count=3 frame=992
-[WS] CB6: count=3 frame=993
-[WS] CB6: count=3 frame=994
-[WS] CB6: count=3 frame=995
-[WS] CB6: count=3 frame=996
-[WS] CB6: count=3 frame=997
-[WS] CB6: count=3 frame=998
-[WS] CB6: count=3 frame=999
-[WS] CB6: count=3 frame=1000
-[WS] CB6: count=3 frame=1001
-[WS] CB6: count=3 frame=1002
-[WS] CB6: count=3 frame=1003
-[WS] CB6: count=3 frame=1004
-[WS] CB6: count=3 frame=1005
-[WS] CB6: count=3 frame=1006
-[WS] CB6: count=3 frame=1007
-[WS] CB6: count=3 frame=1008
-[WS] CB6: count=3 frame=1009
-[WS] CB6: count=3 frame=1010
-[WS] CB6: count=3 frame=1011
-[WS] CB6: count=3 frame=1012
-[WS] CB6: count=3 frame=1013
-[WS] CB6: count=3 frame=1014
-[WS] CB6: count=3 frame=1015
-[WS] CB6: count=3 frame=1016
-[WS] CB6: count=3 frame=1017
-[WS] CB6: count=3 frame=1018
-[WS] CB6: count=3 frame=1019
-[WS] CB6: count=3 frame=1020
-[WS] CB6: count=3 frame=1021
-[WS] CB6: count=3 frame=1022
-[WS] CB6: count=3 frame=1023
-[WS] CB6: count=3 frame=1024
-[WS] CB6: count=3 frame=1025
-[WS] CB6: count=3 frame=1026
-[WS] CB6: count=3 frame=1027
-[WS] CB6: count=3 frame=1028
-[WS] CB6: count=3 frame=1029
-[WS] CB6: count=3 frame=1030
-[WS] CB6: count=3 frame=1031
-[WS] CB6: count=3 frame=1032
-[WS] CB6: count=3 frame=1033
-[WS] CB6: count=3 frame=1034
-[WS] CB6: count=3 frame=1035
-[WS] CB6: count=3 frame=1036
-[WS] CB6: count=3 frame=1037
-[WS] CB6: count=3 frame=1038
-[WS] CB6: count=3 frame=1039
-[WS] CB6: count=3 frame=1040
-[WS] CB6: count=3 frame=1041
-[WS] CB6: count=3 frame=1042
-[WS] CB6: count=3 frame=1043
-[WS] CB6: count=3 frame=1044
-[WS] CB6: count=3 frame=1045
-[WS] CB6: count=3 frame=1046
-[WS] CB6: count=3 frame=1047
-[WS] CB6: count=3 frame=1048
-[WS] CB6: count=3 frame=1049
-[WS] CB6: count=3 frame=1050
-[WS] CB6: count=3 frame=1051
-[WS] CB6: count=3 frame=1052
-[WS] CB6: count=3 frame=1053
-[WS] CB6: count=3 frame=1054
-[WS] CB6: count=3 frame=1055
-[WS] CB6: count=3 frame=1056
-[WS] CB6: count=3 frame=1057
-[WS] CB6: count=3 frame=1058
-[WS] CB6: count=3 frame=1059
-[WS] CB6: count=3 frame=1060
-[WS] CB6: count=3 frame=1061
-[WS] CB6: count=3 frame=1062
-[WS] CB6: count=3 frame=1063
-[WS] CB6: count=3 frame=1064
-[WS] CB6: count=3 frame=1065
-[WS] CB6: count=3 frame=1066
-[WS] CB6: count=3 frame=1067
-[WS] CB6: count=3 frame=1068
-[WS] CB6: count=3 frame=1069
+[WS] CB6: count=3 frame=3618
+[WS] CB6: count=3 frame=3619
+[WS] CB6: count=3 frame=3620
+[WS] CB6: count=3 frame=3621
+[WS] CB6: count=3 frame=3622
+[WS] CB6: count=3 frame=3623
+[WS] CB6: count=3 frame=3624
+[WS] CB6: count=3 frame=3625
+[WS] CB6: count=3 frame=3626
+[WS] CB6: count=3 frame=3627
+[WS] CB6: count=3 frame=3628
+[WS] CB6: count=3 frame=3629
+[WS] CB6: count=3 frame=3630
+[WS] CB6: count=3 frame=3631
+[WS] CB6: count=3 frame=3632
+[WS] CB6: count=3 frame=3633
+[WS] CB6: count=3 frame=3634
+[WS] CB6: count=3 frame=3635
+[WS-DBG] GESTURE: Three-finger swipe DOWN [session=3] (dispY=-0.0921)
+[2026-08-07 13:37:20.544] [GestureEngineWrapper.swift:102] GestureEngine(C): SWIPE DOWN detected
+[2026-08-07 13:37:20.544] [AppDelegate.swift:247] GESTURE: threeFingerSwipeDown, overlayVisible=true
+[WS] CB6: count=3 frame=3636
+[2026-08-07 13:37:20.552] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3637
+[2026-08-07 13:37:20.561] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3638
+[2026-08-07 13:37:20.568] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3639
+[2026-08-07 13:37:20.576] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3640
+[2026-08-07 13:37:20.584] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3641
+[2026-08-07 13:37:20.592] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3642
+[2026-08-07 13:37:20.600] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3643
+[2026-08-07 13:37:20.608] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3644
+[2026-08-07 13:37:20.616] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3645
+[2026-08-07 13:37:20.624] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3646
+[2026-08-07 13:37:20.632] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3647
+[2026-08-07 13:37:20.640] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3648
+[2026-08-07 13:37:20.648] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3649
+[2026-08-07 13:37:20.656] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3650
+[2026-08-07 13:37:20.664] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3651
+[2026-08-07 13:37:20.672] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3652
+[2026-08-07 13:37:20.682] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3653
+[2026-08-07 13:37:20.688] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3654
+[2026-08-07 13:37:20.696] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3655
+[2026-08-07 13:37:20.704] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3656
+[2026-08-07 13:37:20.712] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3657
+[2026-08-07 13:37:20.720] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3658
+[2026-08-07 13:37:20.728] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3659
+[2026-08-07 13:37:20.736] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3660
+[2026-08-07 13:37:20.744] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3661
+[2026-08-07 13:37:20.752] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3662
+[2026-08-07 13:37:20.760] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3663
+[2026-08-07 13:37:20.768] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3664
+[2026-08-07 13:37:20.776] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3665
+[2026-08-07 13:37:20.784] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3666
+[2026-08-07 13:37:20.792] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3667
+[2026-08-07 13:37:20.800] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3668
+[2026-08-07 13:37:20.808] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3669
+[2026-08-07 13:37:20.816] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3670
+[2026-08-07 13:37:20.824] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3671
+[2026-08-07 13:37:20.832] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3672
+[2026-08-07 13:37:20.840] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3673
+[2026-08-07 13:37:20.848] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3674
+[2026-08-07 13:37:20.856] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3675
+[2026-08-07 13:37:20.865] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS] CB6: count=3 frame=3676
+[2026-08-07 13:37:20.872] [AppDelegate.swift:417] ElasticDrag: isAtBoundary(dirRight=true) → false, count=18
+[WS-DBG] fingerCount: 3 -> 1 (count=1)
+[WS-DBG] STATE: SWIPING -> IDLE [session=3] (lift, fingerCount=1) GestureEnd fired
+[2026-08-07 13:37:20.880] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 13:37:20.880] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG] fingerCount: 1 -> 2 (count=2)
+[WS] CB6: count=3 frame=3696
+[WS-DBG] fingerCount: 2 -> 3 (count=3)
+[WS-DBG] STATE: IDLE -> TRACKING [session=4] (3 fingers)
+[WS] CB6: count=3 frame=3697
+[WS] CB6: count=3 frame=3698
+[WS] CB6: count=3 frame=3699
+[WS] CB6: count=3 frame=3700
+[WS] CB6: count=3 frame=3701
+[WS] CB6: count=3 frame=3702
+[WS] CB6: count=3 frame=3703
+[WS] CB6: count=3 frame=3704
+[WS] CB6: count=3 frame=3705
+[2026-08-07 13:37:21.109] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.109] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 13:37:21.109] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.109] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3706
+[WS] CB6: count=3 frame=3707
+[2026-08-07 13:37:21.125] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.125] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3708
+[WS] CB6: count=3 frame=3709
+[2026-08-07 13:37:21.142] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.142] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3710
+[WS] CB6: count=3 frame=3711
+[2026-08-07 13:37:21.158] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.158] [AppDelegate.swift:154] onInteraction fired for window 5828
+[WS] CB6: count=3 frame=3712
+[WS] CB6: count=3 frame=3713
+[WS-DBG] GESTURE: Three-finger swipe UP [session=4] (dispY=0.1609)
+[2026-08-07 13:37:21.169] [GestureEngineWrapper.swift:99] GestureEngine(C): SWIPE UP detected
+[2026-08-07 13:37:21.169] [AppDelegate.swift:235] GESTURE: threeFingerSwipeUp, overlayVisible=false
+[2026-08-07 13:37:21.169] [AppDelegate.swift:330] TIMING: [t=0ms] showImmersiveOverlay called
+[2026-08-07 13:37:21.174] [WindowManager.swift:124] WindowManager: refreshed 18 windows
+[2026-08-07 13:37:21.174] [AppDelegate.swift:334] TIMING: [t=4ms] refreshWindows done, 18 windows
+[WS] CB6: count=3 frame=3714
+[WS] CB6: count=3 frame=3715
+[WS] CB6: count=3 frame=3716
+[WS] CB6: count=3 frame=3717
+[WS] CB6: count=3 frame=3718
+[WS] CB6: count=3 frame=3719
+[WS] CB6: count=3 frame=3720
+[WS] CB6: count=3 frame=3721
+[WS] CB6: count=3 frame=3722
+[WS] CB6: count=3 frame=3723
+[WS] CB6: count=3 frame=3724
+[WS] CB6: count=3 frame=3725
+[2026-08-07 13:37:21.265] [WindowManager.swift:159] WindowManager: preloadThumbnails count=11 ids.count=11 success=11
+[2026-08-07 13:37:21.265] [AppDelegate.swift:346] TIMING: [t=95ms] preload visible done (capture=90ms, hit=0, miss=11)
+[2026-08-07 13:37:21.265] [AppDelegate.swift:351] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]Obsidian → [2]Obsidian → [3]Google Chrome → [4]Google Chrome → [5]Google Chrome → [6]HibernateModeManager → [7]微信 → [8]活动监视器 → [9]系统设置 → [10]微信读书 → [11]微信 → [12]网易有道翻译 → [13]访达 → [14]坚果云 → [15]青山 → [16]CodeBuddy CN → [17]时钟
+[2026-08-07 13:37:21.268] [AppDelegate.swift:354] TIMING: [t=99ms] overlay shown (UI=3ms, total=99ms)
+[WS] CB6: count=3 frame=3726
+[2026-08-07 13:37:21.279] [OverlayView.swift:89] CARD-FRAMES: updated, count=18
+[WS] CB6: count=3 frame=3727
+[WS] CB6: count=3 frame=3728
+[WS] CB6: count=3 frame=3729
+[WS] CB6: count=3 frame=3730
+[WS] CB6: count=3 frame=3731
+[WS] CB6: count=3 frame=3732
+[WS] CB6: count=3 frame=3733
+[WS] CB6: count=3 frame=3734
+[WS] CB6: count=3 frame=3735
+[WS] CB6: count=3 frame=3736
+[2026-08-07 13:37:21.355] [AppDelegate.swift:374] TIMING: background preload complete, captured 7 thumbnails
+[WS] CB6: count=3 frame=3737
+[WS] CB6: count=3 frame=3738
+[WS] CB6: count=3 frame=3739
+[WS] CB6: count=3 frame=3740
+[WS] CB6: count=3 frame=3741
+[WS] CB6: count=3 frame=3742
+[WS] CB6: count=3 frame=3743
+[WS] CB6: count=3 frame=3744
+[WS] CB6: count=3 frame=3745
+[WS] CB6: count=3 frame=3746
+[WS] CB6: count=3 frame=3747
+[WS] CB6: count=3 frame=3748
+[WS] CB6: count=3 frame=3749
+[WS] CB6: count=3 frame=3750
+[WS] CB6: count=3 frame=3751
+[WS] CB6: count=3 frame=3752
 [WS-DBG] fingerCount: 3 -> 2 (count=2)
-[WS-DBG] STATE: SWIPING -> IDLE [session=3] (lift, fingerCount=2) GestureEnd fired
-[2026-08-07 00:20:05.838] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=1
-[2026-08-07 00:20:05.838] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
+[WS-DBG] STATE: SWIPING -> IDLE [session=4] (lift, fingerCount=2) GestureEnd fired
+[2026-08-07 13:37:21.487] [AppDelegate.swift:300] ElasticDrag: gestureEnd, inProgress=false, session=0
+[2026-08-07 13:37:21.487] [AppDelegate.swift:321] ElasticDrag: gestureEnd ignored — no drag in progress
+[2026-08-07 13:37:21.508] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:21.508] [AppDelegate.swift:154] onInteraction fired for window 5828
 [WS-DBG] fingerCount: 2 -> 1 (count=1)
-[2026-08-07 00:20:05.858] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:05.858] [AppDelegate.swift:154] onInteraction fired for window 5828
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[WS-DBG] fingerCount: 1 -> 2 (count=2)
-[WS-DBG] fingerCount: 2 -> 1 (count=1)
-[2026-08-07 00:20:29.661] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:29.661] [AppDelegate.swift:154] onInteraction fired for window 5828
-[2026-08-07 00:20:29.668] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-07 00:20:29.670] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-07 00:20:29.689] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[2026-08-07 00:20:35.726] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:35.726] [AppDelegate.swift:154] onInteraction fired for window 5828
-[2026-08-07 00:20:36.126] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → 活动监视器 — 活动监视器 → 系统设置 — 辅助功能]
-[2026-08-07 00:20:36.126] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 13:37:24.560] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:24.560] [AppDelegate.swift:154] onInteraction fired for window 5828
+[2026-08-07 13:37:24.562] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-07 13:37:24.567] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-07 13:37:24.599] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[2026-08-07 13:37:25.093] [LRUOrderingEngine.swift:127] LRU-INTERACT: [终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34] already at idx=0, no-op. order=[终端 — TorchTool — ✳ macOS触控板手势自定义 — sourcekit-lsp ◂ claude — 112×34 → Obsidian — 2026-08 - 工作管理 - Obsidian 1.13.4 → Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4 → Google Chrome — ▶ Superman → Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换]
+[2026-08-07 13:37:25.093] [AppDelegate.swift:154] onInteraction fired for window 5828

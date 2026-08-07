@@ -9,7 +9,6 @@ final class OverlayWindowController {
     private var localKeyMonitor: Any?
     private var mouseMoveMonitor: Any?
     private var scrollWheelMonitor: Any?
-
     var isVisible: Bool { panel?.isVisible ?? false }
 
     var onWindowSelected: ((WindowInfo) -> Void)?
@@ -43,37 +42,54 @@ final class OverlayWindowController {
             return event
         }
 
-        // Scroll-wheel monitor: forward events to NSScrollView for full-screen
-        // trackpad scrolling. Manually track hover (onHover doesn't fire when
-        // events are consumed). On finger lift, correct the offset so the card
-        // nearest to cursor aligns its center with the cursor X.
+        // Scroll-wheel monitor.
+        //
+        // All events forwarded to NSScrollView for native live scrolling
+        // and native inertia — zero interference with the scroll curve.
+        //
+        // Mode A (centerFocus disabled): focus = cursor X.
+        // Mode B (centerFocus enabled):  focus = screen horizontal center;
+        //         after scrolling fully stops, snap the nearest card so its
+        //         center aligns with the focus point.
         scrollWheelMonitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
             guard let self, let sv = self.viewModel.scrollView else { return event }
+
+            let centerFocus = AppSettings.shared.centerFocusEnabled
+            let targetX: CGFloat = centerFocus
+                ? (NSScreen.main?.frame.width ?? 0) / 2
+                : NSEvent.mouseLocation.x
+
+            // Forward ALL events for native curve.
             sv.scrollWheel(with: event)
 
-            // Update hover from card frames (onHover doesn't fire since we consume the event)
-            let mouseX = NSEvent.mouseLocation.x
-            if let idx = self.nearestCardIndex(to: mouseX) {
+            // Update hover.
+            if let idx = self.nearestCardIndex(to: targetX) {
                 self.viewModel.hoveredIndex = idx
             }
 
-            if event.phase == .ended, let idx = self.viewModel.hoveredIndex {
-                // Defer to next run loop so GeometryReader has updated cardFrames
-                // after NSScrollView.scrollWheel(with:) changed bounds synchronously.
-                let snapMouseX = mouseX
-                DispatchQueue.main.async { [weak self] in
-                    guard let self,
-                          let sv = self.viewModel.scrollView,
-                          let cardFrame = self.viewModel.cardFrames[idx] else { return }
+            // Mode B: on scroll-complete, snap nearest card to focus point.
+            if centerFocus,
+               let snapIdx = self.nearestCardIndex(to: targetX),
+               let cardFrame = self.viewModel.cardFrames[snapIdx] {
+
+                let isScrollComplete = event.momentumPhase.contains(.ended)
+                                    || (event.phase == .ended && event.momentumPhase.isEmpty)
+
+                if isScrollComplete {
                     let currentX = sv.contentView.bounds.origin.x
-                    let correction = cardFrame.midX - snapMouseX
-                    var newX = currentX + correction
+                    var targetOriginX = cardFrame.midX + currentX - targetX
                     let maxX = max(0, sv.documentView!.frame.width - sv.contentView.bounds.width)
-                    newX = min(max(newX, 0), maxX)
+                    targetOriginX = min(max(targetOriginX, 0), maxX)
+
+                    logDebug("SNAP: idx=\(snapIdx) currentX=\(Int(currentX)) targetX=\(Int(targetOriginX)) delta=\(Int(targetOriginX - currentX)) centerFocus=\(centerFocus)")
+
                     NSAnimationContext.runAnimationGroup { ctx in
-                        ctx.duration = 0.2
+                        ctx.duration = 0.15
                         ctx.allowsImplicitAnimation = true
-                        sv.contentView.scroll(to: NSPoint(x: newX, y: sv.contentView.bounds.origin.y))
+                        ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                        sv.contentView.animator().setBoundsOrigin(
+                            NSPoint(x: targetOriginX, y: sv.contentView.bounds.origin.y)
+                        )
                     }
                 }
             }

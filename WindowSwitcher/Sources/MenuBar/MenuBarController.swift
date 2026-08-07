@@ -131,6 +131,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var displacementLabelView: MenuItemView?
     private weak var threeFingerTapToggleView: MenuItemView?
     private weak var threeFingerSwipeUpToggleView: MenuItemView?
+    private weak var centerFocusToggleView: MenuItemView?
 
     private let menu: NSMenu = {
         let m = NSMenu()
@@ -323,7 +324,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         let sub = NSMenu()
         sub.autoenablesItems = false
 
-        let tapToggle = makeToggleItem(title: "三指轻点",
+        let tapToggle = makeToggleItem(title: "三指轻点激活",
                                        isOn: AppSettings.shared.threeFingerTapEnabled) {
             AppSettings.shared.threeFingerTapEnabled.toggle()
             self.threeFingerTapToggleView?.isOn = AppSettings.shared.threeFingerTapEnabled
@@ -331,7 +332,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         threeFingerTapToggleView = menuItemView(from: tapToggle)
         sub.addItem(tapToggle)
 
-        let swipeUpToggle = makeToggleItem(title: "三指上扫",
+        let swipeUpToggle = makeToggleItem(title: "三指上扫激活",
                                            isOn: AppSettings.shared.threeFingerSwipeUpEnabled) {
             AppSettings.shared.threeFingerSwipeUpEnabled.toggle()
             self.threeFingerSwipeUpToggleView?.isOn = AppSettings.shared.threeFingerSwipeUpEnabled
@@ -339,7 +340,17 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         threeFingerSwipeUpToggleView = menuItemView(from: swipeUpToggle)
         sub.addItem(swipeUpToggle)
 
-        let parentItem = NSMenuItem(title: "预览模式激活", action: nil, keyEquivalent: "")
+        sub.addItem(.separator())
+
+        let centerFocus = makeToggleItem(title: "焦点居中",
+                                         isOn: AppSettings.shared.centerFocusEnabled) {
+            AppSettings.shared.centerFocusEnabled.toggle()
+            self.centerFocusToggleView?.isOn = AppSettings.shared.centerFocusEnabled
+        }
+        centerFocusToggleView = menuItemView(from: centerFocus)
+        sub.addItem(centerFocus)
+
+        let parentItem = NSMenuItem(title: "预览模式设置", action: nil, keyEquivalent: "")
         parentItem.submenu = sub
         parentItem.image = menuIndentImage()
         menu.addItem(parentItem)
