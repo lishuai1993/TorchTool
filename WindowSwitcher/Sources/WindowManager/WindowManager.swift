@@ -25,6 +25,13 @@ final class WindowManager: @unchecked Sendable {
     private var scrollMonitor: Any?
     private var interactionMonitor: Any?
 
+    /// Scroll-gesture state machine. A single trackpad scroll gesture
+    /// (began → … → ended) promotes the frontmost window to the LRU head
+    /// exactly once; the dedup flag is re-armed on the next gesture.
+    private var scrollGestureActive = false
+    private var scrollDidTriggerReorder = false
+    private var lastScrollReorderTime: TimeInterval = 0
+
     /// Callback invoked when a window receives substantial interaction.
     var onInteraction: ((CGWindowID) -> Void)?
 
@@ -238,52 +245,83 @@ final class WindowManager: @unchecked Sendable {
 
     // MARK: - Interaction monitoring
 
-    /// TEMP-DIAG: readable label for an NSEvent scroll phase.
-    private static func phaseLabel(_ p: NSEvent.Phase) -> String {
-        switch p {
-        case .began: return "began"
-        case .changed: return "changed"
-        case .ended: return "ended"
-        case .cancelled: return "cancelled"
-        case .mayBegin: return "mayBegin"
-        default: return "none(\(p.rawValue))"
-        }
-    }
-
     func startInteractionMonitoring() -> Bool {
         activationHistory.start()
 
-        // Scroll monitor: trackpad activity watchdog + real-scroll reorder.
+        // Reset scroll-gesture state in case monitoring was stopped mid-gesture.
+        scrollGestureActive = false
+        scrollDidTriggerReorder = false
+        lastScrollReorderTime = 0
+
+        // Scroll monitor: trackpad activity watchdog + MRU-gated reorder.
+        // Gate: interaction is only meaningful for a window that is NOT already
+        // the LRU head (most-recently-active). For such a window, the first
+        // effective vertical scroll event — slow or fast — is treated as a real
+        // user interaction and promotes it to the LRU head. Once it is at the
+        // head, promotion is idempotent, so further interactions short-circuit.
         scrollMonitor = NSEvent.addGlobalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
             guard let self else { return }
-            // TEMP-DIAG: log every scroll event to confirm phase behavior on slow scrolls.
-            logDebug("SCROLL-DIAG: phase=\(Self.phaseLabel(event.phase)) momentum=\(Self.phaseLabel(event.momentumPhase)) dX=\(String(format: "%.3f", event.deltaX)) dY=\(String(format: "%.3f", event.deltaY)) frontID=\(self.frontmostWindowID?.description ?? "nil") gesture=\(self.isGestureActive) activating=\(self.isActivating)")
             self.onTrackpadActivity?()
-            let blockedByGesture = self.isGestureActive
-            let blockedByActivating = self.isActivating
-            let frontID = self.frontmostWindowID
-            if blockedByGesture || blockedByActivating || frontID == nil {
-                if event.momentumPhase.isEmpty && event.phase == .ended {
-                    logDebug("SCROLL-MON: blocked gesture=\(blockedByGesture) activating=\(blockedByActivating) frontID=\(frontID?.description ?? "nil")")
+
+            // Skip the inertial (momentum) phase: it is a physical continuation
+            // of the previous gesture, not a fresh user input.
+            guard event.momentumPhase.isEmpty else { return }
+
+            // Track the scroll-gesture lifecycle to deduplicate one gesture.
+            switch event.phase {
+            case .began:
+                self.scrollGestureActive = true
+                self.scrollDidTriggerReorder = false
+            case .ended, .cancelled:
+                self.scrollGestureActive = false
+            case .changed:
+                if !self.scrollGestureActive {
+                    self.scrollGestureActive = true
+                    self.scrollDidTriggerReorder = false
                 }
-                return
+            default: break
             }
-            // Only trigger reorder on vertical-dominant scroll (page content
-            // scrolling). Horizontal-dominant scroll is a three-finger swipe
-            // artifact and must not trigger windowDidInteract.
-            guard event.phase == .began, abs(event.deltaY) > abs(event.deltaX) else { return }
-            logDebug("SCROLL-MON: → windowDidInteract(\(frontID!)) name=\(self.orderingEngine.windowNames[frontID!] ?? "?")")
-            self.orderingEngine.windowDidInteract(frontID!)
-            self.onInteraction?(frontID!)
+
+            // Block: three-finger gesture in progress / programmatic activation /
+            // no known front window.
+            guard !self.isGestureActive, !self.isActivating,
+                  let frontID = self.frontmostWindowID else { return }
+
+            // MRU gate: if the frontmost window is already the LRU head, any
+            // reorder would be a no-op — short-circuit before processing.
+            if frontID == self.orderingEngine.orderedIDs.first { return }
+
+            // Only vertical-dominant scroll counts as real page scrolling.
+            // Horizontal-dominant scroll is a three-finger swipe artifact and
+            // must not trigger windowDidInteract.
+            guard abs(event.deltaY) > abs(event.deltaX) else { return }
+
+            // Deduplicate: one gesture triggers exactly one reorder. The time
+            // window also backs up phase-less devices (e.g. external mouse
+            // wheels), where .began/.ended never fire, so a fresh scroll after
+            // a pause re-arms the trigger.
+            let now = ProcessInfo.processInfo.systemUptime
+            if self.scrollDidTriggerReorder {
+                guard now - self.lastScrollReorderTime > 0.5 else { return }
+                self.scrollDidTriggerReorder = false
+            }
+
+            self.scrollDidTriggerReorder = true
+            self.lastScrollReorderTime = now
+            logDebug("SCROLL-MON: → windowDidInteract(\(frontID)) name=\(self.orderingEngine.windowNames[frontID] ?? "?")")
+            self.orderingEngine.windowDidInteract(frontID)
+            self.onInteraction?(frontID)
         }
 
-        // Interaction monitor: clicks on windows trigger reorder.
+        // Interaction monitor: clicks on windows trigger reorder. Gated the same
+        // way as scroll — a click on an already-MRU window is a no-op.
         interactionMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak self] _ in
             guard let self,
                   let frontID = self.frontmostWindowID,
-                  !self.isActivating else { return }
+                  !self.isActivating,
+                  frontID != self.orderingEngine.orderedIDs.first else { return }
             self.orderingEngine.windowDidInteract(frontID)
             self.onInteraction?(frontID)
         }
