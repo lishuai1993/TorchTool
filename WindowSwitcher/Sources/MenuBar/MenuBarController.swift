@@ -133,6 +133,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var threeFingerTapToggleView: MenuItemView?
     private weak var threeFingerSwipeUpToggleView: MenuItemView?
     private weak var centerFocusToggleView: MenuItemView?
+    private weak var centerSnapToggleView: MenuItemView?
 
     private let menu: NSMenu = {
         let m = NSMenu()
@@ -358,6 +359,14 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         }
         centerFocusToggleView = menuItemView(from: centerFocus)
         sub.addItem(centerFocus)
+
+        let centerSnap = makeToggleItem(title: "焦点居中回弹",
+                                        isOn: AppSettings.shared.centerSnapEnabled) {
+            AppSettings.shared.centerSnapEnabled.toggle()
+            self.centerSnapToggleView?.isOn = AppSettings.shared.centerSnapEnabled
+        }
+        centerSnapToggleView = menuItemView(from: centerSnap)
+        sub.addItem(centerSnap)
 
         let parentItem = NSMenuItem(title: "预览模式设置", action: nil, keyEquivalent: "")
         parentItem.submenu = sub

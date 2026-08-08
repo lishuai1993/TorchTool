@@ -68,7 +68,8 @@ final class OverlayWindowController {
             }
 
             // Mode B: on scroll-complete, snap nearest card to focus point.
-            if centerFocus,
+            // Snap is independently disabled by centerSnapEnabled.
+            if centerFocus, AppSettings.shared.centerSnapEnabled,
                let snapIdx = self.nearestCardIndex(to: targetX),
                let cardFrame = self.viewModel.cardFrames[snapIdx] {
 

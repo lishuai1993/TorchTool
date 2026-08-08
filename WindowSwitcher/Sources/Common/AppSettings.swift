@@ -63,6 +63,10 @@ final class AppSettings: ObservableObject {
     @Published var centerFocusEnabled: Bool {
         didSet { defaults.set(centerFocusEnabled, forKey: Keys.centerFocusEnabled) }
     }
+    /// 焦点居中模式下，滚动停止后将最近卡片磁吸到屏幕中心的回弹效果
+    @Published var centerSnapEnabled: Bool {
+        didSet { defaults.set(centerSnapEnabled, forKey: Keys.centerSnapEnabled) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -130,6 +134,7 @@ final class AppSettings: ObservableObject {
             Keys.threeFingerTapEnabled: true,
             Keys.threeFingerSwipeUpEnabled: false,
             Keys.centerFocusEnabled: false,
+            Keys.centerSnapEnabled: true,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -152,6 +157,7 @@ final class AppSettings: ObservableObject {
         _threeFingerTapEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerTapEnabled))
         _threeFingerSwipeUpEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerSwipeUpEnabled))
         _centerFocusEnabled = .init(initialValue: defaults.bool(forKey: Keys.centerFocusEnabled))
+        _centerSnapEnabled = .init(initialValue: defaults.bool(forKey: Keys.centerSnapEnabled))
     }
 
     func resetToDefaults() {
@@ -175,6 +181,7 @@ final class AppSettings: ObservableObject {
         threeFingerTapEnabled = true
         threeFingerSwipeUpEnabled = false
         centerFocusEnabled = false
+        centerSnapEnabled = true
     }
 }
 
@@ -196,6 +203,7 @@ private enum Keys {
     static let threeFingerTapEnabled = "threeFingerTapEnabled"
     static let threeFingerSwipeUpEnabled = "threeFingerSwipeUpEnabled"
     static let centerFocusEnabled = "centerFocusEnabled"
+    static let centerSnapEnabled = "centerSnapEnabled"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"
