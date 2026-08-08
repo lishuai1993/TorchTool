@@ -119,8 +119,10 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/WindowManager/ActivationHistory.swift \
                 Sources/WindowManager/ActivationSuppressor.swift \
                 Sources/WindowManager/WindowInfo.swift \
+                Sources/WindowManager/AXWindowMatcher.swift \
                 Sources/Common/Logger.swift \
-                Sources/Common/Constants.swift
+                Sources/Common/Constants.swift \
+                Sources/Common/GesturePhase.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests
@@ -135,7 +137,7 @@ $(BUILD_DIR)/WindowSwitcherTests: $(TEST_SOURCES)
 	swiftc \
 		$(TEST_SOURCES) \
 		-D DEBUG \
-		-framework AppKit -framework CoreGraphics \
+		-framework AppKit -framework CoreGraphics -framework ApplicationServices \
 		-sdk $(SDK) \
 		-target $(TARGET) \
 		-o $(BUILD_DIR)/WindowSwitcherTests

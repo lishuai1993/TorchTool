@@ -306,6 +306,183 @@ private func testActivationSuppressor() {
     }
 }
 
+// MARK: - GesturePhase Tests
+
+private func testGesturePhase() {
+    runSuite("idle does not intercept scroll") {
+        assertFalse(GesturePhase.idle.interceptsScroll)
+    }
+
+    runSuite("overlayVisible does not intercept scroll") {
+        assertFalse(GesturePhase.overlayVisible.interceptsScroll)
+    }
+
+    runSuite("quickSwitching intercepts scroll") {
+        assertTrue(GesturePhase.quickSwitching.interceptsScroll)
+    }
+
+    runSuite("elasticDragging intercepts scroll") {
+        assertTrue(GesturePhase.elasticDragging.interceptsScroll)
+    }
+}
+
+// MARK: - AXWindowMatcher Tests
+
+private func testAXWindowMatcher() {
+    let matcher = AXWindowMatcher.shared
+
+    runSuite("frameMatches exact same frame") {
+        let a = CGRect(x: 0, y: 0, width: 100, height: 50)
+        assertTrue(AXWindowMatcher.frameMatches(a, a))
+    }
+
+    runSuite("frameMatches within tolerance") {
+        let a = CGRect(x: 0, y: 0, width: 100, height: 50)
+        let b = CGRect(x: 5, y: 3, width: 100, height: 50)
+        assertTrue(AXWindowMatcher.frameMatches(a, b, tolerance: 10))
+    }
+
+    runSuite("frameMatches rejects origin beyond tolerance") {
+        let a = CGRect(x: 0, y: 0, width: 100, height: 50)
+        let b = CGRect(x: 20, y: 0, width: 100, height: 50)
+        assertFalse(AXWindowMatcher.frameMatches(a, b, tolerance: 10))
+    }
+
+    runSuite("frameMatches rejects size difference") {
+        let a = CGRect(x: 0, y: 0, width: 100, height: 50)
+        let b = CGRect(x: 0, y: 0, width: 120, height: 50)
+        assertFalse(AXWindowMatcher.frameMatches(a, b, tolerance: 10))
+    }
+
+    // -- matchAXToCGWindowID --
+    let win1 = WindowInfo(id: 101, ownerPid: 10, ownerName: "AppA", ownerBundleID: nil,
+                          windowTitle: "Alpha", frame: CGRect(x: 0, y: 0, width: 200, height: 100), thumbnail: nil)
+    let win2 = WindowInfo(id: 102, ownerPid: 10, ownerName: "AppA", ownerBundleID: nil,
+                          windowTitle: "Beta", frame: CGRect(x: 300, y: 0, width: 200, height: 100), thumbnail: nil)
+    let win3 = WindowInfo(id: 103, ownerPid: 20, ownerName: "AppB", ownerBundleID: nil,
+                          windowTitle: "Gamma", frame: CGRect(x: 0, y: 200, width: 200, height: 100), thumbnail: nil)
+    let windows: [CGWindowID: WindowInfo] = [101: win1, 102: win2, 103: win3]
+
+    runSuite("matchAX single frame match") {
+        let m = matcher.matchAXToCGWindowID(pid: 10, title: "Alpha", frame: win1.frame,
+                                            windows: windows, appZOrder: [:])
+        assertEqual(m, 101)
+    }
+
+    runSuite("matchAX title-only fallback when no frame match") {
+        let m = matcher.matchAXToCGWindowID(pid: 20, title: "Gamma",
+                                            frame: CGRect(x: 999, y: 999, width: 10, height: 10),
+                                            windows: windows, appZOrder: [:])
+        assertEqual(m, 103)
+    }
+
+    runSuite("matchAX returns nil when nothing matches") {
+        let m = matcher.matchAXToCGWindowID(pid: 99, title: "Unknown", frame: .zero,
+                                            windows: windows, appZOrder: [:])
+        assertNil(m)
+    }
+
+    runSuite("matchAX multiple same-frame candidates resolved by title") {
+        let frame = CGRect(x: 0, y: 0, width: 200, height: 100)
+        let wA = WindowInfo(id: 201, ownerPid: 30, ownerName: "AppC", ownerBundleID: nil,
+                            windowTitle: "One", frame: frame, thumbnail: nil)
+        let wB = WindowInfo(id: 202, ownerPid: 30, ownerName: "AppC", ownerBundleID: nil,
+                            windowTitle: "Two", frame: frame, thumbnail: nil)
+        let ws: [CGWindowID: WindowInfo] = [201: wA, 202: wB]
+        let m = matcher.matchAXToCGWindowID(pid: 30, title: "Two", frame: frame,
+                                            windows: ws, appZOrder: [30: [(201, frame), (202, frame)]])
+        assertEqual(m, 202)
+    }
+
+    runSuite("matchAX fallback to first candidate when no title match") {
+        let frame = CGRect(x: 0, y: 0, width: 200, height: 100)
+        let wA = WindowInfo(id: 201, ownerPid: 30, ownerName: "AppC", ownerBundleID: nil,
+                            windowTitle: "One", frame: frame, thumbnail: nil)
+        let wB = WindowInfo(id: 202, ownerPid: 30, ownerName: "AppC", ownerBundleID: nil,
+                            windowTitle: "Two", frame: frame, thumbnail: nil)
+        let ws: [CGWindowID: WindowInfo] = [201: wA, 202: wB]
+        let m = matcher.matchAXToCGWindowID(pid: 30, title: "Mismatch", frame: frame,
+                                            windows: ws, appZOrder: [:])
+        assertEqual(m, 201) // candidates.first
+    }
+
+    // -- selectAXWindow --
+    runSuite("selectAX single frame match") {
+        let frame = CGRect(x: 0, y: 0, width: 100, height: 50)
+        let ax = [(index: 0, title: "A", frame: frame)]
+        let r = matcher.selectAXWindow(for: 501, pid: 40, frame: frame, title: "A",
+                                       axWindows: ax, appZOrder: [40: [(501, frame)]])
+        assertEqual(r?.index, 0)
+        assertEqual(r?.title, "A")
+    }
+
+    runSuite("selectAX multiple same-frame uses z-order rank") {
+        let frame = CGRect(x: 0, y: 0, width: 100, height: 50)
+        let ax = [(index: 0, title: "A", frame: frame), (index: 1, title: "B", frame: frame)]
+        let r = matcher.selectAXWindow(for: 502, pid: 50, frame: frame, title: "",
+                                       axWindows: ax, appZOrder: [50: [(501, frame), (502, frame)]])
+        assertEqual(r?.index, 1) // rank of 502 within sameFrameCG is 1
+    }
+
+    runSuite("selectAX title fallback when no frame match") {
+        let ax = [(index: 0, title: "A", frame: CGRect(x: 0, y: 0, width: 100, height: 50)),
+                  (index: 1, title: "B", frame: CGRect(x: 200, y: 0, width: 100, height: 50))]
+        let r = matcher.selectAXWindow(for: 601, pid: 60, frame: .zero, title: "B",
+                                       axWindows: ax, appZOrder: [:])
+        assertEqual(r?.index, 1)
+    }
+}
+
+// MARK: - LRU Boundary Tests
+
+private func testLRUBoundary() {
+    runSuite("isAtBoundary right true at last index") {
+        let e = LRUOrderingEngine()
+        e.sync(windowIDs: [1, 2, 3])
+        _ = e.advanceCursor(directionRight: true) // cursor 0 → 1
+        _ = e.advanceCursor(directionRight: true) // cursor 1 → 2
+        assertTrue(e.isAtBoundary(directionRight: true))
+        assertFalse(e.isAtBoundary(directionRight: false))
+    }
+
+    runSuite("isAtBoundary left true at index 0") {
+        let e = LRUOrderingEngine()
+        e.sync(windowIDs: [1, 2, 3])
+        assertTrue(e.isAtBoundary(directionRight: false))
+        assertFalse(e.isAtBoundary(directionRight: true))
+    }
+
+    runSuite("isAtBoundary false in the middle") {
+        let e = LRUOrderingEngine()
+        e.sync(windowIDs: [1, 2, 3])
+        _ = e.advanceCursor(directionRight: true) // cursor → 1
+        assertFalse(e.isAtBoundary(directionRight: true))
+        assertFalse(e.isAtBoundary(directionRight: false))
+    }
+
+    runSuite("isAtBoundary true for empty list") {
+        let e = LRUOrderingEngine()
+        assertTrue(e.isAtBoundary(directionRight: true))
+        assertTrue(e.isAtBoundary(directionRight: false))
+    }
+
+    runSuite("advanceCursor non-cyclic returns nil at right wall, cursor stays") {
+        let e = LRUOrderingEngine()
+        e.sync(windowIDs: [1, 2, 3])
+        _ = e.advanceCursor(directionRight: true, cyclic: false) // 0 → 1 (window 2)
+        _ = e.advanceCursor(directionRight: true, cyclic: false) // 1 → 2 (window 3)
+        assertNil(e.advanceCursor(directionRight: true, cyclic: false))
+        assertEqual(e.currentIndex, 2) // cursor did not move
+    }
+
+    runSuite("advanceCursor non-cyclic returns nil at left wall, cursor stays") {
+        let e = LRUOrderingEngine()
+        e.sync(windowIDs: [1, 2, 3])
+        assertNil(e.advanceCursor(directionRight: false, cyclic: false))
+        assertEqual(e.currentIndex, 0)
+    }
+}
+
 // MARK: - Integration Tests
 
 private func testIntegration() {
@@ -384,6 +561,18 @@ struct TestRunner {
         print("")
         print("[ActivationSuppressor]")
         testActivationSuppressor()
+
+        print("")
+        print("[GesturePhase]")
+        testGesturePhase()
+
+        print("")
+        print("[AXWindowMatcher]")
+        testAXWindowMatcher()
+
+        print("")
+        print("[LRUBoundary]")
+        testLRUBoundary()
 
         print("")
         print("[Integration]")

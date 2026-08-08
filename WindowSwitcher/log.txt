@@ -1,379 +1,87 @@
-[2026-08-08 11:26:05.084] [Logger.swift:23] ══════════════════════════════════════
-[2026-08-08 11:26:05.091] [Logger.swift:24] WindowSwitcher logger initialized
-[2026-08-08 11:26:05.092] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
-[2026-08-08 11:26:05.093] [Logger.swift:26] PID: 59903
-[2026-08-08 11:26:05.093] [Logger.swift:27] ══════════════════════════════════════
-[2026-08-08 11:26:05.093] [main.swift:3] main.swift: entry point
-[2026-08-08 11:26:05.133] [main.swift:8] main.swift: starting run loop...
-[2026-08-08 11:26:05.143] [AppDelegate.swift:19] === applicationDidFinishLaunching BEGIN ===
-[2026-08-08 11:26:05.143] [AppDelegate.swift:22] Step 0: Ensuring single instance...
-[2026-08-08 11:26:05.210] [AppDelegate.swift:29] Step 1: Setting activation policy to .accessory
-[2026-08-08 11:26:05.210] [AppDelegate.swift:31] Step 1: OK
-[2026-08-08 11:26:05.210] [AppDelegate.swift:34] Step 2: Setting up menu bar...
-[2026-08-08 11:26:05.244] [AppDelegate.swift:36] Step 2: Menu bar OK
-[WS] C engine logging to: /Users/lishuai/lishuai/personal_projects/TorchTool/WindowSwitcher/log.txt
-[2026-08-08 11:26:05.245] [AppDelegate.swift:39] Step 3: Starting gesture engine (MultitouchSupport)...
-[2026-08-08 11:26:05.245] [GestureEngineWrapper.swift:58] GestureEngine: sensitivity — tapMaxDur=0.2 tapMaxDisp=0.05 swipeMinDisp=0.08
-[2026-08-08 11:26:05.245] [GestureEngineWrapper.swift:61] GestureEngine: sensitivity — touchdownWindow=400ms
-[2026-08-08 11:26:05.245] [GestureEngineWrapper.swift:62] GestureEngine: starting C engine (MultitouchSupport)...
-[WS] Symbol resolution:
-[WS]   MTDeviceCreateDefault    => 0x193b9b338
-[WS]   MTDeviceCreateList       => 0x193b9ad48
-[WS]   MTDeviceStart            => 0x193b9b954
-[WS]   MTDeviceStop             => 0x193b9a49c
-[WS]   MTRegisterContactFrameCallback          => 0x193baa6f4
-[WS]   MTRegisterContactFrameCallbackWithRefcon => 0x193baa740
-[WS]   MTUnregisterContactFrameCallback          => 0x193baa78c
-[WS]   MTUnregisterContactFrameCallbackWithRefcon => 0x0
-[WS] MTDeviceCreateDefault => 0x135082600
-[WS] MTDeviceStop => -536870195 (0xe00002cd)
-[WS] Registering 6-param callback (WithRefcon)...
-[WS] MTRegisterContactFrameCallbackWithRefcon => 1 (0x1)
-[WS] Calling MTDeviceStart(mtDevice, 0)...
-[WS] MTDeviceStart => 0 (0x0)
-[WS] Gesture engine started (reg=1, start=0). Waiting for callbacks...
-[2026-08-08 11:26:05.246] [GestureEngineWrapper.swift:68] GestureEngine: C engine started OK (result=0)
-[2026-08-08 11:26:05.246] [AppDelegate.swift:42] Step 3: Gesture engine started OK
-[2026-08-08 11:26:05.246] [AppDelegate.swift:50] Step 4: Starting interaction monitoring...
-[2026-08-08 11:26:05.247] [ActivationHistory.swift:13] ActivationHistory: starting observation
-[2026-08-08 11:26:05.247] [ActivationHistory.swift:30] ActivationHistory: started OK
-[2026-08-08 11:26:05.248] [WindowManager.swift:329] WindowManager: NSEvent monitors registered OK
-[2026-08-08 11:26:05.248] [AppDelegate.swift:53] Step 4: Interaction monitoring started OK
-[2026-08-08 11:26:05.248] [AppDelegate.swift:59] Step 5: Wiring callbacks...
-[2026-08-08 11:26:05.248] [AppDelegate.swift:61] Step 5: Callbacks wired OK
-[2026-08-08 11:26:05.248] [AppDelegate.swift:65] Step 6.5: Setting up session observers...
-[2026-08-08 11:26:05.248] [AppDelegate.swift:67] Step 6.5: OK
-[2026-08-08 11:26:05.248] [AppDelegate.swift:70] Step 7: Checking permissions...
-[2026-08-08 11:26:05.251] [AppDelegate.swift:499] Permission check: Accessibility = true
-[2026-08-08 11:26:05.261] [LRUOrderingEngine.swift:71] LRU: sync - added 19 windows at front
-[2026-08-08 11:26:05.261] [WindowManager.swift:155] WindowManager: refreshed 19 windows
-[2026-08-08 11:26:05.261] [AppDelegate.swift:76] Initial LRU order:
-  [0] 终端 — WindowSwitcher — -zsh — 112×34 ← 游标
-  [1] 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4
-  [2] Obsidian — 天气记录 - 生活管理 - Obsidian 1.13.4
-  [3] 访达 — WindowSwitcher
-  [4] 坚果云 — 坚果云
-  [5] Obsidian — git使用教程 - 工作管理 - Obsidian 1.13.4
-  [6] 微信 — 微信
-  [7] Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换
-  [8] Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘
-  [9] HibernateModeManager — HibernateMode Manager
-  [10] Google Chrome — 千问-阿里 AI 助手
-  [11] 时钟 — 时钟
-  [12] CodeBuddy CN — 20260723112900
-  [13] 青山 — 青山
-  [14] 网易有道翻译 — 网易有道翻译
-  [15] 系统设置 — 辅助功能
-  [16] 活动监视器 — 活动监视器
-  [17] 微信读书 — 微信读书
-  [18] 微信 — 微信 (窗口)
-[2026-08-08 11:26:05.261] [AppDelegate.swift:82] === applicationDidFinishLaunching END (SUCCESS) ===
-[WS-DBG] processContactData: ALIVE frame=191 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0768,x=0.574,y=0.267
-[2026-08-08 11:26:06.024] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=false
-[2026-08-08 11:26:06.025] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.025] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.025] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.026] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.026] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.031] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.031] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.031] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.545,y=0.810
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0477,x=0.545,y=0.814
-[WS-DBG] processContactData: ALIVE frame=333 count=1
-[2026-08-08 11:26:06.476] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-08 11:26:06.526] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:06.526] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-08 11:26:06.576] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:06.759] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.760] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.760] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=false, isEnabled=false
-[2026-08-08 11:26:06.760] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.761] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.827] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.828] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.828] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=false, isEnabled=false
-[2026-08-08 11:26:06.828] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:06.828] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:07.038] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:07.038] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:07.039] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:07.039] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=yes, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.486,y=0.626
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0509,x=0.487,y=0.629
-[2026-08-08 11:26:07.643] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[WS-DBG] processContactData: ALIVE frame=478 count=1
-[2026-08-08 11:26:07.839] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:07.840] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-08 11:26:07.939] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:07.939] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[2026-08-08 11:26:08.239] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:08.241] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: false → true
-[WS-DBG] processContactData: ALIVE frame=598 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.663,y=0.423
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0405,x=0.662,y=0.423
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.746,y=0.475
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.5169,x=0.738,y=0.468
-[2026-08-08 11:26:09.439] [MenuBarController.swift:19] [MENU-HOVER] [?] isHighlighted: true → false
-[2026-08-08 11:26:09.887] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=false
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.888] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[2026-08-08 11:26:09.889] [MenuBarController.swift:41] [MENU-VIEW] [?] viewDidMoveToWindow, window=nil, showsHighlight=true, isEnabled=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.650,y=0.411
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0042,x=0.651,y=0.414
-[WS] CB6: count=3 frame=802
-[WS] CB6: count=3 frame=803
-[WS] CB6: count=3 frame=804
-[WS] CB6: count=3 frame=805
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=1,z=0.0592,x=0.541,y=0.313 [1]st=4,ty=3,fl=1,z=0.0291,x=0.542,y=0.069 [2]st=4,ty=4,fl=1,z=0.0249,x=0.652,y=0.415
-[WS] CB6: count=3 frame=806
-[WS-DBG] fingerCount: 2 -> 3 (totalContacts=3)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0291,x=0.541,y=0.312 [1]st=4,ty=3,fl=1,z=-0.0187,x=0.542,y=0.069 [2]st=4,ty=4,fl=1,z=0.0156,x=0.652,y=0.415
-[WS-DBG] STATE: IDLE -> TRACKING [session=1] (touchdown 56ms, prevFinger=2)
-[WS] CB6: count=3 frame=807
-[WS] CB6: count=3 frame=808
-[WS] CB6: count=3 frame=809
-[WS] CB6: count=3 frame=810
-[WS] CB6: count=3 frame=811
-[WS] CB6: count=3 frame=812
-[WS] CB6: count=3 frame=813
-[WS] CB6: count=3 frame=814
-[WS] CB6: count=3 frame=815
-[WS] CB6: count=3 frame=816
-[WS] CB6: count=3 frame=817
-[WS] CB6: count=3 frame=818
-[WS] CB6: count=3 frame=819
-[WS] CB6: count=3 frame=820
-[WS] CB6: count=3 frame=821
-[WS] CB6: count=3 frame=822
-[WS] CB6: count=3 frame=823
-[WS-DBG] processContactData: ALIVE frame=823 count=3
-[WS] CB6: count=3 frame=824
-[WS] CB6: count=3 frame=825
-[WS] CB6: count=3 frame=826
-[WS] CB6: count=3 frame=827
-[WS] CB6: count=3 frame=828
-[WS] CB6: count=3 frame=829
-[WS] CB6: count=3 frame=830
-[WS] CB6: count=3 frame=831
-[WS] CB6: count=3 frame=832
-[WS] CB6: count=3 frame=833
-[WS] CB6: count=3 frame=834
-[WS] CB6: count=3 frame=835
-[WS] CB6: count=3 frame=836
-[WS] CB6: count=3 frame=837
-[WS] CB6: count=3 frame=838
-[WS] CB6: count=3 frame=839
-[WS] CB6: count=3 frame=840
-[WS] CB6: count=3 frame=841
-[WS] CB6: count=3 frame=842
-[WS] CB6: count=3 frame=843
-[WS] CB6: count=3 frame=844
-[WS] CB6: count=3 frame=845
-[WS] CB6: count=3 frame=846
-[WS] CB6: count=3 frame=847
-[WS-DBG] TRACK postSettle: dispX=-0.0020 dispY=0.0164 |dX|=0.0020 |dY|=0.0164 swipeMinDisp=0.0800 elapsed=248ms
-[WS] CB6: count=3 frame=848
-[WS] CB6: count=3 frame=849
-[WS] CB6: count=3 frame=850
-[WS] CB6: count=3 frame=851
-[WS] CB6: count=3 frame=852
-[WS] CB6: count=3 frame=853
-[WS] CB6: count=3 frame=854
-[WS-DBG] GESTURE: UP candidate [session=1] dX=0.0026 dY=0.1306 |dX/dY|=0.02
-[WS] CB6: count=3 frame=855
-[WS] CB6: count=3 frame=856
-[WS] CB6: count=3 frame=857
-[WS] CB6: count=3 frame=858
-[WS] CB6: count=3 frame=859
-[WS] CB6: count=3 frame=860
-[WS] CB6: count=3 frame=861
-[WS] CB6: count=3 frame=862
-[WS-DBG] GESTURE: swipe UP confirmed [session=1] dX=0.0120 dY=0.2923 |dX/dY|=0.04 confirm=64ms
-[2026-08-08 11:26:10.815] [GestureEngineWrapper.swift:101] GestureEngine(Swift): callback #1, type=4, progress=1.0
-[2026-08-08 11:26:10.815] [GestureEngineWrapper.swift:117] GestureEngine(C): SWIPE UP detected
-[2026-08-08 11:26:10.815] [AppDelegate.swift:252] GESTURE: threeFingerSwipeUp, overlayVisible=false
-[2026-08-08 11:26:10.815] [ImmersiveOverlayCoordinator.swift:16] TIMING: [t=0ms] showImmersiveOverlay called
-[WS] CB6: count=3 frame=863
-[2026-08-08 11:26:10.827] [WindowManager.swift:155] WindowManager: refreshed 19 windows
-[2026-08-08 11:26:10.827] [ImmersiveOverlayCoordinator.swift:20] TIMING: [t=11ms] refreshWindows done, 19 windows
-[WS] CB6: count=3 frame=864
-[WS] CB6: count=3 frame=865
-[WS] CB6: count=3 frame=866
-[WS] CB6: count=3 frame=867
-[WS] CB6: count=3 frame=868
-[WS] CB6: count=3 frame=869
-[WS] CB6: count=3 frame=870
-[WS] CB6: count=3 frame=871
-[WS] CB6: count=3 frame=872
-[2026-08-08 11:26:10.897] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=17079 size=2940x1836 dt=70ms
-[WS] CB6: count=3 frame=873
-[WS] CB6: count=3 frame=874
-[2026-08-08 11:26:10.916] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=24826 size=2940x1654 dt=18ms
-[WS] CB6: count=3 frame=875
-[2026-08-08 11:26:10.923] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=14250 size=2940x1836 dt=6ms
-[2026-08-08 11:26:10.929] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=40 size=2940x1836 dt=5ms
-[WS] CB6: count=3 frame=876
-[WS] CB6: count=3 frame=877
-[2026-08-08 11:26:10.937] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=15794 size=900x1360 dt=8ms
-[WS] CB6: count=3 frame=878
-[2026-08-08 11:26:10.945] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=14251 size=2940x1836 dt=7ms
-[2026-08-08 11:26:10.953] [ThumbnailCapturer.swift:22] CAPTURE: OK [?] win=158 size=1760x1280 dt=7ms
-[2026-08-08 11:26:10.953] [ThumbnailCapturer.swift:45] CAPTURE: preloadThumbnails count=7 ids=7 success=7 dt=125ms
-[2026-08-08 11:26:10.953] [ImmersiveOverlayCoordinator.swift:32] TIMING: [t=137ms] preload visible done (capture=126ms, hit=0, miss=7)
-[2026-08-08 11:26:10.953] [ImmersiveOverlayCoordinator.swift:37] IMMERSIVE-SHOW: LRU order = [0]终端 → [1]迅雷影音 → [2]Obsidian → [3]访达 → [4]坚果云 → [5]Obsidian → [6]微信 → [7]Google Chrome → [8]Google Chrome → [9]HibernateModeManager → [10]Google Chrome → [11]时钟 → [12]CodeBuddy CN → [13]青山 → [14]网易有道翻译 → [15]系统设置 → [16]活动监视器 → [17]微信读书 → [18]微信
-[WS] CB6: count=3 frame=879
-[WS] CB6: count=3 frame=880
-[2026-08-08 11:26:10.962] [OverlayWindowController.swift:28] CAPTURE-UI: overlay show, windows=19, withThumbnails=7
-[WS] CB6: count=3 frame=881
-[2026-08-08 11:26:10.970] [ImmersiveOverlayCoordinator.swift:40] TIMING: [t=155ms] overlay shown (UI=17ms, total=155ms)
-[2026-08-08 11:26:10.970] [ImmersiveOverlayCoordinator.swift:45] CAPTURE: background capture starting, remaining=12, overlay shown at t=155ms
-[2026-08-08 11:26:10.971] [ActivationHistory.swift:27] ActivationHistory: app activated [WindowSwitcher] pid=59903
-[2026-08-08 11:26:10.972] [AXFocusObserver.swift:58] AXFocusObserver: started pid=59903
-[WS] CB6: count=3 frame=882
-[2026-08-08 11:26:10.980] [ThumbnailCapturer.swift:22] CAPTURE: OK [Google Chrome — lishuai1993/TorchTool: mac系统触控板三指左右滑动实现窗口级切换] win=16229 size=2940x1836 dt=8ms
-[WS] CB6: count=3 frame=883
-[2026-08-08 11:26:10.986] [OverlayView.swift:89] CARD-FRAMES: updated, count=19
-[2026-08-08 11:26:10.988] [ThumbnailCapturer.swift:22] CAPTURE: OK [Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘] win=16224 size=2940x1836 dt=7ms
-[2026-08-08 11:26:10.993] [ThumbnailCapturer.swift:22] CAPTURE: OK [HibernateModeManager — HibernateMode Manager] win=73 size=1600x1136 dt=5ms
-[WS] CB6: count=3 frame=884
-[WS] CB6: count=3 frame=885
-[2026-08-08 11:26:11.002] [ThumbnailCapturer.swift:22] CAPTURE: OK [Google Chrome — 千问-阿里 AI 助手] win=16219 size=2940x1836 dt=8ms
-[WS] CB6: count=3 frame=886
-[WS] CB6: count=3 frame=887
-[WS] CB6: count=3 frame=888
-[WS] CB6: count=3 frame=889
-[2026-08-08 11:26:11.042] [ThumbnailCapturer.swift:22] CAPTURE: OK [时钟 — 时钟] win=72 size=2048x1536 dt=39ms
-[WS] CB6: count=3 frame=890
-[2026-08-08 11:26:11.047] [ThumbnailCapturer.swift:22] CAPTURE: OK [CodeBuddy CN — 20260723112900] win=3993 size=2940x1836 dt=5ms
-[WS] CB6: count=3 frame=891
-[2026-08-08 11:26:11.053] [ThumbnailCapturer.swift:22] CAPTURE: OK [青山 — 青山] win=129 size=1600x1200 dt=5ms
-[2026-08-08 11:26:11.058] [ThumbnailCapturer.swift:22] CAPTURE: OK [网易有道翻译 — 网易有道翻译] win=106 size=1608x1090 dt=5ms
-[WS] CB6: count=3 frame=892
-[2026-08-08 11:26:11.063] [ThumbnailCapturer.swift:22] CAPTURE: OK [系统设置 — 辅助功能] win=17781 size=1430x1836 dt=4ms
-[WS] CB6: count=3 frame=893
-[2026-08-08 11:26:11.075] [ThumbnailCapturer.swift:22] CAPTURE: OK [活动监视器 — 活动监视器] win=85 size=2940x1836 dt=11ms
-[WS] CB6: count=3 frame=894
-[WS] CB6: count=3 frame=895
-[2026-08-08 11:26:11.088] [ThumbnailCapturer.swift:22] CAPTURE: OK [微信读书 — 微信读书] win=20873 size=2048x1592 dt=13ms
-[WS] CB6: count=3 frame=896
-[2026-08-08 11:26:11.095] [ThumbnailCapturer.swift:22] CAPTURE: OK [微信 — 微信 (窗口)] win=10870 size=2940x1836 dt=6ms
-[2026-08-08 11:26:11.096] [ImmersiveOverlayCoordinator.swift:67] CAPTURE: background capture complete, captured=12/12, dt=124ms
-[WS] CB6: count=3 frame=897
-[WS] CB6: count=3 frame=898
-[WS] CB6: count=3 frame=899
-[WS] CB6: count=3 frame=900
-[WS-DBG] fingerCount: 3 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=7,ty=0,fl=0,z=0.0000,x=0.502,y=0.343 [1]st=5,ty=3,fl=1,z=-0.0540,x=0.721,y=0.801
-[WS-DBG] TRAJECTORY: swipe-end [session=1] dX=0.0327 dY=0.3035 |dX/dY|=0.11
-[WS-DBG] STATE: SWIPING -> IDLE [session=1] (lift, fingerCount=2) GestureEnd fired
-[2026-08-08 11:26:11.133] [AppDelegate.swift:327] ElasticDrag: gestureEnd, inProgress=false, session=0
-[2026-08-08 11:26:11.133] [AppDelegate.swift:335] ElasticDrag: gestureEnd ignored — no drag in progress
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=6,ty=3,fl=1,z=-0.0737,x=0.721,y=0.799
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.495,y=0.306
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0810,x=0.501,y=0.310
-[WS-DBG] processContactData: ALIVE frame=981 count=1
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.825,y=0.728 [1]st=1,ty=0,fl=0,z=0.0000,x=0.954,y=0.799
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0426,x=0.823,y=0.738 [1]st=4,ty=4,fl=1,z=0.1318,x=0.958,y=0.802
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.552,y=0.553
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.860,y=0.731
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0529,x=0.859,y=0.727 [1]st=3,ty=4,fl=1,z=0.0996,x=0.995,y=0.780
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.0820,x=0.858,y=0.726 [1]st=4,ty=4,fl=1,z=-0.1806,x=0.994,y=0.778
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.612,y=0.576
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.788,y=0.651 [1]st=1,ty=0,fl=0,z=0.0000,x=0.906,y=0.686
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=3,fl=1,z=-0.7131,x=0.778,y=0.646 [1]st=4,ty=4,fl=1,z=-0.5512,x=0.900,y=0.687
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=2,fl=1,z=0.0000,x=0.579,y=0.507
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.411,y=0.495
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=-1,z=0.3488,x=0.549,y=0.660 [1]st=4,ty=3,fl=-1,z=0.1204,x=0.411,y=0.489
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.0426,x=0.549,y=0.661 [1]st=4,ty=3,fl=-1,z=0.0332,x=0.412,y=0.491
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.761,y=0.643
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.454,y=0.500 [1]st=1,ty=0,fl=0,z=0.0000,x=0.592,y=0.665
-[WS-DBG] fingerCount: 0 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.0965,x=0.459,y=0.502 [1]st=4,ty=3,fl=1,z=0.1765,x=0.595,y=0.667
-[WS-DBG] processContactData: ALIVE frame=1624 count=2
-[WS-DBG] fingerCount: 2 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=3,fl=1,z=0.0000,x=0.791,y=0.604
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.586,y=0.665
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=3,ty=2,fl=1,z=0.0384,x=0.441,y=0.493 [1]st=4,ty=3,fl=1,z=0.0239,x=0.585,y=0.666
-[WS-DBG] fingerCount: 1 -> 2 (totalContacts=2)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=0.1401,x=0.442,y=0.494 [1]st=4,ty=3,fl=1,z=0.1515,x=0.586,y=0.668
-[WS-DBG] fingerCount: 2 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.708,y=0.559
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0965,x=0.707,y=0.560
-[2026-08-08 11:26:20.405] [OverlayWindowController.swift:128] CAPTURE-UI: overlay hide called, isVisible=true
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.463,y=0.120
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=-1,z=0.1848,x=0.464,y=0.119
-[WS-DBG] processContactData: ALIVE frame=2238 count=1
-[2026-08-08 11:30:47.505] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
-[2026-08-08 11:30:47.508] [AXFocusObserver.swift:76] AXFocusObserver: stopped
-[2026-08-08 11:30:47.532] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.567,y=0.649
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=2,fl=1,z=-0.0540,x=0.567,y=0.641
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.983,y=0.527
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=-0.0955,x=0.987,y=0.515
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.011,y=0.570
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=-1,z=0.0000,x=0.008,y=0.566
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.988,y=0.503
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=1,z=0.0000,x=0.984,y=0.502
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.013,y=0.633
-[WS-DBG] processContactData: ALIVE frame=2429 count=1
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=7,ty=7,fl=-1,z=0.0000,x=0.016,y=0.628
-[WS-DBG] fingerCount: 1 -> 0 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=1,ty=0,fl=0,z=0.0000,x=0.974,y=0.316
-[WS-DBG] fingerCount: 0 -> 1 (totalContacts=1)
-[WS-DBG]   RAW: [0]st=4,ty=7,fl=1,z=0.0259,x=0.983,y=0.285
+[2026-08-08 11:55:11.590] [Logger.swift:23] ══════════════════════════════════════
+[2026-08-08 11:55:11.592] [Logger.swift:24] WindowSwitcher logger initialized
+[2026-08-08 11:55:11.593] [Logger.swift:25] macOS Version 15.3.2 (Build 24D81)
+[2026-08-08 11:55:11.593] [Logger.swift:26] PID: 64333
+[2026-08-08 11:55:11.593] [Logger.swift:27] ══════════════════════════════════════
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:63] LRU: sync - removed 1 windows
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 2 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 2 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:63] LRU: sync - removed 1 windows
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 2 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:98] LRU: moveToFront [?] from [2] → [0]
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:115] LRU-INTERACT: [?] idx=2→0, before=[], after=[]
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:117] LRU-INTERACT: [?] already at idx=0, no-op. order=[]
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:129] LRU-SELECT: [?] cursor→1, order=[] (unchanged=true)
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [0]→[1] → ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [1]→[2] → ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [2]→[0] → ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [0]→[2] ← ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [2]→[1] ← ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:181] LRU: cursor [1]→[0] ← ?
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.593] [LRUOrderingEngine.swift:71] LRU: sync - added 2 windows at front
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:37] ActivationHistory: stopped
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:13] ActivationHistory: starting observation
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:30] ActivationHistory: started OK
+[2026-08-08 11:55:11.593] [ActivationHistory.swift:37] ActivationHistory: stopped
+[2026-08-08 11:55:11.594] [AXWindowMatcher.swift:73] AXFocusChange: match by title only (no frame match)
+[2026-08-08 11:55:11.598] [AXWindowMatcher.swift:95] AXFocusChange: sameFrameAX=0 sameFrameCG=2
+[2026-08-08 11:55:11.598] [AXWindowMatcher.swift:101] AXFocusChange: title match → CG id=202
+[2026-08-08 11:55:11.598] [AXWindowMatcher.swift:95] AXFocusChange: sameFrameAX=0 sameFrameCG=0
+[2026-08-08 11:55:11.598] [AXWindowMatcher.swift:112] AXFocusChange: fallback first frame match
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:181] LRU: cursor [0]→[1] → ?
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:181] LRU: cursor [1]→[2] → ?
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:181] LRU: cursor [0]→[1] → ?
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:71] LRU: sync - added 3 windows at front
+[2026-08-08 11:55:11.598] [LRUOrderingEngine.swift:181] LRU: cursor [0]→[1] → ?
+[2026-08-08 12:04:57.340] [ActivationHistory.swift:27] ActivationHistory: app activated [loginwindow] pid=154
+[2026-08-08 12:04:57.342] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 12:04:57.406] [AXFocusObserver.swift:58] AXFocusObserver: started pid=154
+[2026-08-08 12:20:51.971] [AppDelegate.swift:462] Session observers: system woke — scheduling MT restart
+[2026-08-08 12:20:52.086] [AppDelegate.swift:469] Session observers: screens woke — scheduling MT restart
+[2026-08-08 12:20:52.086] [AppDelegate.swift:484] Session observers: restart already scheduled recently, skipping
+[2026-08-08 12:20:52.906] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-08 12:20:52.971] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 12:20:53.049] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[2026-08-08 12:20:53.492] [GestureEngineWrapper.swift:80] GestureEngine: restart() — re-registering MT device
+[2026-08-08 12:20:53.496] [GestureEngineWrapper.swift:88] GestureEngine: restart() done (result=0)
+[2026-08-08 12:20:54.525] [ActivationHistory.swift:27] ActivationHistory: app activated [HibernateModeManager] pid=505
+[2026-08-08 12:20:54.544] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 12:20:54.600] [AXFocusObserver.swift:58] AXFocusObserver: started pid=505
+[2026-08-08 12:20:55.722] [LRUOrderingEngine.swift:115] LRU-INTERACT: [HibernateModeManager — HibernateMode Manager] idx=10→0, before=[Google Chrome — 千问-阿里 AI 助手 → 微信 — 微信 → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → 终端 — WindowSwitcher — -zsh — 112×34 → 迅雷影音 — [电影天堂www.dytt89.com]坠落的审判-2023_BD国英双语中英双字.mp4], after=[HibernateModeManager — HibernateMode Manager → Google Chrome — 千问-阿里 AI 助手 → 微信 — 微信 → Google Chrome — 「深演智能市场/公关/广告招聘」深演智能招聘信息-BOSS直聘 → 终端 — WindowSwitcher — -zsh — 112×34]
+[2026-08-08 12:20:55.722] [AppDelegate.swift:151] onInteraction fired for window 73
+[2026-08-08 12:20:56.223] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-08 12:20:56.230] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 12:20:56.243] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
+[2026-08-08 12:20:57.191] [ActivationHistory.swift:27] ActivationHistory: app activated [loginwindow] pid=154
+[2026-08-08 12:20:57.192] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 12:20:57.204] [AXFocusObserver.swift:58] AXFocusObserver: started pid=154
+[2026-08-08 19:26:42.392] [AppDelegate.swift:469] Session observers: screens woke — scheduling MT restart
+[2026-08-08 19:26:42.673] [AppDelegate.swift:462] Session observers: system woke — scheduling MT restart
+[2026-08-08 19:26:42.673] [AppDelegate.swift:484] Session observers: restart already scheduled recently, skipping
+[2026-08-08 19:26:43.964] [GestureEngineWrapper.swift:80] GestureEngine: restart() — re-registering MT device
+[2026-08-08 19:26:43.968] [GestureEngineWrapper.swift:88] GestureEngine: restart() done (result=0)
+[2026-08-08 19:27:16.921] [AppDelegate.swift:469] Session observers: screens woke — scheduling MT restart
+[2026-08-08 19:27:18.496] [GestureEngineWrapper.swift:80] GestureEngine: restart() — re-registering MT device
+[2026-08-08 19:27:18.500] [GestureEngineWrapper.swift:88] GestureEngine: restart() done (result=0)
+[2026-08-08 19:27:22.054] [ActivationHistory.swift:27] ActivationHistory: app activated [终端] pid=8243
+[2026-08-08 19:27:22.060] [AXFocusObserver.swift:76] AXFocusObserver: stopped
+[2026-08-08 19:27:22.134] [AXFocusObserver.swift:58] AXFocusObserver: started pid=8243
