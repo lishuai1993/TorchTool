@@ -230,41 +230,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         switch event {
         case .threeFingerTap:
             logDebug("GESTURE: threeFingerTap, overlayVisible=\(overlayController.isVisible)")
-            windowManager.isGestureActive = false
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
+                windowManager.gesturePhase = .idle
                 return
             }
             if overlayController.isVisible {
                 overlayController.selectFocused()
+                windowManager.gesturePhase = overlayController.isVisible ? .overlayVisible : .idle
                 return
             }
-            guard settings.immersiveModeEnabled, settings.threeFingerTapEnabled else { return }
+            guard settings.immersiveModeEnabled, settings.threeFingerTapEnabled else {
+                windowManager.gesturePhase = .idle
+                return
+            }
             immersiveOverlay.show()
+            windowManager.gesturePhase = .overlayVisible
 
         case .threeFingerSwipeUp:
             logDebug("GESTURE: threeFingerSwipeUp, overlayVisible=\(overlayController.isVisible)")
-            windowManager.isGestureActive = false
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: swipeUp intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
+                windowManager.gesturePhase = .idle
                 return
             }
-            if overlayController.isVisible { return }
-            guard settings.immersiveModeEnabled, settings.threeFingerSwipeUpEnabled else { return }
+            if overlayController.isVisible {
+                windowManager.gesturePhase = .overlayVisible
+                return
+            }
+            guard settings.immersiveModeEnabled, settings.threeFingerSwipeUpEnabled else {
+                windowManager.gesturePhase = .idle
+                return
+            }
             immersiveOverlay.show()
+            windowManager.gesturePhase = .overlayVisible
 
         case .threeFingerSwipeDown:
             logDebug("GESTURE: threeFingerSwipeDown, overlayVisible=\(overlayController.isVisible)")
-            windowManager.isGestureActive = false
             if overlayController.isVisible {
                 overlayController.hide()
+                windowManager.gesturePhase = .idle
                 return
             }
+            windowManager.gesturePhase = .idle
 
         case .threeFingerSwipeLeft:
-            windowManager.isGestureActive = true
+            windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
@@ -277,7 +290,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             quickSwitch(directionRight: true)
 
         case .threeFingerSwipeRight:
-            windowManager.isGestureActive = true
+            windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
@@ -290,7 +303,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             quickSwitch(directionRight: false)
 
         case .swipeUpdate(let progress):
-            windowManager.isGestureActive = true
+            windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
             let dirRight = progress < 0
@@ -299,6 +312,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if settings.elasticDragEnabled {
                     logDebug("ElasticDrag: begin [session=\(elasticDrag.sessionID + 1)], progress=\(String(format: "%.3f", progress)), dirRight=\(dirRight)")
                     elasticDrag.beginElasticDrag()
+                    windowManager.gesturePhase = .elasticDragging
                 } else {
                     elasticDrag.setBoundaryWithoutDrag()
                 }
@@ -309,7 +323,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
         case .gestureEnd:
-            windowManager.isGestureActive = false
             elasticDrag.cancelWatchdog()
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDrag.isInProgress), session=\(elasticDrag.sessionID)")
             if elasticDrag.isInProgress {
@@ -321,6 +334,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 logDebug("ElasticDrag: gestureEnd ignored — no drag in progress")
             }
+            windowManager.gesturePhase = overlayController.isVisible ? .overlayVisible : .idle
         }
     }
 

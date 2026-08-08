@@ -38,10 +38,10 @@ final class WindowManager: @unchecked Sendable {
     /// Callback invoked on trackpad scroll/swipe events.
     var onTrackpadActivity: (() -> Void)?
 
-    /// Set by AppDelegate when a three-finger gesture is in progress.
-    /// When true, scroll events are treated as gesture artifacts and do NOT
-    /// trigger windowDidInteract (they would reset the LRU cursor mid-swipe).
-    var isGestureActive = false
+    /// The current gesture/interaction phase, driven by AppDelegate.
+    /// Scroll events are treated as gesture artifacts (and do NOT trigger
+    /// windowDidInteract) only while quickSwitching or elasticDragging.
+    var gesturePhase: GesturePhase = .idle
 
     /// Per-app z-ordered window list (CGWindowID + frame) from the most recent
     /// refresh, in CGWindowList order (frontmost first). Used to correlate a
@@ -284,7 +284,7 @@ final class WindowManager: @unchecked Sendable {
 
             // Block: three-finger gesture in progress / programmatic activation /
             // no known front window.
-            guard !self.isGestureActive, !self.isActivating,
+            guard !self.gesturePhase.interceptsScroll, !self.isActivating,
                   let frontID = self.frontmostWindowID else { return }
 
             // MRU gate: if the frontmost window is already the LRU head, any
