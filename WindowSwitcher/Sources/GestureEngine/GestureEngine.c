@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <limits.h>
+#include <stdatomic.h>
 
 // ──────────────────────────────────────────────────
 // Dual-output logging (stderr + optional log file)
@@ -128,6 +129,12 @@ typedef enum {
 
 static GestureState gState = GS_IDLE;
 
+// Mirrors "a three-finger gesture is in progress" (gState == GS_TRACKING ||
+// gState == GS_SWIPING). Written on the MT callback thread under stateLock,
+// read atomically from the main-thread scroll monitor, so a plain bool is
+// insufficient — keep it atomic to avoid a data race.
+static atomic_bool trackingActive = false;
+
 // Settling period: ignore the first 80ms of three-finger contact
 // to account for natural finger flattening/centroid drift.
 #define SETTLING_DURATION 0.080
@@ -151,10 +158,6 @@ static float   maxPostSettleDisp   = 0;  // max displacement after settling
 static int     activeFingerCount   = 0;
 static bool    swipeActionFired    = false;
 static bool    isHorizontalSwipe   = false; // true for LEFT/RIGHT, false for UP/DOWN
-static bool    verticalCandidate    = false;
-static double  verticalCandidateStart = 0;
-static int     verticalCandidateDir  = 0;  // 1=UP, -1=DOWN
-#define VERTICAL_CONFIRM_DURATION 0.060
 static int     lastFrame           = 0;   // for detecting callback interruption
 
 // Per-frame finger count tracking (reset on engine start).
@@ -356,6 +359,7 @@ int gesture_engine_start(GestureCallback callback) {
     // Reset gesture state machine. Static variables survive stop/start
     // cycles — clear them defensively so stale values don't break detection.
     gState = GS_IDLE;
+    atomic_store(&trackingActive, false);
     gestureSessionID = 0;
     prevFingerCount = 0;
     lastFingerCount = 0;
@@ -364,9 +368,6 @@ int gesture_engine_start(GestureCallback callback) {
     settlingEndTime = 0;
     swipeActionFired = false;
     isHorizontalSwipe = false;
-    verticalCandidate = false;
-    verticalCandidateStart = 0;
-    verticalCandidateDir = 0;
     lastFrame = 0;
 
     // ── Strategy: stop device, register callback, then start device ──
@@ -425,6 +426,9 @@ int gesture_engine_start(GestureCallback callback) {
 void gesture_engine_stop(void) {
     engineRunning = false;
     userCallback = NULL;
+    // Clear the tracking flag too: if stopped mid-gesture it would otherwise
+    // linger as true and block all scroll reorders until the next start.
+    atomic_store(&trackingActive, false);
 
     if (mtDevice) {
         if (pMTUnregisterCB5) {
@@ -456,6 +460,10 @@ void gesture_engine_stop(void) {
 
 bool gesture_engine_is_running(void) {
     return engineRunning;
+}
+
+bool gesture_engine_is_tracking(void) {
+    return atomic_load(&trackingActive);
 }
 
 int gesture_engine_callback_count(void) {
@@ -579,6 +587,7 @@ static void processContactData(int deviceIndex, void *data,
             if (sinceFirst <= maxTouchdownWindow) {
                 // Valid: all three fingers arrived within the touchdown window.
                 gState = GS_TRACKING;
+                atomic_store(&trackingActive, true);
                 gestureSessionID++;
                 touchStartTime = timestamp;
                 settlingEndTime = timestamp + SETTLING_DURATION;
@@ -636,10 +645,9 @@ static void processContactData(int deviceIndex, void *data,
                 }
             }
             gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
             swipeActionFired = false;
             isHorizontalSwipe = false;
-            verticalCandidate = false;
-            verticalCandidateDir = 0;
         } else if (inSettling) {
             // Still in settling period — update settled centroid, don't detect swipes
             settledCentroidX = centroidX;
@@ -665,68 +673,38 @@ static void processContactData(int deviceIndex, void *data,
 
             // Direction detection (post-settling).
             //
-            // Vertical (UP/DOWN): 3.0x ratio + 1.5x min displacement + 60ms
-            // confirmation period — prevents diagonal swipes from being
-            // misclassified as vertical based on early-frame trajectory.
+            // Vertical (UP/DOWN): 1.5x ratio + 1.5x min displacement, fired
+            // immediately on the first qualifying frame. Semantics are now
+            // unambiguous (three-finger = window operation), so the former
+            // 3.0x ratio + 60ms confirmation period — a differentiator for
+            // when three-finger also scrolled pages — is no longer needed;
+            // diagonal swipes satisfy this relaxed ratio only on genuinely
+            // vertical trajectories.
             //
-            // Horizontal (LEFT/RIGHT): 2.0x ratio + immediate fire (no
-            // confirmation) so elastic drag feedback stays responsive.
+            // Horizontal (LEFT/RIGHT): 2.0x ratio + immediate fire so elastic
+            // drag feedback stays responsive.
             //
             // SwipeUpdate: fires for partial horizontal progress to drive
             // elastic drag, guarded by |dX| > |dY| to skip vertical swipes.
 
-            bool vertConditionMet = false;
             if (elapsed >= SETTLING_DURATION + swipeMinDuration) {
-                if (dispY > swipeMinDisplacement * 1.5f && fabsf(dispY) > fabsf(dispX) * 3.0f) {
-                    // UP candidate
-                    if (!verticalCandidate || verticalCandidateDir != 1) {
-                        verticalCandidate = true;
-                        verticalCandidateStart = timestamp;
-                        verticalCandidateDir = 1;
-                        ws_log("[WS-DBG] GESTURE: UP candidate [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
-                               gestureSessionID, dispX, dispY,
-                               fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f);
-                    } else if (timestamp - verticalCandidateStart >= VERTICAL_CONFIRM_DURATION) {
-                        gState = GS_SWIPING;
-                        swipeActionFired = true;
-                        isHorizontalSwipe = false;
-                        verticalCandidate = false;
-                        userCallback(GestureThreeFingerSwipeUp, 1.0);
-                        ws_log("[WS-DBG] GESTURE: swipe UP confirmed [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f confirm=%.0fms\n",
-                               gestureSessionID, dispX, dispY,
-                               fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f,
-                               (timestamp - verticalCandidateStart) * 1000);
-                    }
-                    vertConditionMet = true;
-                } else if (dispY < -swipeMinDisplacement * 1.5f && fabsf(dispY) > fabsf(dispX) * 3.0f) {
-                    // DOWN candidate
-                    if (!verticalCandidate || verticalCandidateDir != -1) {
-                        verticalCandidate = true;
-                        verticalCandidateStart = timestamp;
-                        verticalCandidateDir = -1;
-                        ws_log("[WS-DBG] GESTURE: DOWN candidate [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
-                               gestureSessionID, dispX, dispY,
-                               fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f);
-                    } else if (timestamp - verticalCandidateStart >= VERTICAL_CONFIRM_DURATION) {
-                        gState = GS_SWIPING;
-                        swipeActionFired = true;
-                        isHorizontalSwipe = false;
-                        verticalCandidate = false;
-                        userCallback(GestureThreeFingerSwipeDown, 1.0);
-                        ws_log("[WS-DBG] GESTURE: swipe DOWN confirmed [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f confirm=%.0fms\n",
-                               gestureSessionID, dispX, dispY,
-                               fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f,
-                               (timestamp - verticalCandidateStart) * 1000);
-                    }
-                    vertConditionMet = true;
+                if (dispY > swipeMinDisplacement * 1.5f && fabsf(dispY) > fabsf(dispX) * 1.5f) {
+                    gState = GS_SWIPING;
+                    swipeActionFired = true;
+                    isHorizontalSwipe = false;
+                    userCallback(GestureThreeFingerSwipeUp, 1.0);
+                    ws_log("[WS-DBG] GESTURE: swipe UP [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
+                           gestureSessionID, dispX, dispY,
+                           fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f);
+                } else if (dispY < -swipeMinDisplacement * 1.5f && fabsf(dispY) > fabsf(dispX) * 1.5f) {
+                    gState = GS_SWIPING;
+                    swipeActionFired = true;
+                    isHorizontalSwipe = false;
+                    userCallback(GestureThreeFingerSwipeDown, 1.0);
+                    ws_log("[WS-DBG] GESTURE: swipe DOWN [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
+                           gestureSessionID, dispX, dispY,
+                           fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f);
                 }
-            }
-            if (!vertConditionMet && verticalCandidate) {
-                ws_log("[WS-DBG] GESTURE: vertical candidate cleared [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
-                       gestureSessionID, dispX, dispY,
-                       fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f);
-                verticalCandidate = false;
-                verticalCandidateDir = 0;
             }
 
             if (gState == GS_TRACKING) {
@@ -736,8 +714,6 @@ static void processContactData(int deviceIndex, void *data,
                     swipeActionFired = true;
                     float ratio = fabsf(dispY) > 0.0001f ? fabsf(dispX) / fabsf(dispY) : 99.0f;
                     isHorizontalSwipe = true;
-                    verticalCandidate = false;
-                    verticalCandidateDir = 0;
                     if (dispX > 0) {
                         userCallback(GestureThreeFingerSwipeRight, 1.0);
                         ws_log("[WS-DBG] GESTURE: swipe RIGHT [session=%d] dX=%.4f dY=%.4f |dX/dY|=%.2f\n",
@@ -770,6 +746,7 @@ static void processContactData(int deviceIndex, void *data,
             ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (callback gap, frame %d->%d) GestureEnd fired\n",
                    gestureSessionID, lastFrame, frame);
             gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
             swipeActionFired = false;
             isHorizontalSwipe = false;
         } else if (fingerCount < 3) {
@@ -784,6 +761,7 @@ static void processContactData(int deviceIndex, void *data,
             ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (lift, fingerCount=%d) GestureEnd fired\n",
                    gestureSessionID, fingerCount);
             gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
             swipeActionFired = false;
             isHorizontalSwipe = false;
         } else if (isHorizontalSwipe) {

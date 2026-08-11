@@ -351,9 +351,14 @@ final class WindowManager: @unchecked Sendable {
             default: break
             }
 
-            // Block: three-finger gesture in progress / programmatic activation /
-            // no known front window.
-            guard !self.gesturePhase.interceptsScroll, !self.isActivating,
+            // Block: three-finger gesture in progress (its scrollWheel is the
+            // gesture's own artifact, not a real user interaction) / programmatic
+            // activation / no known front window. Query the C engine synchronously
+            // so the swipe's scroll is blocked from the touchdown frame — no race
+            // with the Swift-side gesturePhase, which updates asynchronously.
+            guard !self.gesturePhase.interceptsScroll,
+                  !gesture_engine_is_tracking(),
+                  !self.isActivating,
                   let frontID = self.frontmostWindowID else { return }
 
             // MRU gate: if the frontmost window is already the LRU head, any

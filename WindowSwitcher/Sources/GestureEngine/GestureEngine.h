@@ -22,6 +22,13 @@ int gesture_engine_start_safe(void);  // starts device without registering callb
 void gesture_engine_stop(void);
 bool gesture_engine_is_running(void);
 
+// Whether a three-finger gesture is currently being tracked (GS_TRACKING or
+// GS_SWIPING). Scroll events arriving while true are the gesture's own
+// artifacts (a three-finger swipe generates scrollWheel as the fingers move)
+// and must NOT trigger a window reorder. Read synchronously from the Swift
+// scroll monitor; safe to call from any thread.
+bool gesture_engine_is_tracking(void);
+
 // Number of contact-frame callbacks received since the engine started.
 // Used as a heartbeat to detect when the MT contact stream has stalled.
 int gesture_engine_callback_count(void);
