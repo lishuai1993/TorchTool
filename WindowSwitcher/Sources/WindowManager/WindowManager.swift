@@ -363,16 +363,12 @@ final class WindowManager: @unchecked Sendable {
             // Residual-swipe guard: within ~600ms after a three-finger gesture
             // ends, the system delivers leftover scrollWheel events from that
             // swipe (observed arriving at 410-490ms). Treat them as artifacts
-            // and never reorder — this is the primary defense; the direction
-            // guard below is secondary.
+            // and never reorder. Beyond the window any-direction scroll is a
+            // real user interaction — vertical page scroll, or horizontal
+            // page-turn (e.g. 微信读书 双指左右滑动翻页) — and triggers a reorder.
             if ProcessInfo.processInfo.systemUptime - self.lastGestureEndAt < 0.6 {
                 return
             }
-
-            // Only vertical-dominant scroll counts as real page scrolling.
-            // Horizontal-dominant scroll is a three-finger swipe artifact and
-            // must not trigger windowDidInteract.
-            guard abs(event.deltaY) > abs(event.deltaX) else { return }
 
             // Deduplicate: one gesture triggers exactly one reorder. The time
             // window also backs up phase-less devices (e.g. external mouse
