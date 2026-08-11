@@ -42,8 +42,13 @@ final class LRUOrderingEngine {
     // MARK: - Mutations
 
     /// Call when the window list changes (windows added / removed).
-    /// New windows are inserted at the front. Removed windows are dropped.
-    func sync(windowIDs: [CGWindowID]) {
+    /// Genuinely new windows are inserted at the front. Removed windows are
+    /// dropped. Windows that are a rebuild of a just-removed window (same app,
+    /// `rebuildMap: addedID → removedID`) inherit the removed window's LRU
+    /// position instead of jumping to the head — e.g. a terminal tab change
+    /// recreates the CGWindowID and must not leap past apps the user is
+    /// actually working in.
+    func sync(windowIDs: [CGWindowID], rebuildMap: [CGWindowID: CGWindowID] = [:]) {
         let oldSet = Set(orderedIDs)
         let newSet = Set(windowIDs)
 
@@ -58,19 +63,42 @@ final class LRUOrderingEngine {
         let cursorWindowID: CGWindowID? = orderedIDs.indices.contains(currentIndex)
             ? orderedIDs[currentIndex] : nil
 
+        // Capture each rebuild predecessor's index BEFORE any mutation.
+        var rebuildPosition: [CGWindowID: Int] = [:]
+        for (addedID, removedID) in rebuildMap {
+            if let idx = orderedIDs.firstIndex(of: removedID) {
+                rebuildPosition[addedID] = idx
+            }
+        }
+
         // Remove closed windows
         if !removed.isEmpty {
             logDebug("LRU: sync - removed \(removed.count) windows")
         }
         orderedIDs.removeAll { removed.contains($0) }
 
-        // Prepend new windows in reverse CGWindowList order so the final
-        // order matches the z-order snapshot.  Must iterate over `windowIDs`
-        // (the ordered array) — NOT `added` (a Set with undefined iteration).
-        if !added.isEmpty {
-            logDebug("LRU: sync - added \(added.count) windows at front")
+        // 1) Rebuild replacements inherit the predecessor's LRU position,
+        //    inserted in ascending position order to keep the final ordering stable.
+        let rebuildIDs = added.filter { rebuildMap[$0] != nil }
+        if !rebuildIDs.isEmpty {
+            logDebug("LRU: sync - inherited \(rebuildIDs.count) rebuilt windows in place")
         }
-        for id in windowIDs.reversed() where added.contains(id) {
+        for id in rebuildIDs.sorted(by: {
+            (rebuildPosition[$0] ?? 0) < (rebuildPosition[$1] ?? 0)
+        }) {
+            let targetIndex = min(rebuildPosition[id] ?? 0, orderedIDs.count)
+            orderedIDs.insert(id, at: targetIndex)
+        }
+
+        // 2) Genuinely new windows go to the front, in reverse CGWindowList
+        //    order so the head matches the z-order snapshot. Iterate over
+        //    `windowIDs` (the ordered array) — NOT `added` (a Set with
+        //    undefined iteration).
+        let trulyNew = windowIDs.reversed().filter { added.contains($0) && rebuildMap[$0] == nil }
+        if !trulyNew.isEmpty {
+            logDebug("LRU: sync - added \(trulyNew.count) genuinely-new windows at front")
+        }
+        for id in trulyNew {
             orderedIDs.insert(id, at: 0)
         }
 

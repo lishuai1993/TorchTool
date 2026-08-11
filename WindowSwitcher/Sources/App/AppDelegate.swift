@@ -324,6 +324,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .gestureEnd:
             elasticDrag.cancelWatchdog()
+            windowManager.lastGestureEndAt = ProcessInfo.processInfo.systemUptime
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDrag.isInProgress), session=\(elasticDrag.sessionID)")
             if elasticDrag.isInProgress {
                 elasticDrag.finishDrag()

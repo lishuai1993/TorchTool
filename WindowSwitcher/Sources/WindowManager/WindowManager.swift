@@ -22,8 +22,33 @@ final class WindowManager: @unchecked Sendable {
     /// Current frontmost window ID.
     private(set) var frontmostWindowID: CGWindowID?
 
+    /// IDs ever seen by sync, to distinguish a genuinely new window from a
+    /// re-detection of a window that merely dropped out of the on-screen
+    /// snapshot (minimized / occluded / other Space).
+    private var knownWindowIDs: Set<CGWindowID> = []
+
     private var scrollMonitor: Any?
     private var interactionMonitor: Any?
+
+    /// Cmd+` event tap. NSEvent.addGlobalMonitorForEvents does not deliver
+    /// Cmd+` — WindowServer consumes it for the app switcher first — so a
+    /// listen-only CGEventTap at the session level is used instead.
+    /// `fileprivate` so the file-scoped C callback can re-enable it.
+    fileprivate var keyEventTap: CFMachPort?
+    private var keyEventTapSource: CFRunLoopSource?
+    /// Diagnostic counter to confirm the tap actually receives key events.
+    private var keyEventCount = 0
+    /// Tap registration retry budget. CGEvent.tapCreate can transiently return
+    /// nil at app launch even when AXIsProcessTrusted() is true, so retry a few
+    /// times with a short delay.
+    private var keyEventTapRetries = 0
+    private let keyEventTapMaxRetries = 5
+
+    /// Cmd+` debounce state: the flag marks a pending key-down so the key-up
+    /// (window cycle settled) can query immediately; the work item is the
+    /// debounced fallback in case no key-up arrives.
+    private var cmdBacktickPending = false
+    private var cmdBacktickWorkItem: DispatchWorkItem?
 
     /// Scroll-gesture state machine. A single trackpad scroll gesture
     /// (began → … → ended) promotes the frontmost window to the LRU head
@@ -31,6 +56,11 @@ final class WindowManager: @unchecked Sendable {
     private var scrollGestureActive = false
     private var scrollDidTriggerReorder = false
     private var lastScrollReorderTime: TimeInterval = 0
+
+    /// Timestamp (systemUptime) of the last three-finger gesture end. Residual
+    /// scrollWheel events arrive ~200-400ms after a three-finger swipe; the
+    /// scroll monitor ignores them for a short immunity window.
+    var lastGestureEndAt: TimeInterval = 0
 
     /// Callback invoked when a window receives substantial interaction.
     var onInteraction: ((CGWindowID) -> Void)?
@@ -66,10 +96,24 @@ final class WindowManager: @unchecked Sendable {
     private init() {
         activationHistory.onAppActivated = { [weak self] pid in
             guard let self, !self.isActivating else { return }
+            // Never observe our own process. When WindowSwitcher becomes
+            // frontmost (e.g. the immersive overlay is shown), keep the previous
+            // app's observer armed so window switches are still captured when
+            // the user returns — otherwise the observer is hijacked to a pid
+            // that produces no events and same-app switches go undetected.
+            if pid == NSRunningApplication.current.processIdentifier {
+                logDebug("ActivationHistory: ignoring self activation pid=\(pid)")
+                return
+            }
             // Suppress the notification caused by our own programmatic
             // app.activate() (delivered asynchronously after isActivating reset).
             if self.activationSuppressor.shouldSuppress(pid: pid) {
                 logDebug("ActivationHistory: suppressed programmatic activation pid=\(pid)")
+                // The suppressed PID is the app we just activated — re-arm the
+                // observer to it so subsequent same-app window switches are
+                // captured. Without this the observer stays on whatever app was
+                // observed last (often WindowSwitcher itself) and goes blind.
+                self.axFocusObserver.startObserving(pid: pid)
                 return
             }
             // Real user activation (Cmd+Tab, Dock click) — record focus
@@ -134,8 +178,33 @@ final class WindowManager: @unchecked Sendable {
         // empty (e.g. Chrome), correlated by frame / z-order rank.
         axMatcher.backfillTitles(&newWindows, appZOrder: appZOrder)
 
+        let oldWindows = windows
         windows = newWindows
-        orderingEngine.sync(windowIDs: orderedIDs)
+        logSyncChangeDiagnostics(oldIDs: orderingEngine.orderedIDs, newIDs: orderedIDs,
+                                 oldWindows: oldWindows, newWindows: newWindows,
+                                 newOrder: orderedIDs)
+
+        // Detect same-app "removed + added" pairs: a window rebuilt under a new
+        // CGWindowID (e.g. a terminal tab change). The rebuild must inherit the
+        // old window's LRU position rather than being prepended to the head.
+        let oldSet = Set(orderingEngine.orderedIDs)
+        let newSet = Set(orderedIDs)
+        var rebuildMap: [CGWindowID: CGWindowID] = [:]
+        for removedID in oldSet.subtracting(newSet) {
+            guard let oldInfo = oldWindows[removedID] else { continue }
+            if let addedID = newSet.subtracting(oldSet).first(where: { id in
+                guard let info = newWindows[id] else { return false }
+                return info.ownerPid == oldInfo.ownerPid
+                    && WindowManager.frameMatches(info.frame, oldInfo.frame, tolerance: 80)
+            }) {
+                rebuildMap[addedID] = removedID
+            }
+        }
+        if !rebuildMap.isEmpty {
+            logDebug("SYNC-DIAG: rebuild pairs detected (inheriting LRU position): "
+                     + rebuildMap.map { "\($0.value)→\($0.key)" }.joined(separator: ", "))
+        }
+        orderingEngine.sync(windowIDs: orderedIDs, rebuildMap: rebuildMap)
 
         // Populate window name lookup for LRU diagnostics
         for (id, info) in newWindows {
@@ -291,6 +360,15 @@ final class WindowManager: @unchecked Sendable {
             // reorder would be a no-op — short-circuit before processing.
             if frontID == self.orderingEngine.orderedIDs.first { return }
 
+            // Residual-swipe guard: within ~600ms after a three-finger gesture
+            // ends, the system delivers leftover scrollWheel events from that
+            // swipe (observed arriving at 410-490ms). Treat them as artifacts
+            // and never reorder — this is the primary defense; the direction
+            // guard below is secondary.
+            if ProcessInfo.processInfo.systemUptime - self.lastGestureEndAt < 0.6 {
+                return
+            }
+
             // Only vertical-dominant scroll counts as real page scrolling.
             // Horizontal-dominant scroll is a three-finger swipe artifact and
             // must not trigger windowDidInteract.
@@ -326,6 +404,13 @@ final class WindowManager: @unchecked Sendable {
             self.onInteraction?(frontID)
         }
 
+        // Cmd+` global key monitor: the only reliable trigger for same-app
+        // window switches. kAXFocusedWindowChangedNotification stops being
+        // delivered after the first switch per observer registration (Chrome)
+        // or never fires (Obsidian), so a key event drives an explicit AX
+        // re-query instead of relying on the notification.
+        registerKeyEventTap()
+
         logDebug("WindowManager: NSEvent monitors registered OK")
         return true
     }
@@ -333,6 +418,17 @@ final class WindowManager: @unchecked Sendable {
     func stopInteractionMonitoring() {
         if let m = scrollMonitor { NSEvent.removeMonitor(m); scrollMonitor = nil }
         if let m = interactionMonitor { NSEvent.removeMonitor(m); interactionMonitor = nil }
+        if let tap = keyEventTap {
+            CGEvent.tapEnable(tap: tap, enable: false)
+            if let src = keyEventTapSource {
+                CFRunLoopRemoveSource(CFRunLoopGetMain(), src, .commonModes)
+                keyEventTapSource = nil
+            }
+            keyEventTap = nil
+        }
+        cmdBacktickWorkItem?.cancel()
+        cmdBacktickWorkItem = nil
+        cmdBacktickPending = false
         axFocusObserver.stopObserving()
         activationHistory.stop()
         logDebug("WindowManager: interaction monitoring stopped")
@@ -400,6 +496,24 @@ final class WindowManager: @unchecked Sendable {
         logDebug("AXFocusChange: frontmostWindowID \(String(describing: oldID))(\(oldName)) → \(matchedID)(\(newName))")
     }
 
+    /// Event-driven re-query of the AX focused window, driven by a Cmd+` key
+    /// event. Same-app window switches are invisible to app-activation and to
+    /// the scroll/click monitors (frontmostWindowID goes stale), and AX
+    /// notifications are unreliable (Chrome fires once per observer
+    /// registration, Obsidian never), so the key event triggers an explicit
+    /// query. Retries once when the switch has not yet reached AX.
+    func recheckFocusedWindow(pid: pid_t) {
+        guard pid != NSRunningApplication.current.processIdentifier else { return }
+        logDebug("KEYMON: Cmd+` → recheckFocusedWindow pid=\(pid)")
+        let before = frontmostWindowID
+        handleAXFocusChange(pid: pid)
+        if frontmostWindowID == before {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
+                self?.handleAXFocusChange(pid: pid)
+            }
+        }
+    }
+
     /// Returns the topmost on-screen window of an app from a fresh snapshot.
     private func frontmostWindow(for pid: pid_t) -> CGWindowID? {
         let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
@@ -452,4 +566,219 @@ final class WindowManager: @unchecked Sendable {
             frame: frame
         )
     }
+
+    // MARK: - Sync change diagnostics
+
+    /// Records WHY windows were removed/added by sync. The on-screen snapshot
+    /// (.optionOnScreenOnly) drops windows that are minimized, on another
+    /// Space, occluded, or off-screen — sync then sees a spurious
+    /// "removed 1 + added 1" and prepends the reappearing window to the LRU
+    /// head. This logs each removed/added window with its inferred cause so the
+    /// root cause can be confirmed instead of guessed.
+    private func logSyncChangeDiagnostics(oldIDs: [CGWindowID], newIDs: [CGWindowID],
+                                          oldWindows: [CGWindowID: WindowInfo],
+                                          newWindows: [CGWindowID: WindowInfo],
+                                          newOrder: [CGWindowID]) {
+        let oldSet = Set(oldIDs)
+        let newSet = Set(newIDs)
+        let removed = oldSet.subtracting(newSet)
+        let added = newSet.subtracting(oldSet)
+        if removed.isEmpty && added.isEmpty && oldIDs == newIDs {
+            knownWindowIDs.formUnion(newSet)
+            return
+        }
+
+        // Fetch the FULL window list (no on-screen filter) once, to determine
+        // why removed windows dropped out. Only runs when a change is detected.
+        let fullList = (CGWindowListCopyWindowInfo([.excludeDesktopElements], kCGNullWindowID)
+                        as? [[String: Any]]) ?? []
+        var fullByID: [CGWindowID: [String: Any]] = [:]
+        for dict in fullList {
+            if let num = dict[kCGWindowNumber as String] as? Int {
+                fullByID[CGWindowID(num)] = dict
+            }
+        }
+
+        logDebug("SYNC-DIAG: === change: removed=\(removed.count) added=\(added.count) orderChanged=\(oldIDs != newIDs) ===")
+
+        for id in removed.sorted() {
+            let old = oldWindows[id]
+            let name = old?.ownerName ?? orderingEngine.windowNames[id] ?? "?"
+            let title = old?.windowTitle ?? "?"
+            let cause = removedCause(for: id, dict: fullByID[id], oldInfo: old,
+                                     newWindows: newWindows, added: added)
+            logDebug("SYNC-DIAG:   REMOVED id=\(id) name=\(name) title=\"\(title)\" cause=\(cause)")
+        }
+
+        for id in added.sorted() {
+            let info = newWindows[id]
+            let name = info?.ownerName ?? "?"
+            let title = info?.windowTitle ?? "?"
+            let everSeen = knownWindowIDs.contains(id)
+            let isFront = newOrder.first == id
+            let category: String
+            if everSeen {
+                category = "re-detection (id seen before → off-screen drop/reappear, NOT new)"
+            } else if isFront {
+                category = "genuinely new frontmost window"
+            } else {
+                category = "genuinely new non-frontmost window"
+            }
+            logDebug("SYNC-DIAG:   ADDED id=\(id) name=\(name) title=\"\(title)\" everSeen=\(everSeen) isFront=\(isFront) → \(category)")
+        }
+
+        let orderStr = newOrder.enumerated().map { idx, id in
+            let nm = newWindows[id]?.ownerName ?? orderingEngine.windowNames[id] ?? "?"
+            return "[\(idx)]\(nm)"
+        }.joined(separator: " → ")
+        logDebug("SYNC-DIAG:   new order: \(orderStr)")
+
+        knownWindowIDs.formUnion(newSet)
+    }
+
+    /// Infers why a removed window left the on-screen snapshot, using the full
+    /// (unfiltered) window list as ground truth.
+    private func removedCause(for id: CGWindowID, dict: [String: Any]?, oldInfo: WindowInfo?,
+                              newWindows: [CGWindowID: WindowInfo], added: Set<CGWindowID>) -> String {
+        guard let dict = dict else {
+            // Not in the full list at all → closed, or rebuilt under a new ID.
+            // A rebuild produces a matching ADDED window (same app, same frame).
+            let rebuilt = added.contains { addedID in
+                guard let info = newWindows[addedID], let old = oldInfo else { return false }
+                return info.ownerPid == old.ownerPid
+                    && WindowManager.frameMatches(info.frame, old.frame, tolerance: 80)
+            }
+            return rebuilt
+                ? "NOT in full list → likely REBUILT under new ID (same-app same-frame in added)"
+                : "NOT in full list → window CLOSED"
+        }
+
+        if let raw = dict[kCGWindowIsOnscreen as String] {
+            let onscreen = (raw as? Bool) ?? ((raw as? NSNumber)?.boolValue ?? true)
+            if !onscreen {
+                return "in full list but offscreen → MINIMIZED / occluded / other Space"
+            }
+        }
+        if let layer = dict[kCGWindowLayer as String] as? Int, layer != 0 {
+            return "in full list, onscreen, layer=\(layer)≠0 → non-normal window layer"
+        }
+        if let pid = dict[kCGWindowOwnerPID as String] as? pid_t,
+           pid == ProcessInfo.processInfo.processIdentifier {
+            return "in full list, onscreen, layer=0, ownerPID==self → own window"
+        }
+        if let pid = dict[kCGWindowOwnerPID as String] as? pid_t,
+           let bid = NSRunningApplication(processIdentifier: pid)?.bundleIdentifier,
+           Constants.excludedAppBundleIDs.contains(bid) {
+            return "in full list, onscreen, layer=0, excluded bundleID=\(bid)"
+        }
+        if let bounds = dict[kCGWindowBounds as String] as? [String: Any],
+           let w = bounds["Width"] as? CGFloat, let h = bounds["Height"] as? CGFloat,
+           w < 100 || h < 100 {
+            return "in full list, onscreen, layer=0, size \(w)×\(h)<100 → size filter"
+        }
+        return "in full list, onscreen, layer=0, normal → parseWindow should accept, VOLATILE snapshot / unknown"
+    }
+
+    /// Registers the Cmd+` event tap, trying the session location first and
+    /// the annotated session location as a fallback. Retries a few times after
+    /// a short delay — at app launch CGEvent.tapCreate can transiently return
+    /// nil even when AXIsProcessTrusted() is already true.
+    private func registerKeyEventTap() {
+        guard keyEventTap == nil else { return }
+        let listenAccess = CGPreflightListenEventAccess()
+        logDebug("WindowManager: Input Monitoring preflight listenAccess=\(listenAccess)")
+        let keyMask = CGEventMask((1 << CGEventType.keyDown.rawValue)
+                                | (1 << CGEventType.keyUp.rawValue))
+        let userInfo = Unmanaged.passUnretained(self).toOpaque()
+        let locations: [(CGEventTapLocation, String)] = [
+            (.cgSessionEventTap, "session"),
+            (.cgAnnotatedSessionEventTap, "annotated"),
+        ]
+        for (location, name) in locations {
+            if let tap = CGEvent.tapCreate(
+                tap: location,
+                place: .headInsertEventTap,
+                options: .listenOnly,
+                eventsOfInterest: keyMask,
+                callback: windowManagerKeyTapCallback,
+                userInfo: userInfo
+            ) {
+                keyEventTap = tap
+                let src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+                keyEventTapSource = src
+                CFRunLoopAddSource(CFRunLoopGetMain(), src, .commonModes)
+                CGEvent.tapEnable(tap: tap, enable: true)
+                logDebug("WindowManager: Cmd+` CGEventTap registered (loc=\(name), retry=\(keyEventTapRetries)), trusted=\(AXIsProcessTrusted()) listenAccess=\(listenAccess)")
+                return
+            }
+        }
+        logDebug("WindowManager: Cmd+` CGEventTap FAILED (loc=session+annotated, retry=\(keyEventTapRetries)), trusted=\(AXIsProcessTrusted()) listenAccess=\(listenAccess)")
+        keyEventTapRetries += 1
+        guard keyEventTapRetries <= keyEventTapMaxRetries else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.registerKeyEventTap()
+        }
+    }
+
+    /// Event tap callback handler: tracks Cmd+` presses to drive a delayed AX
+    /// focus re-check after the window cycle settles. Runs on the main thread.
+    /// `fileprivate` so the file-scoped C callback can invoke it.
+    fileprivate func handleKeyEvent(type: CGEventType, event: CGEvent) {
+        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+        // Diagnostic: confirm the tap actually receives key events (the old
+        // NSEvent global monitor received none — KEYMON never fired).
+        keyEventCount += 1
+        if keyEventCount <= 3 || keyEventCount % 100 == 0 {
+            logDebug("KEYTAP: received \(keyEventCount) key events (keyCode=\(keyCode))")
+        }
+
+        let isBacktick = keyCode == 50
+        if isBacktick {
+            logDebug("KEYTAP: backtick \(type == .keyDown ? "down" : "up") flags=\(event.flags.rawValue)")
+        }
+
+        if type == .keyDown && isBacktick && event.flags.contains(.maskCommand) {
+            // Cmd+` pressed: mark pending and debounce the auto-repeat so the
+            // final window (after the cycle settles) is queried.
+            cmdBacktickPending = true
+            cmdBacktickWorkItem?.cancel()
+            let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier
+            let item = DispatchWorkItem { [weak self] in
+                guard let self else { return }
+                self.cmdBacktickPending = false
+                guard let pid else { return }
+                self.recheckFocusedWindow(pid: pid)
+            }
+            cmdBacktickWorkItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: item)
+        } else if type == .keyUp && isBacktick && cmdBacktickPending {
+            // Key released → the window cycle has settled; query now.
+            cmdBacktickPending = false
+            cmdBacktickWorkItem?.cancel()
+            cmdBacktickWorkItem = nil
+            let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier
+            guard let pid else { return }
+            recheckFocusedWindow(pid: pid)
+        }
+    }
+}
+
+/// C bridge for the Cmd+` event tap. The tap source is added to the main
+/// CFRunLoop, so this runs on the main thread and can touch instance state.
+private func windowManagerKeyTapCallback(
+    _ proxy: CGEventTapProxy,
+    _ type: CGEventType,
+    _ event: CGEvent,
+    _ refcon: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    guard let refcon else { return Unmanaged.passUnretained(event) }
+    let mgr = Unmanaged<WindowManager>.fromOpaque(refcon).takeUnretainedValue()
+    if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+        if let tap = mgr.keyEventTap {
+            CGEvent.tapEnable(tap: tap, enable: true)
+        }
+        return Unmanaged.passUnretained(event)
+    }
+    mgr.handleKeyEvent(type: type, event: event)
+    return Unmanaged.passUnretained(event)
 }
