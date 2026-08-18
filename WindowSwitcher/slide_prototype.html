@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三指横滑滑动过渡 · 三窗口原型</title>
+<style>
+  :root {
+    --ratio: 0.65;
+    --threshold: 0.45;
+    --win-size: 1.0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #1c1c1e; color: #f5f5f7;
+    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+  }
+  .panel {
+    background: #2c2c2e; border-radius: 16px; padding: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+  /* Screen */
+  .screen {
+    position: relative;
+    width: 520px; height: 320px;
+    background: #0a0a0c;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #3a3a3c;
+    user-select: none; touch-action: none; cursor: grab;
+  }
+  .screen.dragging { cursor: grabbing; }
+  .win {
+    position: absolute;
+    top: 24px; height: 240px;
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 15px; letter-spacing: .5px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.5);
+    will-change: transform;
+    z-index: 2;
+  }
+  .win .num { font-size: 44px; font-weight: 700; line-height: 1; opacity: .92; }
+  .win .name { margin-top: 6px; font-size: 14px; font-weight: 600; }
+  .win .tag {
+    position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
+    font-size: 11px; font-weight: 400; opacity: .85;
+  }
+  .win.left   { background: linear-gradient(135deg,#30d158,#248a3d); }   /* 窗口1 */
+  .win.source { background: linear-gradient(135deg,#5ac8fa,#0a84ff); }   /* 窗口2（初始源） */
+  .win.right  { background: linear-gradient(135deg,#ff9f0a,#d67600); }   /* 窗口3 */
+  .win.active { z-index: 3; box-shadow: 0 0 0 2px rgba(255,255,255,.35), 0 4px 18px rgba(0,0,0,.5); }
+  .win.target { z-index: 4; box-shadow: 0 0 0 3px rgba(255,214,10,.85), 0 4px 18px rgba(0,0,0,.5); }
+  .win.dim    { opacity: .35; filter: saturate(.6); }
+  /* Drag handle = home indicator */
+  .handle {
+    position: absolute; bottom: 10px; left: 50%;
+    width: 110px; height: 5px; border-radius: 3px;
+    background: rgba(255,255,255,.55);
+    transform: translateX(-50%);
+    z-index: 5;
+  }
+  .trackpad {
+    position: absolute; bottom: 26px; left: 0; right: 0; height: 26px;
+    background: rgba(255,255,255,.05); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: rgba(255,255,255,.4); z-index: 4;
+  }
+  .readout {
+    position: absolute; top: 8px; left: 10px; z-index: 6;
+    font: 12px/1.6 "SF Mono", Menlo, monospace;
+    color: rgba(255,255,255,.85);
+    background: rgba(0,0,0,.45); padding: 6px 10px; border-radius: 8px;
+    max-width: 340px;
+  }
+  .readout b { color: #ffd60a; }
+  .readout .commit { color: #30d158; }
+  .readout .rebound { color: #ff453a; }
+  .readout .flow { color: #64d2ff; }
+  /* Controls */
+  .controls { width: 520px; }
+  .controls h2 { margin: 0 0 6px; font-size: 16px; }
+  .sub { margin: 0 0 14px; font-size: 12px; color: #8e8e93; line-height: 1.7; }
+  .row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .row label { width: 96px; font-size: 13px; color: #aeaeb2; flex: none; }
+  .row output { width: 64px; text-align: right; font-size: 13px; color: #ffd60a; font-variant-numeric: tabular-nums; }
+  input[type=range] { flex: 1; accent-color: #0a84ff; }
+  .seg { display: flex; gap: 8px; }
+  .seg button {
+    flex: 1; padding: 7px 0; border: 1px solid #48484a; border-radius: 8px;
+    background: #3a3a3c; color: #f5f5f7; font-size: 13px; cursor: pointer;
+  }
+  .seg button.active { background: #0a84ff; border-color: #0a84ff; }
+  .demo-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .demo-row button {
+    padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer;
+    background: #48484a; color: #f5f5f7; font-size: 13px;
+  }
+  .demo-row button:hover { background: #5a5a5c; }
+  .legend { margin-top: 14px; font-size: 12px; color: #8e8e93; line-height: 1.8; }
+  .legend b { color: #d2d2d6; }
+  .legend .w1 { color: #30d158; font-weight: 700; }
+  .legend .w2 { color: #5ac8fa; font-weight: 700; }
+  .legend .w3 { color: #ff9f0a; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <div class="screen" id="screen">
+    <div class="readout" id="readout">窗口 2 为当前窗口 · 拖动触控条体验</div>
+    <div class="win left"  id="w1"><span class="num">1</span><span class="name">窗口 1</span><span class="tag">左邻</span></div>
+    <div class="win source" id="w2"><span class="num">2</span><span class="name">窗口 2</span><span class="tag">当前窗口</span></div>
+    <div class="win right" id="w3"><span class="num">3</span><span class="name">窗口 3</span><span class="tag">右邻</span></div>
+    <div class="trackpad">← 在这里三指左右滑动 →</div>
+    <div class="handle"></div>
+  </div>
+</div>
+
+<div class="controls panel">
+  <h2>交互参数（拖拽可调，边调边试）</h2>
+  <p class="sub">三个窗口编号 1、2、3。<span class="w2">窗口 2</span> 为当前窗口：三指<b>右滑</b> → 窗口 2 向右滑出、<span class="w1">窗口 1</span> 从左侧滑入；三指<b>左滑</b> → 窗口 2 向左滑出、<span class="w3">窗口 3</span> 从右侧滑入；中途反转则逆转。切换成功后当前窗口轮换。</p>
+
+  <div class="row">
+    <label>跟手比例</label>
+    <input type="range" id="ratioSlider" min="0.25" max="3.0" step="0.05" value="0.65">
+    <output id="ratioOut">0.65</output>
+  </div>
+  <div class="row">
+    <label>提交阈值</label>
+    <input type="range" id="threshSlider" min="0.20" max="0.80" step="0.01" value="0.45">
+    <output id="threshOut">0.45</output>
+  </div>
+  <div class="row">
+    <label>窗口尺寸</label>
+    <div class="seg" id="sizeSeg">
+      <button data-size="1.0" class="active">全屏</button>
+      <button data-size="0.55">半屏</button>
+      <button data-size="0.30">小窗</button>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:14px">
+    <label>自动演示</label>
+    <div class="demo-row">
+      <button onclick="demo('commitRight')">右滑提交</button>
+      <button onclick="demo('rebound')">小幅回弹</button>
+      <button onclick="demo('reverse')">右滑→左滑逆转</button>
+      <button onclick="demo('undo')">过阈值又拉回</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>交互规则（对齐 iOS Home Indicator 规范）：</b><br>
+    · <b>三窗口角色</b>：中间为<b>当前窗口</b>，两侧为 LRU 相邻窗口——右滑目标 = 左邻，左滑目标 = 右邻；<br>
+    · <b>跟手</b>：三窗口以「跟手比例」整体跟随手指平移，反向即逆转（Interruptible / Redirectable）；<br>
+    · <b>判定</b>：释放时按最终位移——<code>｜offset｜ ≥ 提交阈值×屏宽</code> → 切换；否则回弹保持原窗口；<br>
+    · <b>提交</b>：当前窗口滑满出屏、目标窗口滑入居中，切换后目标成为新当前窗口（可连续切换）；<br>
+    · <b>复现问题</b>：把「跟手比例」拉到 3.0，即可复现当前实现的“窗口飞太快”问题。
+  </div>
+</div>
+
+<script>
+const screenEl = document.getElementById('screen');
+const w1 = document.getElementById('w1');
+const w2 = document.getElementById('w2');
+const w3 = document.getElementById('w3');
+const wins = [w1, w2, w3];
+const readout = document.getElementById('readout');
+
+const ratioSlider = document.getElementById('ratioSlider');
+const ratioOut = document.getElementById('ratioOut');
+const threshSlider = document.getElementById('threshSlider');
+const threshOut = document.getElementById('threshOut');
+
+let W = 0;
+let H = 0;
+let ratio = parseFloat(ratioSlider.value);
+let threshold = parseFloat(threshSlider.value);
+let winSize = 1.0;
+
+let current = 1;          // 当前窗口索引：0→窗口1, 1→窗口2, 2→窗口3
+let offset = 0;           // 当前位移（px，向右为正）
+let dragStartX = null;
+let animating = false;
+
+// ---------- 布局 ----------
+function layout() {
+  W = screenEl.clientWidth;
+  H = screenEl.clientHeight;
+  const winW = W * winSize;
+  const winH = Math.min(240, H * (0.60 + 0.20 * winSize));
+  const baseX = (W - winW) / 2;
+  const topY = (H - winH) / 2;
+  wins.forEach(el => {
+    el.style.width = winW + 'px';
+    el.style.height = winH + 'px';
+    el.style.top = topY + 'px';
+  });
+  // 按当前窗口排位：当前居中，左邻屏外左，右邻屏外右
+  const leftN = (current + 2) % 3;
+  const rightN = (current + 1) % 3;
+  wins[current].dataset.baseX = baseX;
+  wins[leftN].dataset.baseX = baseX - W;
+  wins[rightN].dataset.baseX = baseX + W;
+  updateBadges();
+  render(0);
+}
+
+// 三窗统一平移：各自 baseX + offset
+function render(off) {
+  wins.forEach(el => {
+    el.style.transform = 'translateX(' + (parseFloat(el.dataset.baseX) + off) + 'px)';
+  });
+}
+
+// 更新三窗口的角色标签与当前态
+function updateBadges() {
+  wins.forEach((el, i) => {
+    el.classList.toggle('active', i === current);
+    const tag = el.querySelector('.tag');
+    if (i === current) tag.textContent = '当前窗口';
+    else if (i === (current + 2) % 3) tag.textContent = '左邻 · 右滑滑入';
+    else tag.textContent = '右邻 · 左滑滑入';
+  });
+}
+
+// 拖动过程中高亮目标、淡化远端窗口
+function highlightTarget(off) {
+  wins.forEach(el => { el.classList.remove('target'); el.classList.remove('dim'); });
+  if (off > 0) {
+    wins[(current + 2) % 3].classList.add('target');
+    wins[(current + 1) % 3].classList.add('dim');
+  } else if (off < 0) {
+    wins[(current + 1) % 3].classList.add('target');
+    wins[(current + 2) % 3].classList.add('dim');
+  }
+}
+function clearHighlight() {
+  wins.forEach(el => { el.classList.remove('target'); el.classList.remove('dim'); });
+}
+
+// 决定哪个窗口居中（模拟实际“判据仅释放时做一次”）
+function currentDecision() {
+  const frac = Math.abs(offset) / W;
+  const dir = offset >= 0 ? '右' : '左';
+  if (frac >= threshold) return { commit: true, dir };
+  return { commit: false, dir };
+}
+
+function updateReadout(dragPx, off, note) {
+  const frac = Math.abs(off) / W;
+  const dec = currentDecision();
+  const cur = current + 1;
+  let flow;
+  if (off > 0) flow = '窗口' + cur + ' <span class="flow">右滑出</span> · 窗口' + ((current + 2) % 3 + 1) + ' <span class="flow">左滑入</span>';
+  else if (off < 0) flow = '窗口' + cur + ' <span class="flow">左滑出</span> · 窗口' + ((current + 1) % 3 + 1) + ' <span class="flow">右滑入</span>';
+  else flow = '窗口' + cur + ' 居中';
+  const parts = [
+    '位移 <b>' + Math.round(off) + 'px</b>（' + frac.toFixed(2) + '×屏宽）',
+    flow
+  ];
+  if (note) parts.push(note);
+  let verdict = '';
+  if (dec.commit) {
+    const target = off >= 0 ? ((current + 2) % 3 + 1) : ((current + 1) % 3 + 1);
+    verdict = ' → 释放将<span class="commit">切换至 窗口' + target + '</span>';
+  } else {
+    verdict = ' → 释放将<span class="rebound">回弹保持窗口 ' + cur + '</span>';
+  }
+  readout.innerHTML = parts.join('　') + verdict;
+}
+
+// ---------- 拖动 ----------
+function setDrag(e) {
+  const r = screenEl.getBoundingClientRect();
+  return e.clientX - r.left;
+}
+
+function onDown(e) {
+  if (animating) return;
+  dragStartX = setDrag(e);
+  screenEl.classList.add('dragging');
+  screenEl.setPointerCapture(e.pointerId);
+  disableTransitions();
+  e.preventDefault();
+}
+function onMove(e) {
+  if (dragStartX === null) return;
+  const x = setDrag(e);
+  const dragPx = x - dragStartX;
+  offset = dragPx * ratio;
+  render(offset);
+  highlightTarget(offset);
+  updateReadout(dragPx, offset, '拖动中…');
+}
+function onUp(e) {
+  if (dragStartX === null) return;
+  dragStartX = null;
+  screenEl.classList.remove('dragging');
+  settle();
+}
+
+// ---------- 释放判定 + 弹簧动画 ----------
+function settle() {
+  clearHighlight();
+  const dec = currentDecision();
+  enableTransitions();
+  animating = true;
+  if (dec.commit) {
+    settleCommit(offset >= 0 ? 1 : -1);
+  } else {
+    settleRebound();
+  }
+}
+
+// 提交：当前窗口滑满出屏，目标窗口滑入居中 → 目标成为新当前窗口
+function settleCommit(dir) {
+  const targetOff = dir * W;
+  render(targetOff);
+  const targetWin = dir > 0 ? ((current + 2) % 3 + 1) : ((current + 1) % 3 + 1);
+  updateReadout(null, offset, '释放：<span class="commit">提交 · 窗口' + targetWin + ' 滑入</span>');
+  setTimeout(() => {
+    current = dir > 0 ? (current + 2) % 3 : (current + 1) % 3;
+    offset = 0;
+    disableTransitions();
+    layout();
+    enableTransitions();
+    animating = false;
+    updateReadout(null, 0, '已切换：当前窗口 → 窗口 ' + (current + 1));
+  }, 420);
+}
+
+// 回弹：全部滑回原位，保持原窗口
+function settleRebound() {
+  render(0);
+  updateReadout(null, 0, '释放：<span class="rebound">回弹 · 未达阈值，保持窗口 ' + (current + 1) + '</span>');
+  setTimeout(() => { offset = 0; animating = false; }, 460);
+}
+
+// ---------- 过渡开关 ----------
+function enableTransitions() {
+  wins.forEach(el => el.style.transition = 'transform .38s cubic-bezier(.2,.8,.3,1.15), opacity .25s ease, filter .25s ease');
+}
+function disableTransitions() {
+  wins.forEach(el => el.style.transition = 'none');
+}
+
+// ---------- 自动演示 ----------
+let demoRun = false;
+function demo(type) {
+  if (demoRun) return;
+  demoRun = true; animating = true;
+  disableTransitions();
+  clearHighlight();
+  render(0);
+  const steps = {
+    commitRight: [ [0.75, 900], ['commit', 300] ],
+    rebound:     [ [0.30, 700], ['rebound', 300] ],
+    reverse:     [ [0.70, 600], [-0.65, 500], ['commit', 300] ],
+    undo:        [ [0.70, 600], [0.20, 500], ['rebound', 300] ],
+  };
+  playStep(steps[type], 0);
+}
+function playStep(seq, i) {
+  if (i >= seq.length) { demoRun = false; animating = false; return; }
+  const step = seq[i];
+  if (Array.isArray(step)) {
+    const frac = step[0], ms = step[1];
+    offset = frac * W;
+    render(offset);
+    highlightTarget(offset);
+    updateReadout(null, offset, '演示拖动…');
+    setTimeout(() => playStep(seq, i + 1), ms);
+  } else if (step === 'commit') {
+    enableTransitions();
+    clearHighlight();
+    settleCommit(offset >= 0 ? 1 : -1);
+    setTimeout(() => playStep(seq, i + 1), 470);
+  } else { // rebound
+    enableTransitions();
+    clearHighlight();
+    settleRebound();
+    setTimeout(() => playStep(seq, i + 1), 500);
+  }
+}
+
+// ---------- 事件绑定 ----------
+screenEl.addEventListener('pointerdown', onDown);
+screenEl.addEventListener('pointermove', onMove);
+screenEl.addEventListener('pointerup', onUp);
+screenEl.addEventListener('pointercancel', onUp);
+
+ratioSlider.addEventListener('input', () => {
+  ratio = parseFloat(ratioSlider.value);
+  ratioOut.textContent = ratio.toFixed(2);
+});
+threshSlider.addEventListener('input', () => {
+  threshold = parseFloat(threshSlider.value);
+  threshOut.textContent = threshold.toFixed(2);
+});
+document.getElementById('sizeSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  winSize = parseFloat(b.dataset.size);
+  document.querySelectorAll('#sizeSeg button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  layout();
+});
+
+window.addEventListener('resize', layout);
+layout();
+updateReadout(0, 0, '就绪');
+</script>
+</body>
+</html>

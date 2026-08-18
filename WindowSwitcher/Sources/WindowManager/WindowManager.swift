@@ -57,6 +57,17 @@ final class WindowManager: @unchecked Sendable {
     private var scrollDidTriggerReorder = false
     private var lastScrollReorderTime: TimeInterval = 0
 
+    /// 延迟滚动重排状态：三指横滑自身的 scrollWheel 可能先于 C 引擎确认三指
+    /// 跟踪到达（事件二竞态）。滚动守卫通过后先挂起 ~250ms，若期间滑动会话
+    /// 开始 / 跟踪确认，延迟任务触发时取消，避免滑动自身污染 LRU。
+    private var pendingScrollReorderWorkItem: DispatchWorkItem?
+    private var pendingScrollReorderFrontID: CGWindowID?
+
+    /// 最近一次滑动会话开始时刻（systemUptime）。延迟重排触发时若在 ~500ms 内
+    /// 有会话开始（即便已快速结束、gesturePhase 已回落），判定该 scroll 为滑动
+    /// 产物，取消重排。
+    var lastSlideSessionStartAt: TimeInterval = 0
+
     /// Timestamp (systemUptime) of the last three-finger gesture end. Residual
     /// scrollWheel events arrive ~200-400ms after a three-finger swipe; the
     /// scroll monitor ignores them for a short immunity window.
@@ -225,6 +236,51 @@ final class WindowManager: @unchecked Sendable {
         return orderedIDs.compactMap { newWindows[$0] }
     }
 
+    /// BGFLASH 诊断专用：只读快照当前屏上窗口（CGWindowList 前→后顺序），
+    /// 复用 parseWindow 的过滤（排除自身 pid、排除 bundle、w/h≥100）。
+    /// 不触碰 LRU/ordering、不触发任何同步，**禁止**在滑动会话期间调用
+    /// refreshWindows（会重排 LRU），用本函数取桌面快照。
+    func snapshotDesktopWindows() -> [(id: CGWindowID, name: String, frame: CGRect)] {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
+                as? [[String: Any]] else {
+            return []
+        }
+        var result: [(id: CGWindowID, name: String, frame: CGRect)] = []
+        for dict in list {
+            guard let info = parseWindow(dict) else { continue }
+            result.append((info.id, info.ownerName, info.frame))
+        }
+        return result
+    }
+
+    /// 2.3 遮挡计算：目标窗口上方（z 序在前）且与目标 frame 相交的普通窗口。
+    /// 过滤 layer==0、alpha>0.5（parseWindow 已排除自身 pid/排除 bundle/w<h<100）。
+    /// 返回前→后顺序，供滑动过渡判定「目标被完全覆盖（buried）或部分可见（reveal）」。
+    /// 只读，不触碰 LRU/ordering，禁止在滑动会话期间用于任何重排。
+    func occluders(aboveTarget targetID: CGWindowID, frame: CGRect)
+        -> [(id: CGWindowID, name: String, frame: CGRect)] {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
+                as? [[String: Any]] else {
+            return []
+        }
+        var result: [(id: CGWindowID, name: String, frame: CGRect)] = []
+        var passedTarget = false
+        for dict in list {
+            guard let info = parseWindow(dict) else { continue }
+            if info.id == targetID { passedTarget = true; continue }
+            if passedTarget { break }  // 目标之后的窗口不再遮挡它
+            guard let layer = dict[kCGWindowLayer as String] as? Int, layer == 0,
+                  let alpha = dict[kCGWindowAlpha as String] as? Double, alpha > 0.5
+            else { continue }
+            if info.frame.intersects(frame) {
+                result.append((info.id, info.ownerName, info.frame))
+            }
+        }
+        return result
+    }
+
     func activateWindow(_ windowID: CGWindowID) {
         isActivating = true
         defer { isActivating = false }
@@ -385,11 +441,10 @@ final class WindowManager: @unchecked Sendable {
                 self.scrollDidTriggerReorder = false
             }
 
-            self.scrollDidTriggerReorder = true
-            self.lastScrollReorderTime = now
-            logDebug("SCROLL-MON: → windowDidInteract(\(frontID)) name=\(self.orderingEngine.windowNames[frontID] ?? "?")")
-            self.orderingEngine.windowDidInteract(frontID)
-            self.onInteraction?(frontID)
+            // 延迟提交重排：三指横滑自身的 scrollWheel 可能先于 C 引擎确认跟踪
+            // 到达（事件二竞态）。守卫通过后挂起 ~250ms，延迟任务触发时若检测到
+            // 滑动已开始 / 跟踪确认 / 前窗已变化，则取消，避免滑动自身污染 LRU。
+            self.schedulePendingScrollReorder(frontID: frontID)
         }
 
         // Interaction monitor: clicks on windows trigger reorder. Gated the same
@@ -414,6 +469,56 @@ final class WindowManager: @unchecked Sendable {
 
         logDebug("WindowManager: NSEvent monitors registered OK")
         return true
+    }
+
+    /// 挂起滚动触发的 LRU 重排（延迟 ~250ms）。触发时若检测到三指手势已开始 /
+    /// 跟踪确认 / 前窗已变化 / 仍处手势残流免疫窗，则判定该 scroll 为滑动产物，
+    /// 取消重排，避免滑动自身污染 LRU。
+    private func schedulePendingScrollReorder(frontID: CGWindowID) {
+        guard pendingScrollReorderWorkItem == nil else { return }  // 已有待处理，防重复
+        let item = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.pendingScrollReorderWorkItem = nil
+            let scheduledID = self.pendingScrollReorderFrontID
+            self.pendingScrollReorderFrontID = nil
+
+            // 滑动自身 scroll：C 引擎已确认跟踪 / Swift 手势阶段拦截 / 最近 500ms
+            // 内有会话开始（即便已快速结束、phase 已回落）→ 一律取消。
+            if gesture_engine_is_tracking()
+                || self.gesturePhase.interceptsScroll
+                || ProcessInfo.processInfo.systemUptime - self.lastSlideSessionStartAt < 0.5 {
+                return
+            }
+            // 前窗已变化（被点击/滑动接管）→ 原重排已过时；MRU 门短路亦跳过。
+            guard let scheduledID, scheduledID == self.frontmostWindowID,
+                  !self.isActivating,
+                  scheduledID != self.orderingEngine.orderedIDs.first else { return }
+            // 手势残流免疫窗内同样不重排。
+            if ProcessInfo.processInfo.systemUptime - self.lastGestureEndAt < 0.6 { return }
+
+            let fireNow = ProcessInfo.processInfo.systemUptime
+            self.scrollDidTriggerReorder = true
+            self.lastScrollReorderTime = fireNow
+            logDebug("SCROLL-MON: → windowDidInteract(\(scheduledID)) name=\(self.orderingEngine.windowNames[scheduledID] ?? "?")")
+            self.orderingEngine.windowDidInteract(scheduledID)
+            self.onInteraction?(scheduledID)
+        }
+        pendingScrollReorderWorkItem = item
+        pendingScrollReorderFrontID = frontID
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: item)
+    }
+
+    /// 取消待处理的滚动重排（滑动会话开始时调用）。
+    func cancelPendingScrollReorder() {
+        pendingScrollReorderWorkItem?.cancel()
+        pendingScrollReorderWorkItem = nil
+        pendingScrollReorderFrontID = nil
+    }
+
+    /// 记录滑动会话开始时刻并取消待处理滚动重排（AppDelegate 会话开启时调用）。
+    func noteSlideSessionBegan() {
+        lastSlideSessionStartAt = ProcessInfo.processInfo.systemUptime
+        cancelPendingScrollReorder()
     }
 
     func stopInteractionMonitoring() {

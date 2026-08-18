@@ -134,6 +134,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var threeFingerSwipeUpToggleView: MenuItemView?
     private weak var centerFocusToggleView: MenuItemView?
     private weak var centerSnapToggleView: MenuItemView?
+    private weak var slidingTransitionToggleView: MenuItemView?
+    private weak var slidingRatioLabelView: MenuItemView?
+    private weak var slidingThreshLabelView: MenuItemView?
 
     private let menu: NSMenu = {
         let m = NSMenu()
@@ -244,6 +247,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         // Activation submenu
         buildActivationSubmenu()
+
+        // Quick-switch behavior submenu
+        buildQuickSwitchSubmenu()
 
         menu.addItem(.separator())
 
@@ -369,6 +375,70 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         sub.addItem(centerSnap)
 
         let parentItem = NSMenuItem(title: "预览模式设置", action: nil, keyEquivalent: "")
+        parentItem.submenu = sub
+        parentItem.image = menuIndentImage()
+        menu.addItem(parentItem)
+    }
+
+    private func buildQuickSwitchSubmenu() {
+        let sub = NSMenu()
+        sub.autoenablesItems = false
+
+        let slidingToggle = makeToggleItem(title: "滑动过渡切换（跟随手指）",
+                                           isOn: AppSettings.shared.slidingTransitionEnabled) {
+            AppSettings.shared.slidingTransitionEnabled.toggle()
+            self.slidingTransitionToggleView?.isOn = AppSettings.shared.slidingTransitionEnabled
+        }
+        slidingTransitionToggleView = menuItemView(from: slidingToggle)
+        sub.addItem(slidingToggle)
+
+        sub.addItem(.separator())
+
+        let ratio = AppSettings.shared.slidingRatio
+        let ratioLabel = makeLabelItem(title: "跟手比例 \(String(format: "%.2f", ratio))")
+        slidingRatioLabelView = menuItemView(from: ratioLabel)
+        sub.addItem(ratioLabel)
+
+        let ratioDec = makeActionItem(title: "减小跟手比例 (−0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = max(0.25, AppSettings.shared.slidingRatio - 0.05)
+            AppSettings.shared.slidingRatio = v
+            self.slidingRatioLabelView?.title = "跟手比例 \(String(format: "%.2f", v))"
+        }
+        sub.addItem(ratioDec)
+
+        let ratioInc = makeActionItem(title: "增大跟手比例 (+0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = min(3.0, AppSettings.shared.slidingRatio + 0.05)
+            AppSettings.shared.slidingRatio = v
+            self.slidingRatioLabelView?.title = "跟手比例 \(String(format: "%.2f", v))"
+        }
+        sub.addItem(ratioInc)
+
+        sub.addItem(.separator())
+
+        let thresh = AppSettings.shared.slidingCommitThreshold
+        let threshLabel = makeLabelItem(title: "提交阈值 \(String(format: "%.2f", thresh))")
+        slidingThreshLabelView = menuItemView(from: threshLabel)
+        sub.addItem(threshLabel)
+
+        let threshDec = makeActionItem(title: "减小提交阈值 (−0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = max(0.20, AppSettings.shared.slidingCommitThreshold - 0.05)
+            AppSettings.shared.slidingCommitThreshold = v
+            self.slidingThreshLabelView?.title = "提交阈值 \(String(format: "%.2f", v))"
+        }
+        sub.addItem(threshDec)
+
+        let threshInc = makeActionItem(title: "增大提交阈值 (+0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = min(0.80, AppSettings.shared.slidingCommitThreshold + 0.05)
+            AppSettings.shared.slidingCommitThreshold = v
+            self.slidingThreshLabelView?.title = "提交阈值 \(String(format: "%.2f", v))"
+        }
+        sub.addItem(threshInc)
+
+        let parentItem = NSMenuItem(title: "快切模式设置", action: nil, keyEquivalent: "")
         parentItem.submenu = sub
         parentItem.image = menuIndentImage()
         menu.addItem(parentItem)

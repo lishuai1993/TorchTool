@@ -67,6 +67,18 @@ final class AppSettings: ObservableObject {
     @Published var centerSnapEnabled: Bool {
         didSet { defaults.set(centerSnapEnabled, forKey: Keys.centerSnapEnabled) }
     }
+    /// 三指横滑「跟随手指」滑动过渡切换（快捷切换模式的行为配置）
+    @Published var slidingTransitionEnabled: Bool {
+        didSet { defaults.set(slidingTransitionEnabled, forKey: Keys.slidingTransitionEnabled) }
+    }
+    /// 滑动过渡跟手比例：offset = 手指归一化位移 × ratio × 屏宽（1.0 ≈ 手指满触控板 = 满屏）
+    @Published var slidingRatio: Double {
+        didSet { defaults.set(slidingRatio, forKey: Keys.slidingRatio) }
+    }
+    /// 滑动过渡提交阈值（屏宽比例）：|offset| ≥ threshold × 屏宽 才切换，否则回弹
+    @Published var slidingCommitThreshold: Double {
+        didSet { defaults.set(slidingCommitThreshold, forKey: Keys.slidingCommitThreshold) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -135,6 +147,9 @@ final class AppSettings: ObservableObject {
             Keys.threeFingerSwipeUpEnabled: false,
             Keys.centerFocusEnabled: false,
             Keys.centerSnapEnabled: true,
+            Keys.slidingTransitionEnabled: false,
+            Keys.slidingRatio: 1.0,
+            Keys.slidingCommitThreshold: 0.45,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -158,6 +173,9 @@ final class AppSettings: ObservableObject {
         _threeFingerSwipeUpEnabled = .init(initialValue: defaults.bool(forKey: Keys.threeFingerSwipeUpEnabled))
         _centerFocusEnabled = .init(initialValue: defaults.bool(forKey: Keys.centerFocusEnabled))
         _centerSnapEnabled = .init(initialValue: defaults.bool(forKey: Keys.centerSnapEnabled))
+        _slidingTransitionEnabled = .init(initialValue: defaults.bool(forKey: Keys.slidingTransitionEnabled))
+        _slidingRatio = .init(initialValue: defaults.double(forKey: Keys.slidingRatio))
+        _slidingCommitThreshold = .init(initialValue: defaults.double(forKey: Keys.slidingCommitThreshold))
     }
 
     func resetToDefaults() {
@@ -182,6 +200,9 @@ final class AppSettings: ObservableObject {
         threeFingerSwipeUpEnabled = false
         centerFocusEnabled = false
         centerSnapEnabled = true
+        slidingTransitionEnabled = false
+        slidingRatio = 1.0
+        slidingCommitThreshold = 0.45
     }
 }
 
@@ -204,6 +225,9 @@ private enum Keys {
     static let threeFingerSwipeUpEnabled = "threeFingerSwipeUpEnabled"
     static let centerFocusEnabled = "centerFocusEnabled"
     static let centerSnapEnabled = "centerSnapEnabled"
+    static let slidingTransitionEnabled = "slidingTransitionEnabled"
+    static let slidingRatio = "slidingRatio"
+    static let slidingCommitThreshold = "slidingCommitThreshold"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

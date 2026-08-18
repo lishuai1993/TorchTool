@@ -13,6 +13,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let menuBar = MenuBarController.shared
     private let elasticDrag = ElasticDragController.shared
     private let immersiveOverlay = ImmersiveOverlayCoordinator.shared
+    private let slideTransition = SlideTransitionController.shared
+
+    /// 滑动会话收尾看门狗：触控板 MT 事件流停顿（手指静止/系统暂停回调）时，
+    /// C 引擎只能在下一帧到达才检测到 callback-gap，Swift 侧收不到 gestureEnd，
+    /// 面板会冻结在已过提交阈值的位移上。会话开始后 2.5s 内无任何 progress 更新
+    /// 即自动按当前 offset 收尾（提交或回弹），每次 swipeUpdate 重置。
+    private var slideWatchdogTimer: Timer?
+    private let slideWatchdogPeriod: TimeInterval = 2.5
+
+
     // MARK: - NSApplicationDelegate
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -137,6 +147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         gestureEngine.stop()
         windowManager.stopInteractionMonitoring()
         overlayController.hide()
+        slideTransition.cancel()
     }
 
     /// Restart the service: stop then start (clears the log again).
@@ -230,6 +241,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         switch event {
         case .threeFingerTap:
             logDebug("GESTURE: threeFingerTap, overlayVisible=\(overlayController.isVisible)")
+            if slideTransition.isActive {
+                slideTransition.cancel()
+                invalidateSlideWatchdog()
+            }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
@@ -250,6 +265,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .threeFingerSwipeUp:
             logDebug("GESTURE: threeFingerSwipeUp, overlayVisible=\(overlayController.isVisible)")
+            if slideTransition.isActive {
+                slideTransition.cancel()
+                invalidateSlideWatchdog()
+            }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: swipeUp intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
@@ -269,6 +288,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .threeFingerSwipeDown:
             logDebug("GESTURE: threeFingerSwipeDown, overlayVisible=\(overlayController.isVisible)")
+            if slideTransition.isActive {
+                slideTransition.cancel()
+                invalidateSlideWatchdog()
+            }
             if overlayController.isVisible {
                 overlayController.hide()
                 windowManager.gesturePhase = .idle
@@ -279,6 +302,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeLeft:
             windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
+            if settings.slidingTransitionEnabled {
+                guard settings.quickSwitchModeEnabled else { return }
+                if slideTransition.isActive {
+                    // 会话进行中：离散方向事件不改变画面——offset 严格由 swipeUpdate 跟手，
+                    // 避免「闪现半屏」瞬移。抬手提交/回弹完全交给 finishSlideSession 的阈值判定。
+                    logDebug("SLIDE: mid-session swipeLeft — ignored（严格跟手，离散事件不改画面）")
+                } else {
+                    beginSlideSessionIfNeeded(progress: slideInitialProgress(sign: -1))
+                }
+                return
+            }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: BUG swipeLeft while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -292,6 +326,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeRight:
             windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
+            if settings.slidingTransitionEnabled {
+                guard settings.quickSwitchModeEnabled else { return }
+                if slideTransition.isActive {
+                    logDebug("SLIDE: mid-session swipeRight — ignored（严格跟手，离散事件不改画面）")
+                } else {
+                    beginSlideSessionIfNeeded(progress: slideInitialProgress(sign: 1))
+                }
+                return
+            }
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: BUG swipeRight while drag in progress [session=\(elasticDrag.sessionID)] — gestureEnd/tap was NOT received before next swipe action!")
             }
@@ -305,6 +348,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .swipeUpdate(let progress):
             windowManager.gesturePhase = .quickSwitching
             guard !overlayController.isVisible else { return }
+            if settings.slidingTransitionEnabled {
+                guard settings.quickSwitchModeEnabled else { return }
+                let p = CGFloat(progress)
+                if slideTransition.isActive {
+                    slideTransition.update(progress: p)
+                    armSlideWatchdog()
+                } else {
+                    beginSlideSessionIfNeeded(progress: p)
+                }
+                return
+            }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
             let dirRight = progress < 0
             if !elasticDrag.isInProgress {
@@ -325,6 +379,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .gestureEnd:
             elasticDrag.cancelWatchdog()
             windowManager.lastGestureEndAt = ProcessInfo.processInfo.systemUptime
+            invalidateSlideWatchdog()
+            if slideTransition.isActive {
+                finishSlideSession()
+                windowManager.gesturePhase = .idle
+                return
+            }
             logDebug("ElasticDrag: gestureEnd, inProgress=\(elasticDrag.isInProgress), session=\(elasticDrag.sessionID)")
             if elasticDrag.isInProgress {
                 elasticDrag.finishDrag()
@@ -337,6 +397,93 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             windowManager.gesturePhase = overlayController.isVisible ? .overlayVisible : .idle
         }
+    }
+
+    // MARK: - Slide transition (跟随手指)
+
+    /// 快扫兜底开会话的初始 progress：C 引擎的离散 Left/Right 语义为「完成一次
+    /// 有效滑动」（progress=1.0），以其作为首帧位移（≈一次滑动的跟手位置），
+    /// 不瞬移到提交阈值；释放提交/回弹完全交给抬手时的阈值判定。
+    private func slideInitialProgress(sign: CGFloat) -> CGFloat {
+        1.0 * sign
+    }
+
+    /// 开启（或继续）滑动过渡会话。首个合格 swipeUpdate 或 Left/Right 快扫兜底
+    /// 时调用。会话已在推进时仅把 progress 喂给控制器。
+    private func beginSlideSessionIfNeeded(progress: CGFloat) {
+        guard AppSettings.shared.quickSwitchModeEnabled else { return }
+        guard !slideTransition.isActive else {
+            slideTransition.update(progress: progress)
+            return
+        }
+
+        windowManager.gesturePhase = .slidingTransition
+        // 会话开始：取消该滑动自身 scroll 可能已挂起的延迟重排，并记录开始时刻
+        //（延迟重排触发时据此识别滑动产物）。此时刷新窗口会同步 LRU。
+        windowManager.noteSlideSessionBegan()
+        let windows = windowManager.refreshWindows()
+        guard windows.count > 1,
+              let sourceID = windowManager.frontmostWindowID,
+              let idx = windowManager.orderingEngine.index(of: sourceID) else {
+            logDebug("SLIDE: abort — need >=2 windows and a valid source (count=\(windows.count))")
+            windowManager.gesturePhase = .idle
+            invalidateSlideWatchdog()
+            return
+        }
+
+        let ids = windowManager.orderingEngine.orderedIDs
+        let leftID = idx > 0 ? ids[idx - 1] : nil      // moreRecent — p>0 时滑入
+        let rightID = idx + 1 < ids.count ? ids[idx + 1] : nil  // lessRecent — p<0 时滑入
+
+        slideTransition.begin(sourceID: sourceID, leftID: leftID, rightID: rightID, initialProgress: progress)
+        armSlideWatchdog()
+    }
+
+    /// 滑动过渡会话结束：依据最终 offset（相对屏宽比例）判定提交或回弹。
+    /// 提交阈值取屏幕像素，与 progress 解耦，消除「clamp 到满屏导致 delta=0 直切」的缺陷。
+    private func finishSlideSession() {
+        invalidateSlideWatchdog()
+        let off = slideTransition.currentOffset
+        let settings = AppSettings.shared
+        let thresholdPx = CGFloat(settings.slidingCommitThreshold) * slideTransition.screenWidth
+        let commit = abs(off) >= thresholdPx
+        logDebug("SLIDE: gestureEnd offset=\(Int(off)) threshold=\(Int(thresholdPx)) commit=\(commit)")
+
+        let cyclic = settings.cyclicScrollEnabled
+        if commit {
+            let dirRight = off < 0
+            if let target = windowManager.orderingEngine.advanceCursor(directionRight: dirRight, cyclic: cyclic) {
+                let targetName = windowManager.orderingEngine.windowNames[target] ?? "?"
+                logDebug("SLIDE: commit dirRight=\(dirRight) → 激活 [\(targetName)]")
+                slideTransition.settle(finalOffset: off, commit: true) { [weak self] in
+                    self?.windowManager.activateWindow(target)
+                    self?.slideTransition.logPostActivationDiagnostics()
+                }
+                return
+            }
+            logDebug("SLIDE: boundary wall-bump, rebounding")
+        } else {
+            logDebug("SLIDE: rebound to source")
+        }
+        slideTransition.settle(finalOffset: off, commit: false, onComplete: nil)
+    }
+
+    /// 启动/重置滑动会话看门狗：2.5s 内无 progress 更新即自动收尾，防止
+    /// MT 事件流停顿导致面板冻结（事件三）。
+    private func armSlideWatchdog() {
+        slideWatchdogTimer?.invalidate()
+        slideWatchdogTimer = Timer.scheduledTimer(withTimeInterval: slideWatchdogPeriod, repeats: false) { [weak self] _ in
+            guard let self else { return }
+            if self.slideTransition.isActive {
+                logDebug("SLIDE: watchdog fired — auto-settling stalled session")
+                self.finishSlideSession()
+            }
+        }
+    }
+
+    private func invalidateSlideWatchdog() {
+        slideWatchdogTimer?.invalidate()
+        slideWatchdogTimer = nil
     }
 
     // MARK: - Quick switch mode

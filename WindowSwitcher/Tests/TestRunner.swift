@@ -543,6 +543,69 @@ private func testIntegration() {
     }
 }
 
+// MARK: - SlideOffset（滑动过渡映射）Tests
+// 核心规范（见知识库文档 2.5）：滑动全程 offset 必须是 progress 的连续函数，
+// 禁止任何瞬移/跳变。以下用与实机一致的参数（屏宽 1470、ratio 1.5、disp 0.08）
+// 验证映射：无瞬移、连续性、clamp、对称、提交阈值。
+
+private func testSlideOffset() {
+    let W: CGFloat = 1470
+    let ppp: CGFloat = 1.5 * 0.08 * W          // pointsPerProgress = 176.4
+    let threshold: CGFloat = 0.45 * W          // 提交阈值 = 661.5
+
+    runSuite("progress 0 → offset 0") {
+        assertEqual(SlideOffset.eased(progress: 0, pointsPerProgress: ppp, screenWidth: W), 0)
+    }
+
+    runSuite("软起步：微小 progress 处位移趋 0（无首帧弹射）") {
+        let d = SlideOffset.eased(progress: 0.01, pointsPerProgress: ppp, screenWidth: W)
+        assertTrue(d >= 0 && d < 1.0)          // ~0.04px，绝非瞬移到阈值
+    }
+
+    runSuite("离散事件点(progress=1.0) offset 远低于提交阈值 → 无瞬移") {
+        let off1 = SlideOffset.eased(progress: 1.0, pointsPerProgress: ppp, screenWidth: W)
+        assertTrue(off1 > 0)
+        assertTrue(off1 < threshold)           // ~126px ≪ 661px：手指只甩过 8% 触控板时窗口只到 ~8.6% 屏
+    }
+
+    runSuite("全程扫描 0.01→5.0 offset 增量有界（连续无跳变）") {
+        var prev = SlideOffset.eased(progress: 0.01, pointsPerProgress: ppp, screenWidth: W)
+        var maxDelta: CGFloat = 0
+        var i: CGFloat = 0.02
+        while i <= 5.0 {
+            let cur = SlideOffset.eased(progress: i, pointsPerProgress: ppp, screenWidth: W)
+            maxDelta = max(maxDelta, abs(cur - prev))
+            prev = cur
+            i += 0.01
+        }
+        // 步长 0.01 progress 对应最大增量 ≤2px（eased 导数上限 ~0.92×ppp×0.01≈1.6）
+        assertTrue(maxDelta <= 2.0)
+    }
+
+    runSuite("boost 回归：progress 单调递增 offset 单调不减（不再 115→661 跳变）") {
+        let off1 = SlideOffset.eased(progress: 1.0, pointsPerProgress: ppp, screenWidth: W)
+        let off2 = SlideOffset.eased(progress: 1.1, pointsPerProgress: ppp, screenWidth: W)
+        assertTrue(off2 >= off1)
+        assertTrue(off2 - off1 < 30)           // 相邻帧增量 ~16px，绝非 546px 瞬移
+    }
+
+    runSuite("反向对称：eased(-p) = -eased(p)") {
+        let pos = SlideOffset.eased(progress: 0.7, pointsPerProgress: ppp, screenWidth: W)
+        let neg = SlideOffset.eased(progress: -0.7, pointsPerProgress: ppp, screenWidth: W)
+        assertEqual(neg, -pos)
+    }
+
+    runSuite("大 progress clamp 到 ±屏宽") {
+        assertEqual(SlideOffset.eased(progress: 10, pointsPerProgress: ppp, screenWidth: W), W)
+        assertEqual(SlideOffset.eased(progress: -10, pointsPerProgress: ppp, screenWidth: W), -W)
+    }
+
+    runSuite("提交阈值需 ~4.1 progress（33% 触控板）才达到") {
+        assertTrue(SlideOffset.eased(progress: 4.0, pointsPerProgress: ppp, screenWidth: W) < threshold)
+        assertTrue(SlideOffset.eased(progress: 4.5, pointsPerProgress: ppp, screenWidth: W) >= threshold)
+    }
+}
+
 // MARK: - Entry Point
 
 @main
@@ -577,6 +640,10 @@ struct TestRunner {
         print("")
         print("[Integration]")
         testIntegration()
+
+        print("")
+        print("[SlideOffset]")
+        testSlideOffset()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")
