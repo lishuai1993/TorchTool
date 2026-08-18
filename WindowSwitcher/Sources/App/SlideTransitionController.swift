@@ -125,7 +125,10 @@ final class SlideTransitionController {
             defer: false
         )
         panel.isFloatingPanel = true
-        panel.level = .popUpMenu
+        // 层级取菜单栏(kCGMainMenuWindowLevel=24)之下、普通窗口(0)之上：若层级高于
+        // 菜单栏并覆盖其区域，macOS 会自动隐藏菜单栏（演示模式机制），导致滑动全程
+        // 菜单栏消失。降到 23 后真实菜单栏全程保持可见，不再突然消失。
+        panel.level = NSWindow.Level(rawValue: 23)
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.backgroundColor = .clear
         panel.isOpaque = false
@@ -318,9 +321,38 @@ final class SlideTransitionController {
         } completionHandler: { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
+            self.finishSettle(commit: commit, onComplete: onComplete)
+        }
+    }
+
+    /// 收尾：settle 滑动动画完成后收起面板。
+    /// commit 时先把面板层级提到菜单栏之上（盖住真实菜单栏，使其内容切换不可见），
+    /// 再回调激活目标（新菜单栏在面板下完成切换），最后面板 alpha 淡出——旧菜单栏
+    /// （背景图中源 App 的菜单）随面板渐隐、真实新菜单栏渐显，消除「新菜单栏突然
+    /// 出现」。回弹无内容切换，仅面板淡出平滑收起（顺带把 reveal 遮挡者的「原位
+    /// 重现」由瞬切变成渐显）。
+    private func finishSettle(commit: Bool, onComplete: (() -> Void)?) {
+        guard let panel else {
+            onComplete?()
+            teardownPanel()
+            isActive = false
+            return
+        }
+        let token = sessionToken
+        if commit {
+            panel.level = .popUpMenu
+            panel.orderFrontRegardless()
+        }
+        onComplete?()
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.12
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            panel.animator().alphaValue = 0
+        } completionHandler: { [weak self] in
+            guard let self else { return }
+            guard token == self.sessionToken else { return }
             self.teardownPanel()
             self.isActive = false
-            onComplete?()
         }
     }
 
@@ -373,9 +405,19 @@ final class SlideTransitionController {
                 config.capturesAudio = false
                 let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
                 guard token == self.sessionToken, let backdrop else { return }
-                backdrop.layer?.contents = image
-                backdrop.layer?.backgroundColor = nil
-                logDebug("SLIDE: backdrop captured \(image.width)x\(image.height)px excluded=\(excluded.count)")
+                // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。不透明黑占位保留在
+                // 底层（防源残像），图像子 layer 淡入覆盖其上，消除「黑 → 桌面」硬切闪跳。
+                let imageLayer = CALayer()
+                imageLayer.frame = backdrop.bounds
+                imageLayer.contents = image
+                imageLayer.opacity = 0
+                backdrop.layer?.addSublayer(imageLayer)
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.1)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
+                imageLayer.opacity = 1
+                CATransaction.commit()
+                logDebug("SLIDE: backdrop captured \(image.width)x\(image.height)px excluded=\(excluded.count) fadeIn=0.1")
                 let excludedNames = excluded
                     .map { "\($0.windowID):[\($0.owningApplication?.applicationName ?? "?")]" }
                     .joined(separator: ",")
