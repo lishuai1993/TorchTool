@@ -22,9 +22,9 @@ final class SlideTransitionController {
     private(set) var isActive = false
     /// 当前横向位移（像素，右为正，clamp 在 ±屏宽）。供释放判定使用。
     private(set) var currentOffset: CGFloat = 0
-    /// 模式：目标被完全覆盖 → slide-in（源恒静态，仅目标滑入）；目标部分可见 → reveal。
-    /// 边界（目标侧无窗口）时目标为 nil，源随手指滑动产生 wall-bump，释放回弹。
-    private enum SlideMode: String { case staticSource, reveal }
+    /// 模式（共享 SlideMode）：目标被完全覆盖 → staticSource（源恒静态，仅目标滑入）；
+    /// 目标部分可见 → reveal（源 + 遮挡者滑出）。边界（目标侧无窗口）时目标为 nil，
+    /// 源随手指滑动产生 wall-bump，释放回弹。
 
     private var sourceIsStatic = false
     private var mode: SlideMode = .staticSource
@@ -33,6 +33,10 @@ final class SlideTransitionController {
 
     private var panel: NSPanel?
     private var backdrop: NSView?
+    /// 背景图像视图（像素诊断：采样其 presentation 透明度验证淡入是否真的渐变）。
+    private var backdropImageView: NSImageView?
+    /// 当前面板窗口号（像素诊断：采样面板合成输出；teardown 置 0）。
+    private var panelWindowNumber: CGWindowID = 0
     private var sourceView: NSImageView?
     /// 除源窗口外的滑动视图（buried：目标图像锚定 ±屏宽滑入；reveal：遮挡者图像
     /// 锚定真实位滑出）。统一按 offset 平移。
@@ -111,11 +115,14 @@ final class SlideTransitionController {
         let disp = CGFloat(settings.swipeMinDisplacement)
         pointsPerProgress = ratio * disp * screenRect.width
 
-        // 目标 / 反向邻居按初始位移方向（sign）判定：sign>=0 → 目标=left、反向=right。
+        // 方向/模式判别与排除集合：sign>=0 → 目标=left、反向=right；sign<0 相反。
+        // 与 trackingBegan 预捕共用 SlideModeResolver，保证预捕预测与实际计算一致
+        //（take 校验参数一致性，不一致则回退全新捕获）。
         let sign = initialProgress > 0 ? 1 : (initialProgress < 0 ? -1 : 0)
-        let targetID = sign >= 0 ? leftID : rightID
-        let reverseID = sign >= 0 ? rightID : leftID
-        let targetInfo = targetID.flatMap { wm.windows[$0] }
+        let plan = SlideModeResolver.plan(wm: wm, sourceID: sourceID, leftID: leftID, rightID: rightID, sign: sign)
+        mode = plan.mode
+        sourceIsStatic = plan.sourceIsStatic
+        let targetInfo = plan.targetID.flatMap { wm.windows[$0] }
 
         // 面板
         let panel = NSPanel(
@@ -155,29 +162,17 @@ final class SlideTransitionController {
         content.addSubview(sv)
         sourceView = sv
 
-        // 2.3 遮挡计算：目标上方 z 序、与其 frame 相交的窗口（前→后），含源与反向邻居。
-        let occluders = targetInfo.map { wm.occluders(aboveTarget: $0.id, frame: $0.frame) } ?? []
-        // 覆盖判定（buried / reveal 判别）：目标被「上方全部遮挡者的并集」有效覆盖
-        // → buried（目标为滑动对象，从对侧滑入）；否则目标部分可见 → reveal（遮挡者滑出、
-        // 目标留背景）。并集覆盖天然包含反向邻居（z 序在目标上方必在 occluders 中），
-        // 取代「仅反向邻居覆盖」的判定——源/其它遮挡者盖住目标也被判 buried，消除
-        // 「全屏源滑出后弹回」的 WILL-POP。露出区域宽高均 ≥ minExposedSide 才算
-        // 部分可见；菜栏条/屏外细缝等微小露出判为 buried。
-        let targetCovered = targetInfo.map { t in
-            isEffectivelyCovered(t.frame, by: occluders.map(\.frame))
-        } ?? false
-
+        // 排除集 = 源 + 实际渲染的滑动窗口（reveal 遮挡者 / buried 目标）。若某遮挡者
+        // 抓拍失败则不排除、保留在背景（不出现空洞）→ 与预捕计划的 excludedIDs 不一致，
+        // take 判定不匹配、回退全新捕获（抓拍失败属罕见边缘，代价可接受）。
         var excludedIDs = [sourceID]
         var revealOccluders: [(name: String, real: NSRect)] = []
-        if targetInfo != nil && !targetCovered {
+        if mode == .reveal {
             // REVEAL：目标部分可见 —— 目标留在背景真实位（不排除、不渲染滑动视图）；
             // 源 + 目标上方遮挡者（不含反向邻居）以真实位为基准沿跟手方向滑出。
-            mode = .reveal
-            sourceIsStatic = false
-            // 遮挡者视图置于源视图之下（源是最前置窗口）；occluders 为前→后序，
-            // 逆序添加使前部遮挡者靠上、后部靠下，符合真实 z 序。
-            for occ in occluders.reversed() {
-                if occ.id == sourceID || occ.id == reverseID { continue }
+            // 遮挡者视图置于源视图之下（源是最前置窗口）；slideOccluders 已按 back→front
+            // 排序，前部遮挡者靠上、后部靠下，符合真实 z 序。
+            for occ in plan.slideOccluders {
                 guard let image = wm.captureRawImage(for: occ.id, ownerName: occ.name) else {
                     logDebug("SLIDE: reveal occluder capture failed id=\(occ.id) name=[\(occ.name)]")
                     continue
@@ -194,8 +189,6 @@ final class SlideTransitionController {
             // 源一律静止（staticSource），反向邻居恒静态留背景。
             // 边界（目标侧无窗口，targetInfo=nil）：无目标视图，源随手指滑动产生
             // wall-bump 反馈，释放回弹到原位。
-            sourceIsStatic = targetInfo != nil
-            mode = .staticSource
             if let info = targetInfo,
                let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
                 let real = localRect(forCG: info.frame)
@@ -209,10 +202,37 @@ final class SlideTransitionController {
         }
 
         panel.contentView = content
+
+        // 背景预捕消费（一次消费即清空会话）：图已就绪 → 面板弹出前平铺（零黑，
+        // 根治非全屏源黑闪）；图在途 → 异步路径短等该 Direction；无匹配 → 全新捕获。
+        var inflight: BackdropPreCapturer.Direction?
+        var needAsyncBackdrop = true
+        switch BackdropPreCapturer.shared.take(
+            sourceID: sourceID, leftID: leftID, rightID: rightID,
+            screenSize: screenRect.size, sign: sign,
+            mode: mode, excludedIDs: excludedIDs) {
+        case .ready(let image):
+            applyBackdropImage(image, animate: false)
+            logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）mode=\(mode.rawValue)")
+            needAsyncBackdrop = false
+        case .inflight(let dir):
+            inflight = dir
+        case .none:
+            break
+        }
+
         panel.alphaValue = 0
+        // 强制同步渲染：预捕 ready 的 2940×1912 全屏背景图与源/滑动窗口纹理在面板
+        // 可见前完成 GPU 上传。若纹理上传落在淡入（60ms）之后，淡入首帧只能显示
+        // 黑色占位底（begin+30ms 瞬黑）。对 inflight/none 路径（背景为黑色占位）
+        // 同步渲染无副作用，源/滑动视图纹理同样提前就绪。
+        panel.contentView?.layoutSubtreeIfNeeded()
+        panel.contentView?.displayIfNeeded()
+        CATransaction.flush()
         panel.orderFrontRegardless()
 
         self.panel = panel
+        panelWindowNumber = CGWindowID(panel.windowNumber)
         currentOffset = 0
         isActive = true
 
@@ -225,13 +245,16 @@ final class SlideTransitionController {
             panel.animator().alphaValue = 1
         }
 
-        captureBackdrop(excluding: excludedIDs, panelWindowNumber: panel.windowNumber)
+        if needAsyncBackdrop {
+            captureBackdrop(excluding: excludedIDs, panelWindowNumber: panel.windowNumber, inflight: inflight)
+        }
+        scheduleDiagSamples()
 
         let leftName = leftID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
         let rightName = rightID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
         let leftReal = leftID.flatMap { id in wm.windows[id].map { info in localRect(forCG: info.frame) } } ?? .zero
         let rightReal = rightID.flatMap { id in wm.windows[id].map { info in localRect(forCG: info.frame) } } ?? .zero
-        logDebug("SLIDE: begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screenRect.width))x\(Int(screenRect.height)) ratio=\(String(format: "%.2f", ratio)) disp=\(String(format: "%.2f", disp)) mode=\(mode.rawValue) occl=\(occluders.map { $0.name }.joined(separator: ","))")
+        logDebug("SLIDE: begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screenRect.width))x\(Int(screenRect.height)) ratio=\(String(format: "%.2f", ratio)) disp=\(String(format: "%.2f", disp)) mode=\(mode.rawValue) occl=\(plan.occluders.map { $0.name }.joined(separator: ","))")
         logDebug("SLIDE:DBG begin cg source=\(dbgRect(sourceInfo.frame)) left=\(leftID.flatMap { id in wm.windows[id].map { dbgRect($0.frame) } } ?? "nil") right=\(rightID.flatMap { id in wm.windows[id].map { dbgRect($0.frame) } } ?? "nil")")
         logDebug("SLIDE:DBG begin base source=\(dbgRect(sourceBase)) extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
 
@@ -289,6 +312,7 @@ final class SlideTransitionController {
             onComplete?()
             return
         }
+        diagSample(label: "settle")
         let targetOffset: CGFloat
         if commit {
             targetOffset = (finalOffset < 0 ? -1 : 1) * screenRect.width
@@ -344,6 +368,12 @@ final class SlideTransitionController {
             panel.orderFrontRegardless()
         }
         onComplete?()
+        diagSample(label: "finishSettle")
+        let settleFadeToken = token
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
+            guard let self, settleFadeToken == self.sessionToken else { return }
+            self.diagSample(label: "finishSettle+60ms")
+        }
         NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = 0.12
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
@@ -351,6 +381,18 @@ final class SlideTransitionController {
         } completionHandler: { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
+            self.teardownPanel()
+            self.isActive = false
+        }
+        // 兜底：淡出 completionHandler 偶发不触发（主线程被 SCK 截屏/纹理上传阻塞
+        // 超淡出时长，面板滞留全屏不透明并吞掉后续手势——日志中 finishSettle 面板
+        // 冻结、mean 居高不下即此现象）。0.5s 后会话仍存活且面板未收起则强制收起，
+        // 保证不残留死会话。正常淡出 ~0.12-0.2s 完成、panel 置 nil，兜底自然跳过。
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            guard token == self.sessionToken else { return }
+            guard self.panel != nil else { return }
+            logDebug("SLIDE: finishSettle fade fallback — forcing teardown (stall detected)")
             self.teardownPanel()
             self.isActive = false
         }
@@ -370,62 +412,120 @@ final class SlideTransitionController {
     /// 异步截取「排除源/左右邻/本面板后所见屏幕」作为背景层，等价于源窗口
     /// 最小化后桌面的剩余堆叠。截屏到达前以不透明黑层占位（杜绝源窗口残像），
     /// 失败则回退为近乎透明黑，让真实桌面可见。
-    private func captureBackdrop(excluding windowIDs: [CGWindowID], panelWindowNumber: Int) {
+    private func captureBackdrop(excluding windowIDs: [CGWindowID], panelWindowNumber: Int,
+                                 inflight: BackdropPreCapturer.Direction?) {
         let token = sessionToken
         let scr = screenRect
         Task { @MainActor in
-            do {
-                let content = try await SCShareableContent.current
+            // 在途预捕优先：等它完成即用（比全新 SCK 查询早发起 ~100ms，剩余时间更短）。
+            if let inflight,
+               let image = await BackdropPreCapturer.shared.awaitImage(inflight, timeout: 0.35) {
                 guard token == self.sessionToken else { return }
-                guard let display = content.displays.first(where: {
-                    Int($0.width) == Int(scr.width) && Int($0.height) == Int(scr.height)
-                }) ?? content.displays.first else {
-                    logDebug("SLIDE: backdrop abort — no matching display")
-                    return
-                }
-                let excludeSet = Set(windowIDs)
-                let ourPid = ProcessInfo.processInfo.processIdentifier
-                let excluded = content.windows.filter { w in
-                    if excludeSet.contains(w.windowID) || w.windowID == CGWindowID(panelWindowNumber) {
-                        return true
-                    }
-                    // 兜底：本进程覆盖整个目标屏的面板（防 windowNumber 偶发不匹配导致双影）
-                    if let owner = w.owningApplication, owner.processID == ourPid,
-                       abs(w.frame.width - scr.width) < 1 && abs(w.frame.height - scr.height) < 1 {
-                        return true
-                    }
-                    return false
-                }
-                let filter = SCContentFilter(display: display, excludingWindows: excluded)
-                let config = SCStreamConfiguration()
-                let scale = NSScreen.main?.backingScaleFactor ?? 2.0
-                config.width = Int(scr.width * scale)
-                config.height = Int(scr.height * scale)
-                config.showsCursor = false
-                config.capturesAudio = false
-                let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
-                guard token == self.sessionToken, let backdrop else { return }
+                self.applyBackdropImage(image, animate: true)
+                logDebug("SLIDE: backdrop via in-flight pre-capture（淡入）excluded=\(inflight.excludedCount ?? 0)")
+                logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(image))")
+                return
+            }
+            do {
+                let result = try await BackdropPreCapturer.captureDesktop(
+                    size: scr.size, excluding: Set(windowIDs), panelWindowNumber: panelWindowNumber)
+                guard token == self.sessionToken else { return }
                 // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。不透明黑占位保留在
-                // 底层（防源残像），图像子 layer 淡入覆盖其上，消除「黑 → 桌面」硬切闪跳。
-                let imageLayer = CALayer()
-                imageLayer.frame = backdrop.bounds
-                imageLayer.contents = image
-                imageLayer.opacity = 0
-                backdrop.layer?.addSublayer(imageLayer)
-                CATransaction.begin()
-                CATransaction.setAnimationDuration(0.1)
-                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
-                imageLayer.opacity = 1
-                CATransaction.commit()
-                logDebug("SLIDE: backdrop captured \(image.width)x\(image.height)px excluded=\(excluded.count) fadeIn=0.1")
-                let excludedNames = excluded
+                // 底层（防源残像），图像视图淡入覆盖其上，消除「黑 → 桌面」硬切闪跳。
+                self.applyBackdropImage(result.image, animate: true)
+                // 像素诊断①：SCK 背景帧内容亮度（mean≈0 → 后期返回黑帧，坐实假设①）。
+                logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(result.image))")
+                scheduleBackdropFadeSamples(token: token)
+                logDebug("SLIDE: backdrop captured \(result.image.width)x\(result.image.height)px excluded=\(result.excluded.count) fadeIn=0.1")
+                let excludedNames = result.excluded
                     .map { "\($0.windowID):[\($0.owningApplication?.applicationName ?? "?")]" }
                     .joined(separator: ",")
-                logDebug("BGFLASH:capture excluded=[\(excludedNames)] count=\(excluded.count)")
+                logDebug("BGFLASH:capture excluded=[\(excludedNames)] count=\(result.excluded.count)")
             } catch {
                 logDebug("SLIDE: backdrop capture failed — \(error.localizedDescription)")
                 // 捕获失败：回退为近乎透明黑，让真实桌面在滑动中可见（而非不透明占位永久黑屏）。
                 backdrop?.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.25).cgColor
+            }
+        }
+    }
+
+    /// 背景图像视图：animate=false 时直接平铺（预捕就绪、零黑）；animate=true 时以
+    /// ~100ms easeOut 从透明淡入覆盖在不透明黑占位之上（黑占位保留、防源残像）。
+    private func applyBackdropImage(_ image: CGImage, animate: Bool) {
+        guard let backdrop else { return }
+        let imageView = NSImageView(frame: backdrop.bounds)
+        imageView.image = NSImage(cgImage: image, size: backdrop.bounds.size)
+        imageView.imageScaling = .scaleAxesIndependently
+        imageView.wantsLayer = true
+        imageView.alphaValue = animate ? 0 : 1
+        backdrop.addSubview(imageView)
+        backdropImageView = imageView
+        if animate {
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.1
+                ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                imageView.animator().alphaValue = 1
+            } completionHandler: {}
+        }
+    }
+
+    // MARK: - 像素级诊断（仅日志，不影响行为）
+
+    /// 采样 CGImage 亮度：缩放到 3×3 灰度网格，输出网格各点灰度 + 均值（0=纯黑，255=纯白）。
+    private func sampleBrightness(_ image: CGImage) -> String {
+        let n = 3
+        let buf = UnsafeMutableRawPointer.allocate(byteCount: n * n, alignment: 1)
+        defer { buf.deallocate() }
+        guard let ctx = CGContext(data: buf, width: n, height: n,
+                                  bitsPerComponent: 8, bytesPerRow: n,
+                                  space: CGColorSpaceCreateDeviceGray(),
+                                  bitmapInfo: CGImageAlphaInfo.none.rawValue) else {
+            return "ctx-fail"
+        }
+        ctx.interpolationQuality = .medium
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: n, height: n))
+        let bytes = buf.assumingMemoryBound(to: UInt8.self)
+        let vals = (0..<(n * n)).map { Int(bytes[$0]) }
+        let mean = vals.reduce(0, +) / max(vals.count, 1)
+        return "grid=[\(vals.map { String($0) }.joined(separator: ","))] mean=\(mean)"
+    }
+
+    /// 记录面板合成输出（用户实际看到的像素）+ panel/背景图 presentation 透明度。
+    private func diagSample(label: String) {
+        guard let panel else {
+            logDebug("SLIDE:DIAG \(label) no-panel")
+            return
+        }
+        let contentAlpha = (panel.contentView?.layer?.presentation()?.opacity).map { String(format: "%.2f", $0) } ?? "n/a"
+        let bgAlpha = (backdropImageView?.layer?.presentation()?.opacity).map { String(format: "%.2f", $0) } ?? "n/a"
+        var lum = "n/a"
+        if let cg = WindowSwitcher_CaptureWindowImage(CGWindowID(panel.windowNumber))?.takeRetainedValue() {
+            lum = sampleBrightness(cg)
+        } else {
+            lum = "capture-nil"
+        }
+        logDebug("SLIDE:DIAG \(label) contentAlpha=\(contentAlpha) bgImageAlpha=\(bgAlpha) panelLum=\(lum)")
+    }
+
+    /// 调度会话关键时刻采样（begin+30/150/400ms），复现「初期干净 vs 后期黑闪」的亮度轨迹。
+    private func scheduleDiagSamples() {
+        let token = sessionToken
+        for (offset, label) in [(0.03, "begin+30ms"), (0.15, "begin+150ms"), (0.40, "begin+400ms")] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
+                guard let self, token == self.sessionToken else { return }
+                self.diagSample(label: label)
+            }
+        }
+    }
+
+    /// 调度背景图淡入期间的 presentation 轨迹采样（+30/60/100ms，验证是否真的 0→1 渐变）。
+    private func scheduleBackdropFadeSamples(token: Int) {
+        for (offset, label) in [(0.03, "fade+30ms"), (0.06, "fade+60ms"), (0.10, "fade+100ms")] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
+                guard let self, token == self.sessionToken else { return }
+                let alpha = (self.backdropImageView?.layer?.presentation()?.opacity)
+                    .map { String(format: "%.2f", $0) } ?? "n/a"
+                logDebug("SLIDE:DIAG \(label) bgImageAlpha=\(alpha)")
             }
         }
     }
@@ -446,45 +546,6 @@ final class SlideTransitionController {
         if window.minY < cover.minY { parts.append("\(Int(cover.minY - window.minY))px(bottom)") }
         if window.maxY > cover.maxY { parts.append("\(Int(window.maxY - cover.maxY))px(top)") }
         return parts.isEmpty ? "none" : parts.joined(separator: ",")
-    }
-
-    /// 矩形减法：从 target 中逐步挖去 windows（前→后）的覆盖区域，返回剩余
-    /// （露出）区域列表（几何运算与坐标系原点无关，CG/NS 坐标皆可）。
-    private func exposedRegions(_ target: CGRect, subtracting windows: [CGRect]) -> [CGRect] {
-        var remaining = [target]
-        for w in windows {
-            var next: [CGRect] = []
-            for r in remaining {
-                let inter = r.intersection(w)
-                if inter.isNull || inter.isEmpty { next.append(r); continue }
-                if inter.minX > r.minX {
-                    next.append(CGRect(x: r.minX, y: r.minY, width: inter.minX - r.minX, height: r.height))
-                }
-                if inter.maxX < r.maxX {
-                    next.append(CGRect(x: inter.maxX, y: r.minY, width: r.maxX - inter.maxX, height: r.height))
-                }
-                if inter.minY > r.minY {
-                    next.append(CGRect(x: inter.minX, y: r.minY, width: inter.width, height: inter.minY - r.minY))
-                }
-                if inter.maxY < r.maxY {
-                    next.append(CGRect(x: inter.minX, y: inter.maxY, width: inter.width, height: r.maxY - inter.maxY))
-                }
-            }
-            remaining = next
-            if remaining.isEmpty { return [] }
-        }
-        return remaining
-    }
-
-    /// 「有效覆盖」测试：windows 是否盖住 target 的全部有效区域。露出区域需
-    /// 宽、高两个维度均 ≥ minExposedSide 才算「部分可见」（→ reveal）；菜栏条、
-    /// 屏外细缝、亚像素缝隙等微小露出视为被覆盖（→ buried）。仅反向邻居参与
-    /// 判定的语义下，这等价于「reveal 结束后目标是否仍会被反向邻居盖住」。
-    private func isEffectivelyCovered(_ target: CGRect, by windows: [CGRect], minExposedSide: CGFloat = 60) -> Bool {
-        let exposed = exposedRegions(target, subtracting: windows)
-        if exposed.isEmpty { return true }
-        let meaningful = exposed.contains { $0.width >= minExposedSide && $0.height >= minExposedSide }
-        return !meaningful
     }
 
     /// 依据提交方向计算各滑动组/背景窗口在 teardown 后的瞬切判定。
@@ -563,6 +624,8 @@ final class SlideTransitionController {
         panel?.orderOut(nil)
         panel = nil
         backdrop = nil
+        backdropImageView = nil
+        panelWindowNumber = 0
         sourceView = nil
         extraSlideViews = []
         sourceBase = .zero

@@ -123,7 +123,8 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/Logger.swift \
                 Sources/Common/Constants.swift \
                 Sources/Common/GesturePhase.swift \
-                Sources/Common/SlideOffset.swift
+                Sources/Common/SlideOffset.swift \
+                Sources/Common/SlideGeometry.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests

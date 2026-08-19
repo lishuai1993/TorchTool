@@ -521,6 +521,32 @@ final class WindowManager: @unchecked Sendable {
         cancelPendingScrollReorder()
     }
 
+    /// 三指落地（trackingBegan）时启动双方向背景预捕。先刷新窗口列表：滑动会话
+    /// begin（beginSlideSessionIfNeeded）同样先 refreshWindows 再取源/左右邻，预捕若不
+    /// 刷新，两次刷新之间发生的窗口重建/增删会让 take 参数不匹配、回退全新捕获
+    ///（正是首次滑动黑闪的根因）。刷新会同步 LRU，但本函数在会话 begin 前调用
+    ///（trackingBegan，尚无滑动会话），不违反「滑动会话期间禁刷新」约束。
+    /// 门控（滑动过渡开启等）由 AppDelegate 负责。
+    func beginBackdropPreCapture() {
+        _ = refreshWindows()
+        guard let sourceID = frontmostWindowID,
+              let idx = orderingEngine.index(of: sourceID),
+              let sourceInfo = windows[sourceID],
+              orderingEngine.orderedIDs.count > 1 else { return }
+        let ids = orderingEngine.orderedIDs
+        let leftID = idx > 0 ? ids[idx - 1] : nil
+        let rightID = idx + 1 < ids.count ? ids[idx + 1] : nil
+        guard let screen = SlideGeometry.screen(containingCGFrame: sourceInfo.frame, screens: NSScreen.screens) else {
+            logDebug("SLIDE: pre-capture abort — no screen for source")
+            return
+        }
+        let leftName = leftID.flatMap { orderingEngine.windowNames[$0] } ?? "nil"
+        let rightName = rightID.flatMap { orderingEngine.windowNames[$0] } ?? "nil"
+        logDebug("SLIDE: pre-capture begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screen.frame.width))x\(Int(screen.frame.height))")
+        BackdropPreCapturer.shared.start(sourceID: sourceID, leftID: leftID, rightID: rightID,
+                                         screenSize: screen.frame.size)
+    }
+
     func stopInteractionMonitoring() {
         if let m = scrollMonitor { NSEvent.removeMonitor(m); scrollMonitor = nil }
         if let m = interactionMonitor { NSEvent.removeMonitor(m); interactionMonitor = nil }

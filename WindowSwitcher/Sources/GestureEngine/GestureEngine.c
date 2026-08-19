@@ -589,6 +589,7 @@ static void processContactData(int deviceIndex, void *data,
                 gState = GS_TRACKING;
                 atomic_store(&trackingActive, true);
                 gestureSessionID++;
+                userCallback(GestureTrackingBegan, 0);
                 touchStartTime = timestamp;
                 settlingEndTime = timestamp + SETTLING_DURATION;
                 touchStartCentroidX = centroidX;

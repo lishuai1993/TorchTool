@@ -148,6 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowManager.stopInteractionMonitoring()
         overlayController.hide()
         slideTransition.cancel()
+        BackdropPreCapturer.shared.cancel()
     }
 
     /// Restart the service: stop then start (clears the log again).
@@ -245,6 +246,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 slideTransition.cancel()
                 invalidateSlideWatchdog()
             }
+            // tap 手势不产生滑动：清掉 trackingBegan 时启动的预捕会话（若未消费）
+            BackdropPreCapturer.shared.cancel()
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
@@ -298,6 +301,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
             windowManager.gesturePhase = .idle
+
+        case .trackingBegan:
+            logDebug("GESTURE: trackingBegan — 三指落地")
+            // 三指刚落地、滑动方向未知：若滑动过渡开启，按左右两方向预捕 SCK 背景，
+            // 使会话 begin 时背景图已就绪（面板弹出即带完整桌面，根治非全屏源黑闪）。
+            // 该手势若最终不是横滑（tap/纵向 swipe），由 gestureEnd/tap 清理预捕会话。
+            if settings.slidingTransitionEnabled && settings.quickSwitchModeEnabled && !overlayController.isVisible {
+                windowManager.beginBackdropPreCapture()
+            }
 
         case .threeFingerSwipeLeft:
             windowManager.gesturePhase = .quickSwitching
@@ -380,6 +392,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             elasticDrag.cancelWatchdog()
             windowManager.lastGestureEndAt = ProcessInfo.processInfo.systemUptime
             invalidateSlideWatchdog()
+            // 手势结束：未消费的预捕会话随手势清理（已消费的会话早已被 begin 的 take 清空）
+            BackdropPreCapturer.shared.cancel()
             if slideTransition.isActive {
                 finishSlideSession()
                 windowManager.gesturePhase = .idle

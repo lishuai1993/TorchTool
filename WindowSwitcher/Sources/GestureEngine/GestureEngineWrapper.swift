@@ -12,6 +12,7 @@ enum GestureEvent {
     case threeFingerSwipeUp
     case threeFingerSwipeDown
     case swipeUpdate(progress: Float)  // signed: positive=right, negative=left
+    case trackingBegan  // 3 fingers landed; tracking session started
     case gestureEnd
 }
 
@@ -120,6 +121,8 @@ final class GestureEngine: @unchecked Sendable {
                 logDebug("GestureEngine(C): SWIPE DOWN detected")
             case GestureSwipeUpdate:
                 event = .swipeUpdate(progress: progress)
+            case GestureTrackingBegan:
+                event = .trackingBegan
             case GestureEnd:
                 event = .gestureEnd
             default:

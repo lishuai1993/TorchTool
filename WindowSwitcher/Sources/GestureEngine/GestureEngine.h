@@ -12,6 +12,7 @@ typedef enum {
     GestureThreeFingerSwipeUp,
     GestureThreeFingerSwipeDown,
     GestureSwipeUpdate,   // ongoing swipe, signed progress (right=+, left=-)
+    GestureTrackingBegan, // 3 fingers landed; tracking session started (pre-capture hook)
     GestureEnd,           // fingers lifted, gesture finished
 } GestureType;
 
