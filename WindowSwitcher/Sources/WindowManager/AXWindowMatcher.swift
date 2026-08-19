@@ -110,7 +110,8 @@ final class AXWindowMatcher {
             return m.key
         }
         logDebug("AXFocusChange: fallback first frame match")
-        return candidates.first!.key
+        // candidates 源自字典 filter，迭代序不稳定 → 取最小 windowID 保证回退确定性。
+        return candidates.keys.min()
     }
 
     // MARK: - AX window selection

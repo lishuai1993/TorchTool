@@ -20,7 +20,7 @@ C_SOURCES      := Sources/GestureEngine/GestureEngine.c \
 C_OBJECTS      := $(patsubst Sources/%.c,$(BUILD_DIR)/%.o,$(C_SOURCES))
 BRIDGING_HDR   := Sources/bridging-header.h
 
-FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics -framework ScreenCaptureKit
+FRAMEWORKS     := -framework AppKit -framework SwiftUI -framework CoreGraphics -framework ScreenCaptureKit -framework ApplicationServices
 
 # ──────────────────────────────────────────────────
 # Top-level targets
@@ -124,7 +124,8 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/Constants.swift \
                 Sources/Common/GesturePhase.swift \
                 Sources/Common/SlideOffset.swift \
-                Sources/Common/SlideGeometry.swift
+                Sources/Common/SlideGeometry.swift \
+                Sources/WindowManager/MenuBarImageCache.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests

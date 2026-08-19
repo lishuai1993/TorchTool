@@ -11,6 +11,23 @@ final class WindowManager: @unchecked Sendable {
     private let axMatcher = AXWindowMatcher.shared
     private let thumbCapturer = ThumbnailCapturer.shared
 
+    /// 顶栏外观条高度（点）。仅用于「激活/非激活顶栏」交叉溶解的覆盖条裁剪，
+    /// 覆盖标准标题栏 + 统一工具栏区域；自定义顶栏可目测微调。
+    static let titleBarHeightPoints: CGFloat = 36
+
+    /// 真实菜单栏高度（点）。实测非刘海屏/刘海屏 MacBook 均为 37pt（非
+    /// NSStatusBar.system.thickness 的 22）。菜单栏覆盖条（level 25）用它定位与定高。
+    static let menuBarHeightPoints: CGFloat = 37
+
+    /// 窗口顶栏外观缓存（激活/非激活，裁剪自捕获图的顶部条，内存小）。
+    /// captureRawImage 捕获源/目标时按 frontmost 状态填充；滑动过渡 begin() 读取
+    /// 对立外观做顶栏渐暗/渐亮交叉溶解。随 refreshWindows 清理失效窗口。
+    struct WindowAppearances {
+        var active: CGImage?
+        var inactive: CGImage?
+    }
+    private(set) var appearanceCache: [CGWindowID: WindowAppearances] = [:]
+
     /// Current snapshot of visible windows, keyed by CGWindowID.
     var windows: [CGWindowID: WindowInfo] = [:]
 
@@ -92,7 +109,38 @@ final class WindowManager: @unchecked Sendable {
 
     /// Delegate thumbnail capture to the extracted capturer.
     func captureRawImage(for windowID: CGWindowID, ownerName: String = "?") -> NSImage? {
-        thumbCapturer.captureRawImage(for: windowID, ownerName: ownerName)
+        let image = thumbCapturer.captureRawImage(for: windowID, ownerName: ownerName)
+        recordAppearance(windowID: windowID, image: image)
+        return image
+    }
+
+    /// 记录该窗口当前外观的顶栏条到缓存（源=激活、其余=非激活）。
+    /// 仅裁剪顶部条（内存小），供滑动过渡做顶栏渐暗/渐亮交叉溶解。
+    private func recordAppearance(windowID: CGWindowID, image: NSImage?) {
+        guard let image,
+              let info = windows[windowID],
+              let cg = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
+        let scale = CGFloat(cg.height) / max(info.frame.height, 1)
+        let stripPx = max(Int(WindowManager.titleBarHeightPoints * scale), 1)
+        guard let strip = cg.cropping(to: CGRect(x: 0, y: 0,
+                                                 width: CGFloat(cg.width), height: CGFloat(stripPx))) else { return }
+        var entry = appearanceCache[windowID] ?? WindowAppearances()
+        if windowID == frontmostWindowID {
+            entry.active = strip
+        } else {
+            entry.inactive = strip
+        }
+        appearanceCache[windowID] = entry
+    }
+
+    /// 读取某窗口的顶栏外观条（点尺寸），供滑动过渡覆盖层使用。缓存缺失返回 nil，
+    /// 调用方回退亮度合成。
+    func appearanceStrip(windowID: CGWindowID, active: Bool) -> NSImage? {
+        guard let entry = appearanceCache[windowID],
+              let cg = active ? entry.active : entry.inactive else { return nil }
+        let scale = CGFloat(cg.height) / max(WindowManager.titleBarHeightPoints, 1)
+        let wPt = CGFloat(cg.width) / scale
+        return NSImage(cgImage: cg, size: NSSize(width: wPt, height: WindowManager.titleBarHeightPoints))
     }
     func preloadThumbnails(count: Int) { thumbCapturer.preloadThumbnails(count: count) }
     func setThumbnail(_ image: NSImage, for windowID: CGWindowID) {
@@ -191,6 +239,7 @@ final class WindowManager: @unchecked Sendable {
 
         let oldWindows = windows
         windows = newWindows
+        appearanceCache = appearanceCache.filter { newWindows[$0.key] != nil }
         logSyncChangeDiagnostics(oldIDs: orderingEngine.orderedIDs, newIDs: orderedIDs,
                                  oldWindows: oldWindows, newWindows: newWindows,
                                  newOrder: orderedIDs)

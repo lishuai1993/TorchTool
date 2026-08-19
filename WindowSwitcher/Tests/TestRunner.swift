@@ -650,6 +650,58 @@ private func testSlideGeometry() {
     }
 }
 
+// MARK: - MenuBarImageCache（菜单横条真实像素缓存）Tests
+// 纯内存缓存 + 顶部裁剪，无外部依赖、无 SCK 权限要求。
+
+private func testMenuBarImageCache() {
+    runSuite("record → strip 返回缓存；未记录返回 nil") {
+        let cache = MenuBarImageCache()
+        assertTrue(cache.strip(pid: 123) == nil)
+        guard let img = makeSolidImage(width: 200, height: 40) else {
+            print("  (failed to create test image)")
+            return
+        }
+        cache.record(pid: 123, strip: img)
+        assertTrue(cache.contains(pid: 123))
+        assertTrue(cache.strip(pid: 123) != nil)
+        assertTrue(cache.strip(pid: 999) == nil)
+    }
+
+    runSuite("覆盖更新：再次 record 替换旧缓存") {
+        let cache = MenuBarImageCache()
+        guard let img1 = makeSolidImage(width: 100, height: 40),
+              let img2 = makeSolidImage(width: 300, height: 40) else { return }
+        cache.record(pid: 7, strip: img1)
+        cache.record(pid: 7, strip: img2)
+        assertTrue(cache.strip(pid: 7)?.width == 300)
+    }
+
+    runSuite("cropTopStrip 尺寸正确且越界 clamp") {
+        guard let full = makeSolidImage(width: 1512, height: 982) else { return }
+        let strip = MenuBarImageCache.cropTopStrip(from: full, coverWidthPx: 857, menuBarPx: 74)
+        assertTrue(strip != nil)
+        assertTrue(strip?.width == 857)
+        assertTrue(strip?.height == 74)
+        // 越界 clamp 到图像尺寸
+        let clamped = MenuBarImageCache.cropTopStrip(from: full, coverWidthPx: 9999, menuBarPx: 5)
+        assertTrue(clamped?.width == 1512)
+        assertTrue(clamped?.height == 5)
+        // 非法参数返回 nil
+        assertTrue(MenuBarImageCache.cropTopStrip(from: full, coverWidthPx: 0, menuBarPx: 74) == nil)
+        assertTrue(MenuBarImageCache.cropTopStrip(from: full, coverWidthPx: 857, menuBarPx: 0) == nil)
+    }
+}
+
+private func makeSolidImage(width: Int, height: Int) -> CGImage? {
+    guard let ctx = CGContext(data: nil, width: width, height: height,
+                              bitsPerComponent: 8, bytesPerRow: 0,
+                              space: CGColorSpaceCreateDeviceRGB(),
+                              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+    ctx.setFillColor(CGColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1))
+    ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+    return ctx.makeImage()
+}
+
 // MARK: - Entry Point
 
 @main
@@ -692,6 +744,10 @@ struct TestRunner {
         print("")
         print("[SlideGeometry]")
         testSlideGeometry()
+
+        print("")
+        print("[MenuBarImageCache]")
+        testMenuBarImageCache()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")

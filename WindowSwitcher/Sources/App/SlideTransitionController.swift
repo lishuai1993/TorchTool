@@ -1,5 +1,7 @@
 import AppKit
 import ScreenCaptureKit
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 /// 三指横滑「跟随手指」滑动过渡切换。
 ///
@@ -46,6 +48,23 @@ final class SlideTransitionController {
         let realFrame: NSRect
     }
     private var extraSlideViews: [SlidingImage] = []
+
+    /// 顶栏外观覆盖视图（源=非激活外观渐显→渐暗；目标=激活外观渐显→渐亮）。
+    /// 每个覆盖视图是滑动窗口图像的子视图，随窗口移动；alpha 由 progress 驱动。
+    private var titleOverlays: [NSImageView] = []
+
+    /// 屏幕顶部菜单栏覆盖条面板（level 25，37pt 高，全宽）。内部三层：材质模糊
+    /// 背景（始终不透明，遮住真实源菜单）+ 源/目标菜单文字区（真实像素截图，
+    /// alpha 随手指交叉淡化）。仅盖菜单文本区（0→最左状态栏图标 x），状态栏
+    /// 图标区透明、全程可见。commit 后整个 panel 淡出，露出切换后的真实目标菜单。
+    private var menuCoverPanel: NSPanel?
+    /// 材质背景：SCK 截取的源菜单栏区域经高斯模糊（抹掉文字），替代「纯色块」。
+    private var menuBackgroundView: NSImageView?
+    /// 源/目标菜单文字区（真实像素）。源=整屏背景图裁剪的清晰源菜单截图，随手指
+    /// 渐隐；目标=缓存的目标菜单截图（会话内该 App 激活过即有，无缓存则空层、
+    /// commit 瞬显），随手指渐显。
+    private var sourceMenuImageView: NSImageView?
+    private var targetMenuImageView: NSImageView?
 
     /// 源窗口在面板本地坐标系中 offset=0 时的基准 frame。
     private var sourceBase: NSRect = .zero
@@ -161,6 +180,8 @@ final class SlideTransitionController {
         let sv = makeImageView(image: sourceImage, frame: sourceBase)
         content.addSubview(sv)
         sourceView = sv
+        // 源顶栏随手指渐暗：上叠「非激活外观」顶栏条（缓存优先，缺则亮度合成）。
+        attachTitleOverlay(to: sv, windowID: sourceID, currentCapture: sourceImage, want: .inactive)
 
         // 排除集 = 源 + 实际渲染的滑动窗口（reveal 遮挡者 / buried 目标）。若某遮挡者
         // 抓拍失败则不排除、保留在背景（不出现空洞）→ 与预捕计划的 excludedIDs 不一致，
@@ -198,6 +219,8 @@ final class SlideTransitionController {
                 content.addSubview(tv)
                 extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
                 excludedIDs.append(info.id)
+                // 目标顶栏随手指渐亮：上叠「激活外观」顶栏条。
+                attachTitleOverlay(to: tv, windowID: info.id, currentCapture: image, want: .active)
             }
         }
 
@@ -213,6 +236,9 @@ final class SlideTransitionController {
             mode: mode, excludedIDs: excludedIDs) {
         case .ready(let image):
             applyBackdropImage(image, animate: false)
+            // 预捕图就绪即同步喂菜单覆盖条：材质（模糊）+ 源文字（清晰裁剪）都取自
+            // 同一张整屏图，避免预捕路径下覆盖条停留在占位透明态、源菜单不随手指渐隐。
+            applyMenuBarContent(from: image)
             logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）mode=\(mode.rawValue)")
             needAsyncBackdrop = false
         case .inflight(let dir):
@@ -236,6 +262,11 @@ final class SlideTransitionController {
         currentOffset = 0
         isActive = true
 
+        // 顶部菜单栏覆盖条（level 25）：材质背景 + AX 自绘源/目标菜单文字随手指交叉淡化。
+        let sourcePID = sourceInfo.ownerPid
+        let targetPID = plan.targetID.flatMap { wm.windows[$0]?.ownerPid }
+        createMenuCover(sourcePID: sourcePID, targetPID: targetPID)
+
         // 首帧位移在面板可见前应用：淡入时即带正确的小位移，避免「淡入后从 0 瞬移」弹射。
         update(progress: initialProgress)
 
@@ -246,7 +277,8 @@ final class SlideTransitionController {
         }
 
         if needAsyncBackdrop {
-            captureBackdrop(excluding: excludedIDs, panelWindowNumber: panel.windowNumber, inflight: inflight)
+            captureBackdrop(excluding: excludedIDs, panelWindowNumber: panel.windowNumber,
+                            coverWindowNumber: menuCoverPanel?.windowNumber, inflight: inflight)
         }
         scheduleDiagSamples()
 
@@ -289,6 +321,30 @@ final class SlideTransitionController {
                                           pointsPerProgress: pointsPerProgress,
                                           screenWidth: screenRect.width)
         applyCurrentOffset()
+        applyTitleOverlays()
+        applyMenuCover()
+    }
+
+    /// 顶栏外观覆盖层 alpha = 归一化位移（随手指渐暗/渐亮，折返逆转）。
+    private func applyTitleOverlays() {
+        guard !titleOverlays.isEmpty else { return }
+        let tp = min(1, max(0, abs(currentOffset) / max(screenRect.width, 1)))
+        for ov in titleOverlays { ov.alphaValue = tp }
+    }
+
+    /// 菜单文字层 alpha = 随 progress 顺序淡化（不重叠）：源菜单截图先完全消失
+    /// （0→0.7，p≥0.7 时为 0），目标菜单截图在其后才开始渐显（0.72→1）——保证
+    /// 「源文字完全不可见后，目标文字才淡入」。折返逆转。目标无缓存时该层为空 →
+    /// commit 后瞬显。材质背景恒不透明（遮真实源菜单），文字层为唯一变化面。
+    private func applyMenuCover() {
+        let p = min(1, max(0, abs(currentOffset) / max(screenRect.width, 1)))
+        sourceMenuImageView?.alphaValue = 1 - smoothstep(p, edge0: 0, edge1: 0.7)
+        targetMenuImageView?.alphaValue = smoothstep(p, edge0: 0.72, edge1: 1.0)
+    }
+
+    private func smoothstep(_ x: CGFloat, edge0: CGFloat, edge1: CGFloat) -> CGFloat {
+        let t = min(1, max(0, (x - edge0) / max(edge1 - edge0, 0.0001)))
+        return t * t * (3 - 2 * t)
     }
 
     /// 按 currentOffset 平移源 / 额外滑动视图。
@@ -342,19 +398,53 @@ final class SlideTransitionController {
             for s in extraSlideViews {
                 s.view.animator().setFrameOrigin(NSPoint(x: s.view.frame.minX + delta, y: s.view.frame.minY))
             }
+            // 顶栏覆盖层：提交→补满（渐暗/渐亮到位）；回弹→归零（源顶栏/菜单还原）。
+            for ov in titleOverlays {
+                ov.animator().alphaValue = commit ? 1 : 0
+            }
+            // 覆盖条保持不透明（遮住真实菜单栏切换）；整体淡出在 finishSettle 进行。
+            // 菜单文字层不走此组——提交时须「源先消失、目标后渐显」顺序执行，见下。
+            menuCoverPanel?.animator().alphaValue = 1
         } completionHandler: { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
             self.finishSettle(commit: commit, onComplete: onComplete)
         }
+
+        // 菜单文字层（独立顺序动画，与滑动动画并行）：提交→源文字先完全消失
+        //（~0.10s easeOut），目标文字随后渐显（~0.18s easeInOut），两段串行、
+        // 在 settleDuration(0.30s) 内完成、互不重叠；回弹→源/目标文字并行还原
+        //（无真实内容切换，恢复静止态即可）。
+        if commit {
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.10
+                ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                sourceMenuImageView?.animator().alphaValue = 0
+            } completionHandler: { [weak self] in
+                guard let self, token == self.sessionToken else { return }
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.18
+                    ctx.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                    self.targetMenuImageView?.animator().alphaValue = 1
+                } completionHandler: {}
+            }
+        } else {
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.12
+                ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                sourceMenuImageView?.animator().alphaValue = 1
+                targetMenuImageView?.animator().alphaValue = 0
+            } completionHandler: {}
+        }
     }
 
     /// 收尾：settle 滑动动画完成后收起面板。
-    /// commit 时先把面板层级提到菜单栏之上（盖住真实菜单栏，使其内容切换不可见），
-    /// 再回调激活目标（新菜单栏在面板下完成切换），最后面板 alpha 淡出——旧菜单栏
-    /// （背景图中源 App 的菜单）随面板渐隐、真实新菜单栏渐显，消除「新菜单栏突然
-    /// 出现」。回弹无内容切换，仅面板淡出平滑收起（顺带把 reveal 遮挡者的「原位
-    /// 重现」由瞬切变成渐显）。
+    /// 不再抬面板到 popUpMenu——菜单栏过渡由 level 25 覆盖条负责：commit 时面板
+    /// 保持 23、菜单覆盖条保持不透明，onComplete 激活目标（真实菜单栏在覆盖条后
+    /// 切换为目标菜单），随后面板 alpha 与菜单覆盖条 alpha 同步淡出——目标窗口
+    /// 顶栏随面板渐显、真实目标菜单随覆盖条渐显，两者同节奏，无弹跳。
+    /// 回弹无内容切换，仅面板淡出平滑收起（顺带把 reveal 遮挡者的「原位重现」
+    /// 由瞬切变成渐显）。
     private func finishSettle(commit: Bool, onComplete: (() -> Void)?) {
         guard let panel else {
             onComplete?()
@@ -363,10 +453,6 @@ final class SlideTransitionController {
             return
         }
         let token = sessionToken
-        if commit {
-            panel.level = .popUpMenu
-            panel.orderFrontRegardless()
-        }
         onComplete?()
         diagSample(label: "finishSettle")
         let settleFadeToken = token
@@ -375,9 +461,12 @@ final class SlideTransitionController {
             self.diagSample(label: "finishSettle+60ms")
         }
         NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = 0.12
-            ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            // 提交：0.3s easeInOut 让窗口顶栏（面板内容）与真实目标菜单（覆盖条
+            // 之下）同步渐显，节奏一致；回弹无窗口/菜单切换，短淡出快速收起。
+            ctx.duration = commit ? 0.30 : 0.15
+            ctx.timingFunction = CAMediaTimingFunction(name: commit ? .easeInEaseOut : .easeOut)
             panel.animator().alphaValue = 0
+            menuCoverPanel?.animator().alphaValue = 0
         } completionHandler: { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
@@ -413,7 +502,7 @@ final class SlideTransitionController {
     /// 最小化后桌面的剩余堆叠。截屏到达前以不透明黑层占位（杜绝源窗口残像），
     /// 失败则回退为近乎透明黑，让真实桌面可见。
     private func captureBackdrop(excluding windowIDs: [CGWindowID], panelWindowNumber: Int,
-                                 inflight: BackdropPreCapturer.Direction?) {
+                                 coverWindowNumber: Int?, inflight: BackdropPreCapturer.Direction?) {
         let token = sessionToken
         let scr = screenRect
         Task { @MainActor in
@@ -422,17 +511,21 @@ final class SlideTransitionController {
                let image = await BackdropPreCapturer.shared.awaitImage(inflight, timeout: 0.35) {
                 guard token == self.sessionToken else { return }
                 self.applyBackdropImage(image, animate: true)
+                self.applyMenuBarContent(from: image)
                 logDebug("SLIDE: backdrop via in-flight pre-capture（淡入）excluded=\(inflight.excludedCount ?? 0)")
                 logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(image))")
                 return
             }
             do {
+                var excl = Set(windowIDs)
+                if let coverWindowNumber { excl.insert(CGWindowID(coverWindowNumber)) }
                 let result = try await BackdropPreCapturer.captureDesktop(
-                    size: scr.size, excluding: Set(windowIDs), panelWindowNumber: panelWindowNumber)
+                    size: scr.size, excluding: excl, panelWindowNumber: panelWindowNumber)
                 guard token == self.sessionToken else { return }
                 // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。不透明黑占位保留在
                 // 底层（防源残像），图像视图淡入覆盖其上，消除「黑 → 桌面」硬切闪跳。
                 self.applyBackdropImage(result.image, animate: true)
+                self.applyMenuBarContent(from: result.image)
                 // 像素诊断①：SCK 背景帧内容亮度（mean≈0 → 后期返回黑帧，坐实假设①）。
                 logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(result.image))")
                 scheduleBackdropFadeSamples(token: token)
@@ -467,6 +560,43 @@ final class SlideTransitionController {
                 imageView.animator().alphaValue = 1
             } completionHandler: {}
         }
+    }
+
+    /// 从全屏背景图 crop 顶部菜单栏区域 → 高斯模糊（抹掉文字）→ 作为覆盖条材质
+    /// 背景，替换初始占位色。仅填一次（图就绪后不再覆盖）。crop 只取菜单文本区
+    /// 宽度（0→coverW），避免整条横向缩放失真。
+    /// 背景图到达时设置菜单覆盖条内容：① 背景 = 顶部 37pt 强模糊材质（抹净源文字，
+    /// 遮住 live 源菜单）；② 源文字层 = 同区域清晰真实像素（与 live 源菜单完全重合，
+    /// 随手指渐隐）。源截图与背景取自同一张整屏图，无需额外采集。
+    private func applyMenuBarContent(from fullImage: CGImage) {
+        let scale = CGFloat(fullImage.height) / max(screenRect.height, 1)
+        let menuBarPx = max(Int(WindowManager.menuBarHeightPoints * scale), 1)
+        let coverW = menuBackgroundView?.frame.width ?? sourceMenuImageView?.frame.width ?? 0
+        guard coverW > 0 else { return }
+        let cropW = max(Int(coverW * scale), 1)
+        guard let crop = MenuBarImageCache.cropTopStrip(from: fullImage,
+                                                        coverWidthPx: cropW,
+                                                        menuBarPx: menuBarPx) else { return }
+        if let menuBackgroundView, menuBackgroundView.image == nil {
+            let input = CIImage(cgImage: crop)
+            let filter = CIFilter.gaussianBlur()
+            filter.inputImage = input
+            filter.radius = 25
+            if let blurred = filter.outputImage {
+                let ctx = CIContext(options: [.workingColorSpace: NSNull()])
+                if let blurredCG = ctx.createCGImage(blurred, from: input.extent) {
+                    menuBackgroundView.image = NSImage(cgImage: blurredCG,
+                                                       size: NSSize(width: menuBackgroundView.frame.width,
+                                                                    height: menuBackgroundView.frame.height))
+                }
+            }
+        }
+        if let sourceMenuImageView, sourceMenuImageView.image == nil {
+            sourceMenuImageView.image = NSImage(cgImage: crop,
+                                                size: NSSize(width: sourceMenuImageView.frame.width,
+                                                             height: sourceMenuImageView.frame.height))
+        }
+        logDebug("SLIDE: menu cover content applied crop=\(cropW)x\(menuBarPx)px")
     }
 
     // MARK: - 像素级诊断（仅日志，不影响行为）
@@ -628,9 +758,137 @@ final class SlideTransitionController {
         panelWindowNumber = 0
         sourceView = nil
         extraSlideViews = []
+        titleOverlays = []
         sourceBase = .zero
         sourceIsStatic = false
         mode = .staticSource
+        menuCoverPanel?.orderOut(nil)
+        menuCoverPanel = nil
+        menuBackgroundView = nil
+        sourceMenuImageView = nil
+        targetMenuImageView = nil
+    }
+
+    /// 顶栏覆盖层要模拟的外观。源=非激活（随手指渐暗）；目标=激活（随手指渐亮）。
+    private enum TitleAppearance {
+        case active
+        case inactive
+    }
+
+    /// 上叠顶栏外观覆盖视图：缓存外观条优先（真外观，交叉溶解保真度高），缺失则用
+    /// 亮度合成回退（目标≈调亮、源≈调暗去饱和）。overlay 初始 alpha=0，随手指
+    /// progress 渐显（applyTitleOverlays 驱动）。
+    private func attachTitleOverlay(to parentView: NSImageView, windowID: CGWindowID,
+                                    currentCapture: NSImage?, want: TitleAppearance) {
+        let strip = WindowManager.shared.appearanceStrip(windowID: windowID, active: want == .active)
+            ?? synthesizedTitleStrip(from: currentCapture, want: want, width: parentView.frame.width)
+        guard let strip else {
+            logDebug("SLIDE: title overlay skip win=\(windowID) want=\(want == .active ? "active" : "inactive")")
+            return
+        }
+        let h = strip.size.height
+        let ov = NSImageView(frame: NSRect(x: 0, y: parentView.frame.height - h,
+                                           width: parentView.frame.width, height: h))
+        ov.image = strip
+        ov.imageScaling = .scaleAxesIndependently
+        ov.wantsLayer = true
+        ov.alphaValue = 0
+        parentView.addSubview(ov)
+        titleOverlays.append(ov)
+    }
+
+    /// 亮度合成顶栏条（外观缓存缺失时的回退）：截取当前捕获图的顶部条，目标=调亮、
+    /// 源=调暗 + 去饱和（近似非激活灰）。非精确外观，仅保渐变节奏。
+    private func synthesizedTitleStrip(from image: NSImage?, want: TitleAppearance, width: CGFloat) -> NSImage? {
+        guard let image,
+              let cg = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let h = min(image.size.height, WindowManager.titleBarHeightPoints)
+        let scale = CGFloat(cg.height) / max(image.size.height, 1)
+        let stripPx = max(Int(h * scale), 1)
+        guard let stripCg = cg.cropping(to: CGRect(x: 0, y: 0,
+                                                   width: CGFloat(cg.width), height: CGFloat(stripPx))) else { return nil }
+        let filter = CIFilter.colorControls()
+        filter.inputImage = CIImage(cgImage: stripCg)
+        filter.saturation = want == .active ? 1.05 : 0.15
+        filter.brightness = want == .active ? 0.16 : -0.22
+        guard let out = filter.outputImage else { return nil }
+        let ctx = CIContext(options: [.workingColorSpace: NSNull()])
+        guard let result = ctx.createCGImage(out, from: out.extent) else { return nil }
+        return NSImage(cgImage: result, size: NSSize(width: width, height: h))
+    }
+
+    /// 屏幕顶部菜单栏覆盖条（level 25，37pt 高，全宽）。三层结构：
+    /// ① 材质模糊背景（SCK 截源菜单栏区域高斯模糊，始终不透明遮真实源菜单）；
+    /// ② 源菜单文字容器（AX 自绘，alpha 1→0 随手指渐隐）；③ 目标菜单文字容器
+    /// （AX 自绘，alpha 0→1 随手指渐显）。commit 后真实菜单栏在覆盖条后切换，
+    /// 覆盖条随面板淡出，露出真实目标菜单（与自绘文字位置一致，衔接自然）。
+    /// 仅盖菜单文本区（0→最左状态栏图标 x），状态栏图标区透明、全程可见。
+    private func createMenuCover(sourcePID: pid_t?, targetPID: pid_t?) {
+        let menuBarHeight = WindowManager.menuBarHeightPoints
+        let coverFrame = NSRect(x: screenRect.minX, y: screenRect.maxY - menuBarHeight,
+                                width: screenRect.width, height: menuBarHeight)
+        let statusX = leftmostStatusItemX()
+        let coverW = min(coverFrame.width, max(1, statusX))
+
+        let cover = NSPanel(contentRect: coverFrame, styleMask: [.borderless, .nonactivatingPanel],
+                            backing: .buffered, defer: false)
+        cover.isFloatingPanel = true
+        cover.level = NSWindow.Level(rawValue: 25)
+        cover.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        cover.backgroundColor = .clear
+        cover.isOpaque = false
+        cover.hasShadow = false
+        cover.ignoresMouseEvents = true
+        cover.hidesOnDeactivate = false
+        cover.isMovable = false
+        cover.isReleasedWhenClosed = false
+
+        let content = NSView(frame: NSRect(origin: .zero, size: coverFrame.size))
+
+        // ① 材质背景：占位完全透明（不引入任何额外视觉变化——SCK 模糊材质到达前
+        // 真实源菜单透过覆盖条直接可见，与静止态一致）；applyMenuBarContent 异步
+        // 到达后替换为强模糊源菜单区（抹净文字、仍无白板感）。
+        let bg = NSImageView(frame: NSRect(x: 0, y: 0, width: coverW, height: menuBarHeight))
+        bg.wantsLayer = true
+        bg.layer?.backgroundColor = NSColor.clear.cgColor
+        bg.imageScaling = .scaleAxesIndependently
+        content.addSubview(bg)
+        menuBackgroundView = bg
+
+        // ② 源文字层：真实像素（整屏背景图裁剪的清晰源菜单截图），背景图到达时设置。
+        let sourceImage = NSImageView(frame: NSRect(x: 0, y: 0, width: coverW, height: menuBarHeight))
+        sourceImage.wantsLayer = true
+        sourceImage.imageScaling = .scaleAxesIndependently
+        content.addSubview(sourceImage)
+        sourceMenuImageView = sourceImage
+
+        // ③ 目标文字层：目标菜单区缓存真实像素（会话内该 App 激活过即有）；无缓存
+        // → 空层，不随手指渐显，commit 后覆盖条淡出直接揭示真实目标菜单（瞬变）。
+        let targetImage = NSImageView(frame: NSRect(x: 0, y: 0, width: coverW, height: menuBarHeight))
+        targetImage.wantsLayer = true
+        targetImage.imageScaling = .scaleAxesIndependently
+        if let targetPID, let strip = MenuBarImageCache.shared.strip(pid: targetPID) {
+            targetImage.image = NSImage(cgImage: strip,
+                                        size: NSSize(width: coverW, height: menuBarHeight))
+            logDebug("SLIDE: menu cover target cached pid=\(targetPID) \(strip.width)x\(strip.height)px")
+        } else {
+            logDebug("SLIDE: menu cover target no-cache → commit 瞬显")
+        }
+        content.addSubview(targetImage)
+        targetMenuImageView = targetImage
+
+        cover.contentView = content
+        cover.orderFrontRegardless()
+        menuCoverPanel = cover
+        logDebug("SLIDE: menu cover h=\(Int(menuBarHeight)) statusX=\(Int(statusX)) coverW=\(Int(coverW))")
+    }
+
+    /// 最左状态栏图标的全局 x（CG 顶部原点坐标；单屏下与 NS 左起点一致）。
+    /// 扫描逻辑抽到 MenuBarImageCache.leftmostStatusItemX（采集端共用），此处仅取回+日志。
+    private func leftmostStatusItemX() -> CGFloat {
+        let result = MenuBarImageCache.leftmostStatusItemX(fallbackScreenWidth: screenRect.width)
+        logDebug("SLIDE: status items leftmostX=\(Int(result))")
+        return result
     }
 
     /// 将 CGWindowList bounds（左上原点、y 向下、全局坐标）转成 NS 全局坐标

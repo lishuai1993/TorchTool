@@ -638,6 +638,67 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { _ in
             logDebug("Session observers: session resigned (lock/sleep/FUS)")
         })
+        // 菜单栏真实像素缓存采集：App 变为前台且尚无缓存时，采集其菜单横条
+        //（刘海左侧）。每 App 会话内只采一次（contains 判定），供滑动过渡目标侧用。
+        sessionObservers.append(center.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification,
+            object: nil, queue: .main
+        ) { [weak self] note in
+            guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            let cached = MenuBarImageCache.shared.contains(pid: app.processIdentifier)
+            logDebug("MENU-CACHE: activate pid=\(app.processIdentifier) name=\(app.localizedName ?? "?") cached=\(cached)")
+            self?.scheduleMenuBarCacheCapture(for: app.processIdentifier)
+        })
+    }
+
+    // MARK: - 菜单栏真实像素缓存采集
+
+    /// App 变为前台时采集其菜单横条（刘海左侧真实像素）缓存。每 App 会话内只采
+    /// 一次（已有缓存跳过）；延迟 ~0.3s 执行以等菜单渲染完成/滑动淡出结束；采集前
+    /// 校验 frontmost 仍为该 pid（防延迟窗口内用户切走而采错 App）。源 App 滑动时
+    /// 菜单就在整屏背景图里、无需此采集——本缓存专供「目标侧」滑动过渡使用。
+    private func scheduleMenuBarCacheCapture(for pid: pid_t, delay: TimeInterval = 0.3) {
+        let ourPid = ProcessInfo.processInfo.processIdentifier
+        guard pid != ourPid else { return }
+        guard !MenuBarImageCache.shared.contains(pid: pid) else { return }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            guard pid != ProcessInfo.processInfo.processIdentifier else { return }
+            guard !MenuBarImageCache.shared.contains(pid: pid) else { return }
+            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid else {
+                logDebug("MENU-CACHE: skip pid=\(pid) frontmost changed")
+                return
+            }
+            guard let screen = NSScreen.main else { return }
+            let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+            var ownNumbers = Set<CGWindowID>()
+            for w in list {
+                guard let wpid = w[kCGWindowOwnerPID as String] as? Int, wpid == ourPid else { continue }
+                if let num = w[kCGWindowNumber as String] as? Int {
+                    ownNumbers.insert(CGWindowID(num))
+                }
+            }
+            do {
+                let result = try await BackdropPreCapturer.captureDesktop(
+                    size: screen.frame.size,
+                    excluding: ownNumbers,
+                    panelWindowNumber: nil)
+                let scale = CGFloat(result.image.height) / max(screen.frame.height, 1)
+                let menuBarPx = max(Int(WindowManager.menuBarHeightPoints * scale), 1)
+                let coverW = MenuBarImageCache.leftmostStatusItemX(fallbackScreenWidth: screen.frame.width)
+                let coverPx = max(Int(coverW * scale), 1)
+                guard let strip = MenuBarImageCache.cropTopStrip(from: result.image,
+                                                                 coverWidthPx: coverPx,
+                                                                 menuBarPx: menuBarPx) else {
+                    logDebug("MENU-CACHE: crop failed pid=\(pid)")
+                    return
+                }
+                MenuBarImageCache.shared.record(pid: pid, strip: strip)
+                logDebug("MENU-CACHE: record pid=\(pid) \(strip.width)x\(strip.height)px coverW=\(Int(coverW))")
+            } catch {
+                logDebug("MENU-CACHE: capture failed pid=\(pid) — \(error.localizedDescription)")
+            }
+        }
     }
 
     private func scheduleGestureRestart() {
