@@ -606,50 +606,6 @@ private func testSlideOffset() {
     }
 }
 
-// MARK: - SlideGeometry（覆盖/露出几何判别）Tests
-// 验证 buried/reveal 判别（统一模型 2.3）：全盖→buried、有意义露出→reveal、
-// 微小露出→buried、遮挡者并集覆盖→buried、矩形减法面积守恒。
-
-private func testSlideGeometry() {
-    let target = CGRect(x: 0, y: 0, width: 800, height: 600)
-
-    runSuite("全屏源盖住目标 → buried") {
-        let full = CGRect(x: 0, y: 0, width: 1470, height: 956)
-        assertTrue(SlideGeometry.isEffectivelyCovered(target, by: [full]))
-    }
-
-    runSuite("目标明显部分露出（≥60px）→ reveal") {
-        let cover = CGRect(x: 0, y: 0, width: 800, height: 300)
-        assertFalse(SlideGeometry.isEffectivelyCovered(target, by: [cover]))
-    }
-
-    runSuite("微小露出（55px < 60 阈值）→ buried") {
-        let cover = CGRect(x: 0, y: 0, width: 800, height: 545)
-        assertTrue(SlideGeometry.isEffectivelyCovered(target, by: [cover]))
-    }
-
-    runSuite("遮挡者并集覆盖目标 → buried（单窗只盖一半，并集盖全）") {
-        let a = CGRect(x: 0, y: 0, width: 400, height: 600)
-        let b = CGRect(x: 400, y: 0, width: 400, height: 600)
-        assertTrue(SlideGeometry.isEffectivelyCovered(target, by: [a, b]))
-    }
-
-    runSuite("矩形减法：挖去中心后面积守恒且剩 4 块") {
-        let cover = CGRect(x: 200, y: 150, width: 400, height: 300)
-        let regions = SlideGeometry.exposedRegions(target, subtracting: [cover])
-        let area = regions.reduce(0) { $0 + $1.width * $1.height }
-        assertEqual(regions.count, 4)
-        assertEqual(area, 800 * 600 - 400 * 300)
-    }
-
-    runSuite("完全不覆盖 → 露出区域 = 目标本身") {
-        let offscreen = CGRect(x: 2000, y: 2000, width: 100, height: 100)
-        let regions = SlideGeometry.exposedRegions(target, subtracting: [offscreen])
-        assertEqual(regions.count, 1)
-        assertEqual(regions[0], target)
-    }
-}
-
 // MARK: - MenuBarImageCache（菜单横条真实像素缓存）Tests
 // 纯内存缓存 + 顶部裁剪，无外部依赖、无 SCK 权限要求。
 
@@ -740,10 +696,6 @@ struct TestRunner {
         print("")
         print("[SlideOffset]")
         testSlideOffset()
-
-        print("")
-        print("[SlideGeometry]")
-        testSlideGeometry()
 
         print("")
         print("[MenuBarImageCache]")

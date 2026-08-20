@@ -1,58 +1,20 @@
 import AppKit
 import ScreenCaptureKit
 
-/// 一次滑动方向的计划：模式、排除集合与滑动遮挡者。由 SlideModeResolver 计算，
-/// trackingBegan 预捕与 begin() 实际计算共用同一份代码，保证两者判别完全一致。
-struct SlideModePlan {
-    let mode: SlideMode
-    /// buried 且目标存在 → 源恒静态；reveal / 边界 → 源滑动。
-    let sourceIsStatic: Bool
-    /// SCK 背景排除集（源 + reveal 遮挡者 / buried 目标）。反向邻居恒静态、永不排除。
-    let excludedIDs: [CGWindowID]
-    /// 全部遮挡者（前→后，诊断用）。
-    let occluders: [(id: CGWindowID, name: String, frame: CGRect)]
-    /// reveal 模式实际滑出的遮挡者（不含源/反向邻居；back→front 视图顺序）。
-    let slideOccluders: [(id: CGWindowID, name: String, frame: CGRect)]
+/// 一次滑动方向的计划：仅方向目标。由 SlideResolver 计算，trackingBegan 预捕与
+/// begin() 实际计算共用同一份代码，保证两者判别完全一致。
+struct SlidePlan {
     let targetID: CGWindowID?
     let reverseID: CGWindowID?
 }
 
-/// 滑动过渡方向/模式判别（buried / reveal）与排除集合计算。
+/// 滑动过渡方向计划（统一模型：仅目标窗口滑入，背景无排除集）。
 /// sign≥0（右滑）→ 目标=leftID、反向=rightID；sign<0（左滑）→ 目标=rightID、反向=leftID。
-enum SlideModeResolver {
-    static func plan(wm: WindowManager, sourceID: CGWindowID,
-                     leftID: CGWindowID?, rightID: CGWindowID?, sign: Int) -> SlideModePlan {
+enum SlideResolver {
+    static func plan(sign: Int, leftID: CGWindowID?, rightID: CGWindowID?) -> SlidePlan {
         let targetID = sign >= 0 ? leftID : rightID
         let reverseID = sign >= 0 ? rightID : leftID
-        let targetInfo = targetID.flatMap { wm.windows[$0] }
-        let occluders = targetInfo.map { wm.occluders(aboveTarget: $0.id, frame: $0.frame) } ?? []
-        let targetCovered = targetInfo.map { t in
-            SlideGeometry.isEffectivelyCovered(t.frame, by: occluders.map(\.frame))
-        } ?? false
-
-        if targetInfo != nil && !targetCovered {
-            // REVEAL：目标部分可见 → 目标留背景真实位；源 + 遮挡者（不含反向邻居）
-            // 以真实位为基准滑出。occluders 为前→后序，逆序添加使前部遮挡者靠上。
-            var excluded = [sourceID]
-            var slideOccluders: [(id: CGWindowID, name: String, frame: CGRect)] = []
-            for occ in occluders.reversed() {
-                if occ.id == sourceID || occ.id == reverseID { continue }
-                excluded.append(occ.id)
-                slideOccluders.append(occ)
-            }
-            return SlideModePlan(mode: .reveal, sourceIsStatic: false,
-                                 excludedIDs: excluded, occluders: occluders,
-                                 slideOccluders: slideOccluders,
-                                 targetID: targetID, reverseID: reverseID)
-        } else {
-            // BURIED / 边界：目标（若存在）被完全覆盖 → 目标图像从对侧滑入、源
-            // staticSource；边界（目标侧无窗口）→ 无目标视图，源随手指 wall-bump。
-            var excluded = [sourceID]
-            if let info = targetInfo { excluded.append(info.id) }
-            return SlideModePlan(mode: .staticSource, sourceIsStatic: targetInfo != nil,
-                                 excludedIDs: excluded, occluders: occluders,
-                                 slideOccluders: [], targetID: targetID, reverseID: reverseID)
-        }
+        return SlidePlan(targetID: targetID, reverseID: reverseID)
     }
 }
 
@@ -68,11 +30,11 @@ final class BackdropPreCapturer {
     /// 预捕方向结果（类引用：捕获 Task 写回，begin/异步路径轮询读取）。
     final class Direction {
         let sign: Int
-        let plan: SlideModePlan
+        let plan: SlidePlan
         var image: CGImage?
         var excludedCount: Int?
         var done = false
-        init(sign: Int, plan: SlideModePlan) {
+        init(sign: Int, plan: SlidePlan) {
             self.sign = sign
             self.plan = plan
         }
@@ -104,30 +66,24 @@ final class BackdropPreCapturer {
     /// 三指落地：按当前（最近一次 refresh 的）LRU 快照计算左右两方向计划并并行捕获。
     /// sourceID/leftID/rightID 由 WindowManager.beginBackdropPreCapture 提供。
     func start(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?, screenSize: CGSize) {
-        let wm = WindowManager.shared
-        let right = Direction(sign: 1, plan: SlideModeResolver.plan(wm: wm, sourceID: sourceID,
-                                                                   leftID: leftID, rightID: rightID, sign: 1))
-        let left = Direction(sign: -1, plan: SlideModeResolver.plan(wm: wm, sourceID: sourceID,
-                                                                    leftID: leftID, rightID: rightID, sign: -1))
+        let right = Direction(sign: 1, plan: SlideResolver.plan(sign: 1, leftID: leftID, rightID: rightID))
+        let left = Direction(sign: -1, plan: SlideResolver.plan(sign: -1, leftID: leftID, rightID: rightID))
         session = Session(sourceID: sourceID, leftID: leftID, rightID: rightID,
                           screenSize: screenSize, rightSwipe: right, leftSwipe: left)
-        logDebug("SLIDE: pre-capture start source=\(sourceID) left=\(leftID.map(String.init) ?? "nil") right=\(rightID.map(String.init) ?? "nil") modeR=\(right.plan.mode.rawValue) modeL=\(left.plan.mode.rawValue)")
+        logDebug("SLIDE: pre-capture start source=\(sourceID) left=\(leftID.map(String.init) ?? "nil") right=\(rightID.map(String.init) ?? "nil")")
         Task { @MainActor in await Self.capture(into: right, screenSize: screenSize) }
         Task { @MainActor in await Self.capture(into: left, screenSize: screenSize) }
     }
 
     /// begin() 一次性消费：取命中方向的结果并清空会话（无论结果如何，本会话不再复用）。
-    /// 参数不匹配（窗口/方向/模式/排除集变化）→ .none，begin 走全新捕获。
+    /// 参数不匹配（窗口/方向变化）→ .none，begin 走全新捕获。
     func take(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?,
-              screenSize: CGSize, sign: Int, mode: SlideMode, excludedIDs: [CGWindowID]) -> TakeResult {
+              screenSize: CGSize, sign: Int) -> TakeResult {
         guard let session, session.sourceID == sourceID,
               session.leftID == leftID, session.rightID == rightID,
               session.screenSize == screenSize else { return .none }
         let dir = sign >= 0 ? session.rightSwipe : session.leftSwipe
         self.session = nil  // 消费即清空，防旧图被后续手势误用
-        guard dir.plan.mode == mode, Set(dir.plan.excludedIDs) == Set(excludedIDs) else {
-            return .none
-        }
         if let image = dir.image { return .ready(image) }
         return .inflight(dir)
     }
@@ -147,8 +103,9 @@ final class BackdropPreCapturer {
         session = nil
     }
 
-    /// 单方向 SCK 捕获。panelWindowNumber 非 nil 时额外排除本进程全屏面板（防双影）；
-    /// 预捕阶段面板尚未创建，传 nil（排除集只有计划窗口）。
+    /// 单方向 SCK 捕获。统一模型背景无窗口排除集（接受目标滑入时与背景真实位重影）；
+    /// windowIDs 仅携带菜单覆盖条等本进程面板窗口号。panelWindowNumber 非 nil 时额外
+    /// 排除本进程全屏面板（防双影）；预捕阶段面板尚未创建，传 nil。
     static func captureDesktop(size: CGSize, excluding windowIDs: Set<CGWindowID>,
                                panelWindowNumber: Int?) async throws -> (image: CGImage, excluded: [SCWindow]) {
         let content = try await SCShareableContent.current
@@ -191,14 +148,13 @@ final class BackdropPreCapturer {
     private static func capture(into direction: Direction, screenSize: CGSize) async {
         do {
             let result = try await captureDesktop(size: screenSize,
-                                                  excluding: Set(direction.plan.excludedIDs),
+                                                  excluding: [],
                                                   panelWindowNumber: nil)
             direction.image = result.image
             direction.excludedCount = result.excluded.count
             direction.done = true
             logDebug("SLIDE: pre-capture done dir=\(direction.sign > 0 ? "right" : "left") "
-                     + "\(result.image.width)x\(result.image.height)px mode=\(direction.plan.mode.rawValue) "
-                     + "excluded=\(result.excluded.count)")
+                     + "\(result.image.width)x\(result.image.height)px")
         } catch {
             direction.done = true
             logDebug("SLIDE: pre-capture failed dir=\(direction.sign > 0 ? "right" : "left") — \(error.localizedDescription)")

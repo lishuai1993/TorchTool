@@ -5,16 +5,15 @@ import CoreImage.CIFilterBuiltins
 
 /// 三指横滑「跟随手指」滑动过渡切换。
 ///
-/// 会话开始时抓拍源窗口与左右邻窗口（LRU 相邻）快照，以全屏透明 NSPanel
-/// 呈现。三个窗口图像保持真实尺寸与纵向位置，横向按 offset 统一平移：
+/// 统一模型：仅目标窗口图像从对侧滑入真实位，源、遮挡者、反向邻居全部静态留
+/// 背景。目标窗口保持真实尺寸与纵向位置，横向按 offset 平移：
 ///   offset = progress × pointsPerProgress，pointsPerProgress = ratio × swipeMinDisplacement × 屏宽
-///   source.x = sourceBase.x + offset
-///   left.x   = sourceBase.x − W + offset（左邻锚定源窗口左侧一屏宽）
-///   right.x  = sourceBase.x + W + offset（右邻锚定源窗口右侧一屏宽）
-/// 任意 offset 下三窗次序不变，反转 / 改方向由数学自动处理。
+///   target.x = real.minX − 屏宽 + offset（右滑）/ real.minX + 屏宽 + offset（左滑）
+/// 任意 offset 下目标从对侧跟手滑入、折返逆转；边界（目标侧无窗口）时源随手指
+/// 按弹性公式 wall-bump，释放回弹。
 ///
-/// 背景层（方案 B）用 ScreenCaptureKit 截取「排除源/左右邻/本面板后所见的屏幕」，
-/// 等价于「把源窗口最小化到 Dock 后桌面剩余堆叠」，不再使用半透明黑压层。
+/// 背景层（方案 B）用 ScreenCaptureKit 截取整屏桌面（无窗口排除集，接受目标滑入
+/// 时与背景真实位重影；仅排除本面板与菜单覆盖条），不再使用半透明黑压层。
 final class SlideTransitionController {
     static let shared = SlideTransitionController()
 
@@ -24,12 +23,8 @@ final class SlideTransitionController {
     private(set) var isActive = false
     /// 当前横向位移（像素，右为正，clamp 在 ±屏宽）。供释放判定使用。
     private(set) var currentOffset: CGFloat = 0
-    /// 模式（共享 SlideMode）：目标被完全覆盖 → staticSource（源恒静态，仅目标滑入）；
-    /// 目标部分可见 → reveal（源 + 遮挡者滑出）。边界（目标侧无窗口）时目标为 nil，
-    /// 源随手指滑动产生 wall-bump，释放回弹。
-
-    private var sourceIsStatic = false
-    private var mode: SlideMode = .staticSource
+    /// 边界（目标侧无窗口）：无目标视图，源随手指按弹性公式 wall-bump，释放回弹。
+    private var boundary = false
     /// 源窗口所在屏幕宽度（点）。
     var screenWidth: CGFloat { screenRect.width }
 
@@ -40,18 +35,14 @@ final class SlideTransitionController {
     /// 当前面板窗口号（像素诊断：采样面板合成输出；teardown 置 0）。
     private var panelWindowNumber: CGWindowID = 0
     private var sourceView: NSImageView?
-    /// 除源窗口外的滑动视图（buried：目标图像锚定 ±屏宽滑入；reveal：遮挡者图像
-    /// 锚定真实位滑出）。统一按 offset 平移。
+    /// 除源窗口外的滑动视图：统一模型下仅目标图像（锚定真实位 ± 屏宽滑入），
+    /// 按 offset 平移。
     private struct SlidingImage {
         let view: NSImageView
         let baseX: CGFloat
         let realFrame: NSRect
     }
     private var extraSlideViews: [SlidingImage] = []
-
-    /// 顶栏外观覆盖视图（源=非激活外观渐显→渐暗；目标=激活外观渐显→渐亮）。
-    /// 每个覆盖视图是滑动窗口图像的子视图，随窗口移动；alpha 由 progress 驱动。
-    private var titleOverlays: [NSImageView] = []
 
     /// 屏幕顶部菜单栏覆盖条面板（level 25，37pt 高，全宽）。内部三层：材质模糊
     /// 背景（始终不透明，遮住真实源菜单）+ 源/目标菜单文字区（真实像素截图，
@@ -95,11 +86,8 @@ final class SlideTransitionController {
         var sourceReal: NSRect = .zero
         var leftReal: NSRect = .zero
         var rightReal: NSRect = .zero
-        var modeLabel = ""
         var targetName = ""
         var reverseName = ""
-        /// reveal 模式的遮挡者（真实 frame，面板本地坐标）。
-        var occluders: [(name: String, real: NSRect)] = []
     }
 
     private init() {}
@@ -134,14 +122,12 @@ final class SlideTransitionController {
         let disp = CGFloat(settings.swipeMinDisplacement)
         pointsPerProgress = ratio * disp * screenRect.width
 
-        // 方向/模式判别与排除集合：sign>=0 → 目标=left、反向=right；sign<0 相反。
-        // 与 trackingBegan 预捕共用 SlideModeResolver，保证预捕预测与实际计算一致
-        //（take 校验参数一致性，不一致则回退全新捕获）。
+        // 方向计划：sign>=0 → 目标=left、反向=right；sign<0 相反。
+        // 与 trackingBegan 预捕共用 SlideResolver，保证预捕预测与实际计算一致。
         let sign = initialProgress > 0 ? 1 : (initialProgress < 0 ? -1 : 0)
-        let plan = SlideModeResolver.plan(wm: wm, sourceID: sourceID, leftID: leftID, rightID: rightID, sign: sign)
-        mode = plan.mode
-        sourceIsStatic = plan.sourceIsStatic
+        let plan = SlideResolver.plan(sign: sign, leftID: leftID, rightID: rightID)
         let targetInfo = plan.targetID.flatMap { wm.windows[$0] }
+        boundary = targetInfo == nil
 
         // 面板
         let panel = NSPanel(
@@ -180,48 +166,18 @@ final class SlideTransitionController {
         let sv = makeImageView(image: sourceImage, frame: sourceBase)
         content.addSubview(sv)
         sourceView = sv
-        // 源顶栏随手指渐暗：上叠「非激活外观」顶栏条（缓存优先，缺则亮度合成）。
-        attachTitleOverlay(to: sv, windowID: sourceID, currentCapture: sourceImage, want: .inactive)
 
-        // 排除集 = 源 + 实际渲染的滑动窗口（reveal 遮挡者 / buried 目标）。若某遮挡者
-        // 抓拍失败则不排除、保留在背景（不出现空洞）→ 与预捕计划的 excludedIDs 不一致，
-        // take 判定不匹配、回退全新捕获（抓拍失败属罕见边缘，代价可接受）。
-        var excludedIDs = [sourceID]
-        var revealOccluders: [(name: String, real: NSRect)] = []
-        if mode == .reveal {
-            // REVEAL：目标部分可见 —— 目标留在背景真实位（不排除、不渲染滑动视图）；
-            // 源 + 目标上方遮挡者（不含反向邻居）以真实位为基准沿跟手方向滑出。
-            // 遮挡者视图置于源视图之下（源是最前置窗口）；slideOccluders 已按 back→front
-            // 排序，前部遮挡者靠上、后部靠下，符合真实 z 序。
-            for occ in plan.slideOccluders {
-                guard let image = wm.captureRawImage(for: occ.id, ownerName: occ.name) else {
-                    logDebug("SLIDE: reveal occluder capture failed id=\(occ.id) name=[\(occ.name)]")
-                    continue
-                }
-                let real = localRect(forCG: occ.frame)
-                let ov = makeImageView(image: image, frame: real)
-                content.addSubview(ov, positioned: .below, relativeTo: sv)
-                extraSlideViews.append(SlidingImage(view: ov, baseX: real.minX, realFrame: real))
-                revealOccluders.append((name: occ.name, real: real))
-                excludedIDs.append(occ.id)
-            }
-        } else {
-            // BURIED：目标被完全覆盖 —— 目标图像从对侧滑入真实位（滑动对象=目标）；
-            // 源一律静止（staticSource），反向邻居恒静态留背景。
-            // 边界（目标侧无窗口，targetInfo=nil）：无目标视图，源随手指滑动产生
-            // wall-bump 反馈，释放回弹到原位。
-            if let info = targetInfo,
-               let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
-                let real = localRect(forCG: info.frame)
-                let baseX = real.minX + (sign < 0 ? screenRect.width : -screenRect.width)
-                let tv = makeImageView(image: image,
-                                       frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
-                content.addSubview(tv)
-                extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
-                excludedIDs.append(info.id)
-                // 目标顶栏随手指渐亮：上叠「激活外观」顶栏条。
-                attachTitleOverlay(to: tv, windowID: info.id, currentCapture: image, want: .active)
-            }
+        // 统一模型：仅目标窗口图像从对侧滑入真实位（滑动对象=目标）；源、遮挡者、
+        // 反向邻居全部静态留背景（背景无窗口排除集，接受目标滑入时与背景真实位重影）。
+        // 边界（目标侧无窗口）→ 无目标视图，源随手指按弹性公式 wall-bump。
+        if let info = targetInfo,
+           let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
+            let real = localRect(forCG: info.frame)
+            let baseX = real.minX + (sign < 0 ? screenRect.width : -screenRect.width)
+            let tv = makeImageView(image: image,
+                                   frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
+            content.addSubview(tv)
+            extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
         }
 
         panel.contentView = content
@@ -232,14 +188,13 @@ final class SlideTransitionController {
         var needAsyncBackdrop = true
         switch BackdropPreCapturer.shared.take(
             sourceID: sourceID, leftID: leftID, rightID: rightID,
-            screenSize: screenRect.size, sign: sign,
-            mode: mode, excludedIDs: excludedIDs) {
+            screenSize: screenRect.size, sign: sign) {
         case .ready(let image):
             applyBackdropImage(image, animate: false)
             // 预捕图就绪即同步喂菜单覆盖条：材质（模糊）+ 源文字（清晰裁剪）都取自
             // 同一张整屏图，避免预捕路径下覆盖条停留在占位透明态、源菜单不随手指渐隐。
             applyMenuBarContent(from: image)
-            logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）mode=\(mode.rawValue)")
+            logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）")
             needAsyncBackdrop = false
         case .inflight(let dir):
             inflight = dir
@@ -277,7 +232,7 @@ final class SlideTransitionController {
         }
 
         if needAsyncBackdrop {
-            captureBackdrop(excluding: excludedIDs, panelWindowNumber: panel.windowNumber,
+            captureBackdrop(panelWindowNumber: panel.windowNumber,
                             coverWindowNumber: menuCoverPanel?.windowNumber, inflight: inflight)
         }
         scheduleDiagSamples()
@@ -286,7 +241,7 @@ final class SlideTransitionController {
         let rightName = rightID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
         let leftReal = leftID.flatMap { id in wm.windows[id].map { info in localRect(forCG: info.frame) } } ?? .zero
         let rightReal = rightID.flatMap { id in wm.windows[id].map { info in localRect(forCG: info.frame) } } ?? .zero
-        logDebug("SLIDE: begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screenRect.width))x\(Int(screenRect.height)) ratio=\(String(format: "%.2f", ratio)) disp=\(String(format: "%.2f", disp)) mode=\(mode.rawValue) occl=\(plan.occluders.map { $0.name }.joined(separator: ","))")
+        logDebug("SLIDE: begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screenRect.width))x\(Int(screenRect.height)) ratio=\(String(format: "%.2f", ratio)) disp=\(String(format: "%.2f", disp)) boundary=\(boundary)")
         logDebug("SLIDE:DBG begin cg source=\(dbgRect(sourceInfo.frame)) left=\(leftID.flatMap { id in wm.windows[id].map { dbgRect($0.frame) } } ?? "nil") right=\(rightID.flatMap { id in wm.windows[id].map { dbgRect($0.frame) } } ?? "nil")")
         logDebug("SLIDE:DBG begin base source=\(dbgRect(sourceBase)) extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
 
@@ -297,19 +252,17 @@ final class SlideTransitionController {
         bgDiag.sourceName = sourceInfo.ownerName
         bgDiag.leftName = leftName
         bgDiag.rightName = rightName
-        bgDiag.modeLabel = mode.rawValue
         bgDiag.sourceReal = sourceBase
         bgDiag.leftReal = leftReal
         bgDiag.rightReal = rightReal
         bgDiag.targetName = sign >= 0 ? leftName : rightName
         bgDiag.reverseName = sign >= 0 ? rightName : leftName
-        bgDiag.occluders = revealOccluders
-        logDebug("BGFLASH:begin source=[\(bgDiag.sourceName)]@\(dbgRect(sourceInfo.frame)) left=[\(bgDiag.leftName)]@\(leftReal != .zero ? dbgRect(leftReal) : "nil") right=[\(bgDiag.rightName)]@\(rightReal != .zero ? dbgRect(rightReal) : "nil") mode=\(bgDiag.modeLabel) dir=\(sign >= 0 ? "left" : "right") target=[\(bgDiag.targetName)] reverse=[\(bgDiag.reverseName)] occl=[\(bgDiag.occluders.map { "\($0.name)@\(dbgRect($0.real))" }.joined(separator: ","))]")
+        logDebug("BGFLASH:begin source=[\(bgDiag.sourceName)]@\(dbgRect(sourceInfo.frame)) left=[\(bgDiag.leftName)]@\(leftReal != .zero ? dbgRect(leftReal) : "nil") right=[\(bgDiag.rightName)]@\(rightReal != .zero ? dbgRect(rightReal) : "nil") boundary=\(boundary) dir=\(sign >= 0 ? "left" : "right") target=[\(bgDiag.targetName)] reverse=[\(bgDiag.reverseName)]")
         let ground = WindowManager.shared.snapshotDesktopWindows()
             .map { "[\($0.name)]@(\(Int($0.frame.minX)),\(Int($0.frame.minY)),\(Int($0.frame.width)),\(Int($0.frame.height)))" }
             .joined(separator: " ")
         logDebug("BGFLASH:ground \(ground)")
-        logDebug("BGFLASH:excluded 不入背景：\(bgDiag.modeLabel == "reveal" ? "源+遮挡者" : "源+目标")（反向邻居恒静态留背景）excluded=\(excludedIDs.count)")
+        logDebug("BGFLASH:统一模型背景无排除集（源/遮挡者/反向邻居均静态留背景）—— 仅排除本面板/菜单覆盖条")
     }
 
     /// 按最新 progress 平移窗口图像。offset = SlideOffset.eased(progress)，
@@ -321,15 +274,7 @@ final class SlideTransitionController {
                                           pointsPerProgress: pointsPerProgress,
                                           screenWidth: screenRect.width)
         applyCurrentOffset()
-        applyTitleOverlays()
         applyMenuCover()
-    }
-
-    /// 顶栏外观覆盖层 alpha = 归一化位移（随手指渐暗/渐亮，折返逆转）。
-    private func applyTitleOverlays() {
-        guard !titleOverlays.isEmpty else { return }
-        let tp = min(1, max(0, abs(currentOffset) / max(screenRect.width, 1)))
-        for ov in titleOverlays { ov.alphaValue = tp }
     }
 
     /// 菜单文字层 alpha = 随 progress 顺序淡化（不重叠）：源菜单截图先完全消失
@@ -347,24 +292,34 @@ final class SlideTransitionController {
         return t * t * (3 - 2 * t)
     }
 
-    /// 按 currentOffset 平移源 / 额外滑动视图。
+    /// 按 currentOffset 平移源 / 额外滑动视图。统一模型：源静态留背景，仅边界时按
+    /// 弹性公式 wall-bump；额外滑动视图（仅目标）按 offset 平移。
     private func applyCurrentOffset() {
-        guard let sourceView else { return }
-        if !sourceIsStatic {
-            sourceView.setFrameOrigin(NSPoint(x: sourceBase.minX + currentOffset, y: sourceBase.minY))
+        if let sourceView {
+            let x = boundary ? sourceBase.minX + elasticWallBumpDisplacement(currentOffset) : sourceBase.minX
+            sourceView.setFrameOrigin(NSPoint(x: x, y: sourceBase.minY))
         }
         for s in extraSlideViews {
             s.view.setFrameOrigin(NSPoint(x: s.baseX + currentOffset, y: s.realFrame.minY))
         }
-        logDebug("SLIDE:DBG update off=\(Int(currentOffset)) src=\(dbgRect(sourceView.frame)) extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
+        logDebug("SLIDE:DBG update off=\(Int(currentOffset)) src=\(sourceView.map { dbgRect($0.frame) } ?? "nil") extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
+    }
+
+    /// 边界 wall-bump 位移：弹性公式 raw/(1+|raw|/40)，clamp ±「最大偏移像素」
+    ///（AppSettings.elasticDragMaxDisplacement，与弹性拖拽设置一致）。
+    private func elasticWallBumpDisplacement(_ raw: CGFloat) -> CGFloat {
+        let damped = raw / (1.0 + abs(raw) / 40.0)
+        let maxDisp = CGFloat(AppSettings.shared.elasticDragMaxDisplacement)
+        return max(-maxDisp, min(maxDisp, damped))
     }
 
     /// 释放判定后的收尾动画：commit 为 true 时沿当前 offset 方向滑满一屏，
     /// 否则滑回原位。动画完成后收起面板并回调 onComplete（受会话 token 保护）。
-    /// delta = targetOffset − currentOffset，因 currentOffset 已被 clamp 且 target 为其
-    /// 端点（±屏宽或 0），天然 > 0，不存在「已在满屏却 delta=0 直切」的情况。
+    /// 目标滑动视图按 delta = targetOffset − currentOffset 平移；源（边界 wall-bump）
+    /// 直接动画回原位。delta 因 currentOffset 已被 clamp 且 target 为其端点（±屏宽或 0）
+    /// 天然 > 0，不存在「已在满屏却 delta=0 直切」的情况。
     func settle(finalOffset: CGFloat, commit: Bool, onComplete: (() -> Void)?) {
-        guard isActive, let sourceView else {
+        guard isActive else {
             onComplete?()
             return
         }
@@ -378,7 +333,7 @@ final class SlideTransitionController {
         let delta = targetOffset - currentOffset
         let token = sessionToken
         logDebug("SLIDE: settle finalOffset=\(Int(finalOffset)) current=\(Int(currentOffset)) target=\(Int(targetOffset)) commit=\(commit) delta=\(Int(delta))")
-        logDebug("SLIDE:DBG settle src=\(dbgRect(sourceView.frame)) extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
+        logDebug("SLIDE:DBG settle src=\(sourceView.map { dbgRect($0.frame) } ?? "nil") extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
 
         // BGFLASH ③：commit 时预测每个被排除窗口在 teardown 后是否瞬切弹出。
         if commit {
@@ -392,15 +347,12 @@ final class SlideTransitionController {
         NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = settleDuration
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            if !sourceIsStatic {
-                sourceView.animator().setFrameOrigin(NSPoint(x: sourceView.frame.minX + delta, y: sourceView.frame.minY))
+            if let sourceView {
+                // 源：非边界恒静态（不动即原位）；边界 wall-bump 释放后回弹到原位。
+                sourceView.animator().setFrameOrigin(NSPoint(x: sourceBase.minX, y: sourceBase.minY))
             }
             for s in extraSlideViews {
                 s.view.animator().setFrameOrigin(NSPoint(x: s.view.frame.minX + delta, y: s.view.frame.minY))
-            }
-            // 顶栏覆盖层：提交→补满（渐暗/渐亮到位）；回弹→归零（源顶栏/菜单还原）。
-            for ov in titleOverlays {
-                ov.animator().alphaValue = commit ? 1 : 0
             }
             // 覆盖条保持不透明（遮住真实菜单栏切换）；整体淡出在 finishSettle 进行。
             // 菜单文字层不走此组——提交时须「源先消失、目标后渐显」顺序执行，见下。
@@ -443,8 +395,7 @@ final class SlideTransitionController {
     /// 保持 23、菜单覆盖条保持不透明，onComplete 激活目标（真实菜单栏在覆盖条后
     /// 切换为目标菜单），随后面板 alpha 与菜单覆盖条 alpha 同步淡出——目标窗口
     /// 顶栏随面板渐显、真实目标菜单随覆盖条渐显，两者同节奏，无弹跳。
-    /// 回弹无内容切换，仅面板淡出平滑收起（顺带把 reveal 遮挡者的「原位重现」
-    /// 由瞬切变成渐显）。
+    /// 回弹无内容切换，仅面板淡出平滑收起。
     private func finishSettle(commit: Bool, onComplete: (() -> Void)?) {
         guard let panel else {
             onComplete?()
@@ -498,10 +449,10 @@ final class SlideTransitionController {
 
     // MARK: - Backdrop (ScreenCaptureKit)
 
-    /// 异步截取「排除源/左右邻/本面板后所见屏幕」作为背景层，等价于源窗口
-    /// 最小化后桌面的剩余堆叠。截屏到达前以不透明黑层占位（杜绝源窗口残像），
-    /// 失败则回退为近乎透明黑，让真实桌面可见。
-    private func captureBackdrop(excluding windowIDs: [CGWindowID], panelWindowNumber: Int,
+    /// 异步截取整屏桌面作为背景层（无窗口排除集，接受目标滑入时与背景真实位重影；
+    /// 仅排除本面板与菜单覆盖条，防双影/防覆盖条入镜）。截屏到达前以不透明黑层
+    /// 占位（杜绝源窗口残像），失败则回退为近乎透明黑，让真实桌面可见。
+    private func captureBackdrop(panelWindowNumber: Int,
                                  coverWindowNumber: Int?, inflight: BackdropPreCapturer.Direction?) {
         let token = sessionToken
         let scr = screenRect
@@ -517,7 +468,7 @@ final class SlideTransitionController {
                 return
             }
             do {
-                var excl = Set(windowIDs)
+                var excl = Set<CGWindowID>()
                 if let coverWindowNumber { excl.insert(CGWindowID(coverWindowNumber)) }
                 let result = try await BackdropPreCapturer.captureDesktop(
                     size: scr.size, excluding: excl, panelWindowNumber: panelWindowNumber)
@@ -662,60 +613,17 @@ final class SlideTransitionController {
 
     // MARK: - BGFLASH 诊断
 
-    /// 窗口是否被覆盖窗口完全包含（面板本地坐标，与坐标系原点无关）。
-    private func isCovered(_ window: NSRect, by cover: NSRect) -> Bool {
-        window.minX >= cover.minX && window.maxX <= cover.maxX
-            && window.minY >= cover.minY && window.maxY <= cover.maxY
-    }
-
-    /// 窗口未被覆盖的暴露边描述（像素 + 方位）。
-    private func exposedDescription(_ window: NSRect, by cover: NSRect) -> String {
-        var parts: [String] = []
-        if window.minX < cover.minX { parts.append("\(Int(cover.minX - window.minX))px(left)") }
-        if window.maxX > cover.maxX { parts.append("\(Int(window.maxX - cover.maxX))px(right)") }
-        if window.minY < cover.minY { parts.append("\(Int(cover.minY - window.minY))px(bottom)") }
-        if window.maxY > cover.maxY { parts.append("\(Int(window.maxY - cover.maxY))px(top)") }
-        return parts.isEmpty ? "none" : parts.joined(separator: ",")
-    }
-
-    /// 依据提交方向计算各滑动组/背景窗口在 teardown 后的瞬切判定。
-    /// commitDirRight=true 表示右滑（目标=right），false 左滑（目标=left）。
+    /// 依据提交方向计算各滑动组/背景窗口在 teardown 后的瞬切判定（统一模型下全部
+    /// NO-POP：目标滑满一屏落回自身真实位、源/反向邻居静态留背景、边界 wall-bump 回弹）。
     private func bgFlashVerdicts(commitDirRight: Bool) -> [String] {
-        let targetReal = commitDirRight ? bgDiag.rightReal : bgDiag.leftReal
-        let targetName = commitDirRight ? bgDiag.rightName : bgDiag.leftName
         var verdicts: [String] = []
-
-        func check(_ name: String, staticMode: Bool, real: NSRect, why: String) {
-            if staticMode {
-                verdicts.append("\(name):NO-POP(\(why))")
-                return
-            }
-            if isCovered(real, by: targetReal) {
-                verdicts.append("\(name):NO-POP(被目标 \(targetName) 完全覆盖)")
-            } else {
-                verdicts.append("\(name):WILL-POP(\(why) exposed=\(exposedDescription(real, by: targetReal)))")
-            }
-        }
-
-        // 反向邻居恒静态留背景，任何模式都不滑动、不排除。
         if bgDiag.reverseName != "nil" {
             verdicts.append("\(bgDiag.reverseName):NO-POP(反向邻居静态留背景)")
         }
-
-        if bgDiag.modeLabel == "reveal" {
-            verdicts.append("\(targetName):NO-POP(reveal 目标留背景真实位)")
-            check(bgDiag.sourceName, staticMode: false, real: bgDiag.sourceReal, why: "reveal 源滑出")
-            for occ in bgDiag.occluders {
-                check(occ.name, staticMode: false, real: occ.real, why: "reveal 遮挡者滑出(不滑回,已接受)")
-            }
-        } else {
-            if targetName != "nil" {
-                verdicts.append("\(targetName):NO-POP(target 滑满一屏落回自身真实位)")
-            }
-            // buried 恒 staticSource（源不动）；边界 wall-bump 源滑动但释放回弹，同样无 POP。
-            check(bgDiag.sourceName, staticMode: true, real: bgDiag.sourceReal,
-                  why: "staticSource 源不动（边界 wall-bump 回弹）")
+        if bgDiag.targetName != "nil" {
+            verdicts.append("\(bgDiag.targetName):NO-POP(target 滑满一屏落回自身真实位)")
         }
+        verdicts.append("\(bgDiag.sourceName):NO-POP(源静态留背景\(boundary ? "；边界 wall-bump 释放回弹" : ""))")
         return verdicts
     }
 
@@ -758,63 +666,13 @@ final class SlideTransitionController {
         panelWindowNumber = 0
         sourceView = nil
         extraSlideViews = []
-        titleOverlays = []
         sourceBase = .zero
-        sourceIsStatic = false
-        mode = .staticSource
+        boundary = false
         menuCoverPanel?.orderOut(nil)
         menuCoverPanel = nil
         menuBackgroundView = nil
         sourceMenuImageView = nil
         targetMenuImageView = nil
-    }
-
-    /// 顶栏覆盖层要模拟的外观。源=非激活（随手指渐暗）；目标=激活（随手指渐亮）。
-    private enum TitleAppearance {
-        case active
-        case inactive
-    }
-
-    /// 上叠顶栏外观覆盖视图：缓存外观条优先（真外观，交叉溶解保真度高），缺失则用
-    /// 亮度合成回退（目标≈调亮、源≈调暗去饱和）。overlay 初始 alpha=0，随手指
-    /// progress 渐显（applyTitleOverlays 驱动）。
-    private func attachTitleOverlay(to parentView: NSImageView, windowID: CGWindowID,
-                                    currentCapture: NSImage?, want: TitleAppearance) {
-        let strip = WindowManager.shared.appearanceStrip(windowID: windowID, active: want == .active)
-            ?? synthesizedTitleStrip(from: currentCapture, want: want, width: parentView.frame.width)
-        guard let strip else {
-            logDebug("SLIDE: title overlay skip win=\(windowID) want=\(want == .active ? "active" : "inactive")")
-            return
-        }
-        let h = strip.size.height
-        let ov = NSImageView(frame: NSRect(x: 0, y: parentView.frame.height - h,
-                                           width: parentView.frame.width, height: h))
-        ov.image = strip
-        ov.imageScaling = .scaleAxesIndependently
-        ov.wantsLayer = true
-        ov.alphaValue = 0
-        parentView.addSubview(ov)
-        titleOverlays.append(ov)
-    }
-
-    /// 亮度合成顶栏条（外观缓存缺失时的回退）：截取当前捕获图的顶部条，目标=调亮、
-    /// 源=调暗 + 去饱和（近似非激活灰）。非精确外观，仅保渐变节奏。
-    private func synthesizedTitleStrip(from image: NSImage?, want: TitleAppearance, width: CGFloat) -> NSImage? {
-        guard let image,
-              let cg = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
-        let h = min(image.size.height, WindowManager.titleBarHeightPoints)
-        let scale = CGFloat(cg.height) / max(image.size.height, 1)
-        let stripPx = max(Int(h * scale), 1)
-        guard let stripCg = cg.cropping(to: CGRect(x: 0, y: 0,
-                                                   width: CGFloat(cg.width), height: CGFloat(stripPx))) else { return nil }
-        let filter = CIFilter.colorControls()
-        filter.inputImage = CIImage(cgImage: stripCg)
-        filter.saturation = want == .active ? 1.05 : 0.15
-        filter.brightness = want == .active ? 0.16 : -0.22
-        guard let out = filter.outputImage else { return nil }
-        let ctx = CIContext(options: [.workingColorSpace: NSNull()])
-        guard let result = ctx.createCGImage(out, from: out.extent) else { return nil }
-        return NSImage(cgImage: result, size: NSSize(width: width, height: h))
     }
 
     /// 屏幕顶部菜单栏覆盖条（level 25，37pt 高，全宽）。三层结构：
