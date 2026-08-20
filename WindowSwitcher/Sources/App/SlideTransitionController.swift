@@ -5,12 +5,13 @@ import CoreImage.CIFilterBuiltins
 
 /// 三指横滑「跟随手指」滑动过渡切换。
 ///
-/// 统一模型：仅目标窗口图像从对侧滑入真实位，源、遮挡者、反向邻居全部静态留
+/// 统一模型：仅目标窗口图像从屏幕边缘滑入真实位，源、遮挡者、反向邻居全部静态留
 /// 背景。目标窗口保持真实尺寸与纵向位置，横向按 offset 平移：
 ///   offset = progress × pointsPerProgress，pointsPerProgress = ratio × swipeMinDisplacement × 屏宽
-///   target.x = real.minX − 屏宽 + offset（右滑）/ real.minX + 屏宽 + offset（左滑）
-/// 任意 offset 下目标从对侧跟手滑入、折返逆转；边界（目标侧无窗口）时源随手指
-/// 按弹性公式 wall-bump，释放回弹。
+///   target.x = −width + offset（右滑，前缘贴屏幕左缘）/ 屏宽 + offset（左滑，前缘贴右缘）
+/// 边缘锚点保证手指一动即露边、从第一像素跟手（消除小窗口「先滑屏外、后冒出」的
+/// 不可见预行程）；到达真实位后停住（右滑 min / 左滑 max 钳制），折返自动松开反向
+/// 滑出。边界（目标侧无窗口）时源随手指按弹性公式 wall-bump，释放回弹。
 ///
 /// 背景层（方案 B）用 ScreenCaptureKit 截取整屏桌面（无窗口排除集，接受目标滑入
 /// 时与背景真实位重影；仅排除本面板与菜单覆盖条），不再使用半透明黑压层。
@@ -35,8 +36,8 @@ final class SlideTransitionController {
     /// 当前面板窗口号（像素诊断：采样面板合成输出；teardown 置 0）。
     private var panelWindowNumber: CGWindowID = 0
     private var sourceView: NSImageView?
-    /// 除源窗口外的滑动视图：统一模型下仅目标图像（锚定真实位 ± 屏宽滑入），
-    /// 按 offset 平移。
+    /// 除源窗口外的滑动视图：统一模型下仅目标图像（前缘贴屏幕边缘锚定滑入），
+    /// 按 offset 平移、到达真实位即停。
     private struct SlidingImage {
         let view: NSImageView
         let baseX: CGFloat
@@ -167,13 +168,16 @@ final class SlideTransitionController {
         content.addSubview(sv)
         sourceView = sv
 
-        // 统一模型：仅目标窗口图像从对侧滑入真实位（滑动对象=目标）；源、遮挡者、
+        // 统一模型：仅目标窗口图像从屏幕边缘滑入真实位（滑动对象=目标）；源、遮挡者、
         // 反向邻居全部静态留背景（背景无窗口排除集，接受目标滑入时与背景真实位重影）。
+        // 边缘锚点：右滑目标前缘贴屏幕左缘（baseX=-width）、左滑目标前缘贴右缘
+        //（baseX=屏宽）——手指一动即露边、从第一像素跟手，消除小窗口「先滑屏外、
+        // 后冒出」的不可见预行程。到达真实位由 applyCurrentOffset 钳制停住。
         // 边界（目标侧无窗口）→ 无目标视图，源随手指按弹性公式 wall-bump。
         if let info = targetInfo,
            let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
             let real = localRect(forCG: info.frame)
-            let baseX = real.minX + (sign < 0 ? screenRect.width : -screenRect.width)
+            let baseX = sign < 0 ? screenRect.width : -real.width
             let tv = makeImageView(image: image,
                                    frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
             content.addSubview(tv)
@@ -218,9 +222,12 @@ final class SlideTransitionController {
         isActive = true
 
         // 顶部菜单栏覆盖条（level 25）：材质背景 + AX 自绘源/目标菜单文字随手指交叉淡化。
+        // 菜单栏渐变开关关闭时跳过覆盖条创建（下游调用自然空转），采用原生顶栏切换动效。
         let sourcePID = sourceInfo.ownerPid
         let targetPID = plan.targetID.flatMap { wm.windows[$0]?.ownerPid }
-        createMenuCover(sourcePID: sourcePID, targetPID: targetPID)
+        if AppSettings.shared.menuBarGradientEnabled {
+            createMenuCover(sourcePID: sourcePID, targetPID: targetPID)
+        }
 
         // 首帧位移在面板可见前应用：淡入时即带正确的小位移，避免「淡入后从 0 瞬移」弹射。
         update(progress: initialProgress)
@@ -293,14 +300,18 @@ final class SlideTransitionController {
     }
 
     /// 按 currentOffset 平移源 / 额外滑动视图。统一模型：源静态留背景，仅边界时按
-    /// 弹性公式 wall-bump；额外滑动视图（仅目标）按 offset 平移。
+    /// 弹性公式 wall-bump；额外滑动视图（仅目标）从屏幕边缘按 offset 平移、到达
+    /// 真实位即停（右滑 baseX<real.minX → min；左滑 baseX>real.minX → max），折返时
+    /// offset 回落、钳制自动松开、窗口反向滑出。
     private func applyCurrentOffset() {
         if let sourceView {
             let x = boundary ? sourceBase.minX + elasticWallBumpDisplacement(currentOffset) : sourceBase.minX
             sourceView.setFrameOrigin(NSPoint(x: x, y: sourceBase.minY))
         }
         for s in extraSlideViews {
-            s.view.setFrameOrigin(NSPoint(x: s.baseX + currentOffset, y: s.realFrame.minY))
+            let x = s.baseX + currentOffset
+            let parked = s.baseX < s.realFrame.minX ? min(x, s.realFrame.minX) : max(x, s.realFrame.minX)
+            s.view.setFrameOrigin(NSPoint(x: parked, y: s.realFrame.minY))
         }
         logDebug("SLIDE:DBG update off=\(Int(currentOffset)) src=\(sourceView.map { dbgRect($0.frame) } ?? "nil") extra=\(extraSlideViews.map { dbgRect($0.view.frame) }.joined(separator: " | "))")
     }
@@ -313,11 +324,10 @@ final class SlideTransitionController {
         return max(-maxDisp, min(maxDisp, damped))
     }
 
-    /// 释放判定后的收尾动画：commit 为 true 时沿当前 offset 方向滑满一屏，
-    /// 否则滑回原位。动画完成后收起面板并回调 onComplete（受会话 token 保护）。
-    /// 目标滑动视图按 delta = targetOffset − currentOffset 平移；源（边界 wall-bump）
-    /// 直接动画回原位。delta 因 currentOffset 已被 clamp 且 target 为其端点（±屏宽或 0）
-    /// 天然 > 0，不存在「已在满屏却 delta=0 直切」的情况。
+    /// 释放判定后的收尾动画：commit 为 true 时目标动画到真实位、否则滑回屏外原位。
+    /// 动画完成后收起面板并回调 onComplete（受会话 token 保护）。目标滑动视图按绝对
+    /// 端点动画（commit→real.minX，回弹→baseX）；源（边界 wall-bump）直接动画回原位。
+    /// 停靠态下目标已在 real.minX，commit 动画为零、无跳变。delta 仅留诊断日志。
     func settle(finalOffset: CGFloat, commit: Bool, onComplete: (() -> Void)?) {
         guard isActive else {
             onComplete?()
@@ -352,7 +362,8 @@ final class SlideTransitionController {
                 sourceView.animator().setFrameOrigin(NSPoint(x: sourceBase.minX, y: sourceBase.minY))
             }
             for s in extraSlideViews {
-                s.view.animator().setFrameOrigin(NSPoint(x: s.view.frame.minX + delta, y: s.view.frame.minY))
+                let finalX = commit ? s.realFrame.minX : s.baseX
+                s.view.animator().setFrameOrigin(NSPoint(x: finalX, y: s.realFrame.minY))
             }
             // 覆盖条保持不透明（遮住真实菜单栏切换）；整体淡出在 finishSettle 进行。
             // 菜单文字层不走此组——提交时须「源先消失、目标后渐显」顺序执行，见下。
@@ -621,7 +632,7 @@ final class SlideTransitionController {
             verdicts.append("\(bgDiag.reverseName):NO-POP(反向邻居静态留背景)")
         }
         if bgDiag.targetName != "nil" {
-            verdicts.append("\(bgDiag.targetName):NO-POP(target 滑满一屏落回自身真实位)")
+            verdicts.append("\(bgDiag.targetName):NO-POP(target 从边缘滑入落回自身真实位)")
         }
         verdicts.append("\(bgDiag.sourceName):NO-POP(源静态留背景\(boundary ? "；边界 wall-bump 释放回弹" : ""))")
         return verdicts

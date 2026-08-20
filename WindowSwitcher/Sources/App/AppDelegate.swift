@@ -56,6 +56,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         menuBar.updateIconAppearance()  // refresh icon now that engine is running
 
+        // Step 3.5: Start scroll suppression tap（三指跟踪期丢弃 scrollWheel，
+        // 阻止前台 App 网页随三指移动滚动；依赖 C 引擎 trackingActive）。
+        ScrollSuppressionTap.shared.start()
+
         // Step 4: Start interaction monitoring (checks Accessibility permission)
         logDebug("Step 4: Starting interaction monitoring...")
         let monitorOK = windowManager.startInteractionMonitoring()
@@ -95,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         logDebug("applicationWillTerminate")
         gestureEngine.stop()
+        ScrollSuppressionTap.shared.stop()
         windowManager.stopInteractionMonitoring()
     }
 
@@ -128,6 +133,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             _ = gestureEngine.start()
         }
 
+        // 2.5 Start scroll suppression tap（依赖 C 引擎 trackingActive 判定三指手势，
+        // 跟踪期丢弃 scrollWheel，阻止前台 App 网页随三指移动滚动）。
+        ScrollSuppressionTap.shared.start()
+
         // 3. Start interaction monitoring (requires Accessibility permission).
         let monitorOK = windowManager.startInteractionMonitoring()
         if monitorOK {
@@ -145,6 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func stopService() {
         logDebug("stopService called")
         gestureEngine.stop()
+        ScrollSuppressionTap.shared.stop()
         windowManager.stopInteractionMonitoring()
         overlayController.hide()
         slideTransition.cancel()
@@ -658,6 +668,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 校验 frontmost 仍为该 pid（防延迟窗口内用户切走而采错 App）。源 App 滑动时
     /// 菜单就在整屏背景图里、无需此采集——本缓存专供「目标侧」滑动过渡使用。
     private func scheduleMenuBarCacheCapture(for pid: pid_t, delay: TimeInterval = 0.3) {
+        guard AppSettings.shared.menuBarGradientEnabled else {
+            logDebug("MENU-CACHE: gradient disabled — skip capture pid=\(pid)")
+            return
+        }
         let ourPid = ProcessInfo.processInfo.processIdentifier
         guard pid != ourPid else { return }
         guard !MenuBarImageCache.shared.contains(pid: pid) else { return }

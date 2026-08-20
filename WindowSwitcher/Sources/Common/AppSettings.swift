@@ -79,6 +79,11 @@ final class AppSettings: ObservableObject {
     @Published var slidingCommitThreshold: Double {
         didSet { defaults.set(slidingCommitThreshold, forKey: Keys.slidingCommitThreshold) }
     }
+    /// 菜单栏跟随手指渐变（横条背景截屏 + 源菜单随手指渐隐 / 目标菜单渐显）。
+    /// 关闭后不创建覆盖条、不做自绘，采用原生顶栏切换动效（commit 时系统瞬间切换）。
+    @Published var menuBarGradientEnabled: Bool {
+        didSet { defaults.set(menuBarGradientEnabled, forKey: Keys.menuBarGradientEnabled) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -150,6 +155,7 @@ final class AppSettings: ObservableObject {
             Keys.slidingTransitionEnabled: false,
             Keys.slidingRatio: 1.0,
             Keys.slidingCommitThreshold: 0.45,
+            Keys.menuBarGradientEnabled: true,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -176,6 +182,7 @@ final class AppSettings: ObservableObject {
         _slidingTransitionEnabled = .init(initialValue: defaults.bool(forKey: Keys.slidingTransitionEnabled))
         _slidingRatio = .init(initialValue: defaults.double(forKey: Keys.slidingRatio))
         _slidingCommitThreshold = .init(initialValue: defaults.double(forKey: Keys.slidingCommitThreshold))
+        _menuBarGradientEnabled = .init(initialValue: defaults.bool(forKey: Keys.menuBarGradientEnabled))
     }
 
     func resetToDefaults() {
@@ -203,6 +210,7 @@ final class AppSettings: ObservableObject {
         slidingTransitionEnabled = false
         slidingRatio = 1.0
         slidingCommitThreshold = 0.45
+        menuBarGradientEnabled = true
     }
 }
 
@@ -228,6 +236,7 @@ private enum Keys {
     static let slidingTransitionEnabled = "slidingTransitionEnabled"
     static let slidingRatio = "slidingRatio"
     static let slidingCommitThreshold = "slidingCommitThreshold"
+    static let menuBarGradientEnabled = "menuBarGradientEnabled"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

@@ -136,6 +136,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var centerSnapToggleView: MenuItemView?
     private weak var slidingTransitionToggleView: MenuItemView?
     private weak var slidingRatioLabelView: MenuItemView?
+    private weak var menuBarGradientToggleView: MenuItemView?
     private weak var slidingThreshLabelView: MenuItemView?
 
     private let menu: NSMenu = {
@@ -391,6 +392,16 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         }
         slidingTransitionToggleView = menuItemView(from: slidingToggle)
         sub.addItem(slidingToggle)
+
+        sub.addItem(.separator())
+
+        let menuBarGradient = makeToggleItem(title: "菜单栏跟随手指渐变（淡出淡入）",
+                                             isOn: AppSettings.shared.menuBarGradientEnabled) {
+            AppSettings.shared.menuBarGradientEnabled.toggle()
+            self.menuBarGradientToggleView?.isOn = AppSettings.shared.menuBarGradientEnabled
+        }
+        menuBarGradientToggleView = menuItemView(from: menuBarGradient)
+        sub.addItem(menuBarGradient)
 
         sub.addItem(.separator())
 
