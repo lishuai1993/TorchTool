@@ -84,6 +84,31 @@ final class AppSettings: ObservableObject {
     @Published var menuBarGradientEnabled: Bool {
         didSet { defaults.set(menuBarGradientEnabled, forKey: Keys.menuBarGradientEnabled) }
     }
+    /// 滑动过渡期间源窗口是否显示人工投影（sourceView 的 NSShadow）。开启=现状动态
+    /// 效果；关闭=去掉该投影——背景图已自带源窗口真实阴影，去掉可消除双重阴影光晕。
+    @Published var sourceShadowEnabled: Bool {
+        didSet { defaults.set(sourceShadowEnabled, forKey: Keys.sourceShadowEnabled) }
+    }
+    /// 源窗口阴影完全移除（与切换后一致）：开启后背景截屏排除源窗口（去掉真实投影）
+    /// 且 sourceView 不添加人工阴影，滑动期间源窗口完全无阴影；关闭则沿用
+    /// sourceShadowEnabled 行为。
+    @Published var sourceShadowCleanEnabled: Bool {
+        didSet { defaults.set(sourceShadowCleanEnabled, forKey: Keys.sourceShadowCleanEnabled) }
+    }
+    /// 甩动动量提交：释放时按最近几帧释放速度外推动量助推，用「有效位移＝当前位移＋
+    /// 助推」判定提交，快甩（小位移、高速度）即可过阈值完成切换。慢速拖拽速度近零、
+    /// 助推≈0，行为与关闭时一致。动量采样依赖跟踪期 progress 不钳制（GestureEngine 已取消）。
+    @Published var momentumCommitEnabled: Bool {
+        didSet { defaults.set(momentumCommitEnabled, forKey: Keys.momentumCommitEnabled) }
+    }
+    /// 动量助推外推时间窗口 τ（秒）：boost = clamp(v×τ, ±maxBoostPx)。
+    @Published var momentumBoostWindow: Double {
+        didSet { defaults.set(momentumBoostWindow, forKey: Keys.momentumBoostWindow) }
+    }
+    /// 动量助推上限（屏宽比例）：maxBoostPx = ratio × 屏宽。
+    @Published var momentumMaxBoostRatio: Double {
+        didSet { defaults.set(momentumMaxBoostRatio, forKey: Keys.momentumMaxBoostRatio) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -156,6 +181,11 @@ final class AppSettings: ObservableObject {
             Keys.slidingRatio: 1.0,
             Keys.slidingCommitThreshold: 0.45,
             Keys.menuBarGradientEnabled: true,
+            Keys.sourceShadowEnabled: true,
+            Keys.sourceShadowCleanEnabled: false,
+            Keys.momentumCommitEnabled: true,
+            Keys.momentumBoostWindow: 0.15,
+            Keys.momentumMaxBoostRatio: 0.5,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -183,6 +213,11 @@ final class AppSettings: ObservableObject {
         _slidingRatio = .init(initialValue: defaults.double(forKey: Keys.slidingRatio))
         _slidingCommitThreshold = .init(initialValue: defaults.double(forKey: Keys.slidingCommitThreshold))
         _menuBarGradientEnabled = .init(initialValue: defaults.bool(forKey: Keys.menuBarGradientEnabled))
+        _sourceShadowEnabled = .init(initialValue: defaults.bool(forKey: Keys.sourceShadowEnabled))
+        _sourceShadowCleanEnabled = .init(initialValue: defaults.bool(forKey: Keys.sourceShadowCleanEnabled))
+        _momentumCommitEnabled = .init(initialValue: defaults.bool(forKey: Keys.momentumCommitEnabled))
+        _momentumBoostWindow = .init(initialValue: defaults.double(forKey: Keys.momentumBoostWindow))
+        _momentumMaxBoostRatio = .init(initialValue: defaults.double(forKey: Keys.momentumMaxBoostRatio))
     }
 
     func resetToDefaults() {
@@ -211,6 +246,11 @@ final class AppSettings: ObservableObject {
         slidingRatio = 1.0
         slidingCommitThreshold = 0.45
         menuBarGradientEnabled = true
+        sourceShadowEnabled = true
+        sourceShadowCleanEnabled = false
+        momentumCommitEnabled = true
+        momentumBoostWindow = 0.15
+        momentumMaxBoostRatio = 0.5
     }
 }
 
@@ -237,6 +277,11 @@ private enum Keys {
     static let slidingRatio = "slidingRatio"
     static let slidingCommitThreshold = "slidingCommitThreshold"
     static let menuBarGradientEnabled = "menuBarGradientEnabled"
+    static let sourceShadowEnabled = "sourceShadowEnabled"
+    static let sourceShadowCleanEnabled = "sourceShadowCleanEnabled"
+    static let momentumCommitEnabled = "momentumCommitEnabled"
+    static let momentumBoostWindow = "momentumBoostWindow"
+    static let momentumMaxBoostRatio = "momentumMaxBoostRatio"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

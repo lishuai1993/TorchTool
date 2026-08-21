@@ -727,9 +727,10 @@ static void processContactData(int deviceIndex, void *data,
                     touchStartCentroidX = centroidX;
                     touchStartCentroidY = centroidY;
                 } else if (fabsf(dispX) > swipeMinDisplacement * 0.3 && fabsf(dispX) > fabsf(dispY)) {
+                    // 跟踪期 progress 不钳制：反映真实位移（offset 随手指全量跟手），
+                    // 并为上层甩动动量提供真实的释放速度采样。弹性拖拽路径内部自带钳制，
+                    // 不依赖此处的 ±1 上限。
                     float progress = dispX / swipeMinDisplacement;
-                    if (progress > 1.0f) progress = 1.0f;
-                    if (progress < -1.0f) progress = -1.0f;
                     userCallback(GestureSwipeUpdate, progress);
                 }
             }

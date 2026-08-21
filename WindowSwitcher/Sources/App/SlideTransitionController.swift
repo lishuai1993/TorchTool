@@ -60,6 +60,8 @@ final class SlideTransitionController {
 
     /// 源窗口在面板本地坐标系中 offset=0 时的基准 frame。
     private var sourceBase: NSRect = .zero
+    /// 会话源窗口 ID（干净模式下从背景截屏排除源窗口，去掉其真实投影）。
+    private var slideSourceID: CGWindowID = 0
 
     private var screenRect: NSRect = .zero
     private var pointsPerProgress: CGFloat = 1
@@ -70,6 +72,17 @@ final class SlideTransitionController {
     /// 淡出停滞兜底是否已接管拆除：置位后正常淡出 completionHandler 放弃拆除，
     /// 避免与兜底的手动淡出竞争。在 teardownPanel 中复位（随会话切换重置）。
     private var settleFallbackEngaged = false
+
+    // MARK: - 甩动动量：速度采样
+
+    /// 采样点（offset 域）。缓冲保留最近 50ms，速度取末 4 点最小二乘斜率。
+    private struct OffsetSample {
+        let time: CFTimeInterval
+        let offset: Double
+    }
+    private var offsetSamples: [OffsetSample] = []
+    /// 采样开关：begin 置 true，settle 起置 false（收尾动画阶段不再追加）。
+    private var samplingEnabled = true
 
     // MARK: - BGFLASH 诊断状态（仅日志，不影响行为）
 
@@ -111,6 +124,7 @@ final class SlideTransitionController {
             logDebug("SLIDE: abort — source capture failed (id=\(sourceID))")
             return
         }
+        slideSourceID = sourceID
 
         // 目标窗口所在屏幕：取源窗口 NS 坐标中心点所在屏幕。
         let sourceNS = nsGlobalRect(fromCG: sourceInfo.frame)
@@ -166,8 +180,14 @@ final class SlideTransitionController {
         backdrop = bg
 
         // 源窗口图像：按真实屏幕帧摆放（居中、保留真实 y 与尺寸）。
+        // sourceShadowEnabled 关闭时去掉人工 NSShadow——背景图已自带源窗口真实阴影，
+        // 避免双重阴影光晕；开启保留现状动态效果。
+        // 干净模式（sourceShadowCleanEnabled）下强制不加人工阴影——背景已排除源窗口
+        // （无真实投影），叠加只会重新引入阴影，与「完全移除」目标相悖。
         sourceBase = localRect(forCG: sourceInfo.frame)
-        let sv = makeImageView(image: sourceImage, frame: sourceBase)
+        let sourceShadowOn = !AppSettings.shared.sourceShadowCleanEnabled
+            && AppSettings.shared.sourceShadowEnabled
+        let sv = makeImageView(image: sourceImage, frame: sourceBase, shadow: sourceShadowOn)
         content.addSubview(sv)
         sourceView = sv
 
@@ -222,6 +242,8 @@ final class SlideTransitionController {
         self.panel = panel
         panelWindowNumber = CGWindowID(panel.windowNumber)
         currentOffset = 0
+        offsetSamples.removeAll()
+        samplingEnabled = true
         isActive = true
 
         // 顶部菜单栏覆盖条（level 25）：材质背景 + AX 自绘源/目标菜单文字随手指交叉淡化。
@@ -307,8 +329,45 @@ final class SlideTransitionController {
         currentOffset = SlideOffset.eased(progress: progress,
                                           pointsPerProgress: pointsPerProgress,
                                           screenWidth: screenRect.width)
+        recordOffsetSample()
         applyCurrentOffset()
         applyMenuCover()
+    }
+
+    /// 追加 offset 采样：距上个样本 <4ms 则覆盖（防饱和区冗余），否则追加；仅保留
+    /// 最近 50ms。随跟踪期钳制取消，offset 全程反映真实位移，速度采样不再被截平。
+    private func recordOffsetSample() {
+        guard samplingEnabled else { return }
+        let now = CACurrentMediaTime()
+        let value = Double(currentOffset)
+        if let last = offsetSamples.last, now - last.time < 0.004 {
+            offsetSamples[offsetSamples.count - 1] = OffsetSample(time: now, offset: value)
+        } else {
+            offsetSamples.append(OffsetSample(time: now, offset: value))
+        }
+        while let first = offsetSamples.first, now - first.time > 0.050 {
+            offsetSamples.removeFirst()
+        }
+    }
+
+    /// 释放速度（offset 域，px/s）：对缓冲内最近至多 4 个样本做最小二乘线性回归。
+    /// 样本 <3 或时间跨度 <16ms → 返回 0（视为无速度，动量助推为 0）。
+    func releaseVelocity() -> CGFloat {
+        let samples = Array(offsetSamples.suffix(4))
+        guard samples.count >= 3,
+              let t0 = samples.first?.time,
+              let t1 = samples.last?.time,
+              t1 - t0 >= 0.016 else { return 0 }
+        let tMean = samples.reduce(0.0) { $0 + $1.time } / Double(samples.count)
+        let oMean = samples.reduce(0.0) { $0 + $1.offset } / Double(samples.count)
+        var num = 0.0
+        var den = 0.0
+        for s in samples {
+            num += (s.offset - oMean) * (s.time - tMean)
+            den += (s.time - tMean) * (s.time - tMean)
+        }
+        guard den > 1e-9 else { return 0 }
+        return CGFloat(num / den)
     }
 
     /// 菜单文字层 alpha = 随 progress 顺序淡化（不重叠）：源菜单截图先完全消失
@@ -360,6 +419,7 @@ final class SlideTransitionController {
             onComplete?()
             return
         }
+        samplingEnabled = false
         diagSample(label: "settle")
         let targetOffset: CGFloat
         if commit {
@@ -577,6 +637,10 @@ final class SlideTransitionController {
             do {
                 var excl = Set<CGWindowID>()
                 if let coverWindowNumber { excl.insert(CGWindowID(coverWindowNumber)) }
+                // 干净模式：排除源窗口，背景不再携带其真实投影
+                if AppSettings.shared.sourceShadowCleanEnabled {
+                    excl.insert(slideSourceID)
+                }
                 let result = try await BackdropPreCapturer.captureDesktop(
                     size: scr.size, excluding: excl, panelWindowNumber: panelWindowNumber)
                 guard token == self.sessionToken else { return }
@@ -900,16 +964,18 @@ final class SlideTransitionController {
         "(\(Int(r.minX)),\(Int(r.minY)),\(Int(r.width)),\(Int(r.height)))"
     }
 
-    private func makeImageView(image: NSImage, frame: NSRect) -> NSImageView {
+    private func makeImageView(image: NSImage, frame: NSRect, shadow: Bool = true) -> NSImageView {
         let iv = NSImageView(frame: frame)
         iv.image = image
         iv.imageScaling = .scaleProportionallyUpOrDown
         iv.wantsLayer = true
-        let shadow = NSShadow()
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
-        shadow.shadowBlurRadius = 12
-        shadow.shadowOffset = NSSize(width: 0, height: -3)
-        iv.shadow = shadow
+        if shadow {
+            let nsShadow = NSShadow()
+            nsShadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
+            nsShadow.shadowBlurRadius = 12
+            nsShadow.shadowOffset = NSSize(width: 0, height: -3)
+            iv.shadow = nsShadow
+        }
         return iv
     }
 
@@ -923,6 +989,7 @@ final class SlideTransitionController {
         sourceView = nil
         extraSlideViews = []
         sourceBase = .zero
+        slideSourceID = 0
         boundary = false
         menuCoverPanel?.orderOut(nil)
         menuCoverPanel = nil

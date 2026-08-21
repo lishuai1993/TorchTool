@@ -471,12 +471,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let off = slideTransition.currentOffset
         let settings = AppSettings.shared
         let thresholdPx = CGFloat(settings.slidingCommitThreshold) * slideTransition.screenWidth
-        let commit = abs(off) >= thresholdPx
-        logDebug("SLIDE: gestureEnd offset=\(Int(off)) threshold=\(Int(thresholdPx)) commit=\(commit)")
+
+        // 甩动动量：有效位移 = 当前位移 + 释放速度外推助推。慢速拖拽速度近零 → 助推≈0，
+        // 行为与关闭时一致；快甩（小位移、高速度）经助推后即可越过提交阈值完成切换。
+        let vel = slideTransition.releaseVelocity()
+        let boost: CGFloat
+        if settings.momentumCommitEnabled {
+            let maxBoostPx = CGFloat(settings.momentumMaxBoostRatio) * slideTransition.screenWidth
+            boost = max(-maxBoostPx, min(maxBoostPx, vel * CGFloat(settings.momentumBoostWindow)))
+        } else {
+            boost = 0
+        }
+        let effective = off + boost
+        let commit = abs(effective) >= thresholdPx
+        logDebug("SLIDE: gestureEnd offset=\(Int(off)) vel=\(Int(vel))px/s boost=\(Int(boost)) effective=\(Int(effective)) threshold=\(Int(thresholdPx)) commit=\(commit)")
 
         let cyclic = settings.cyclicScrollEnabled
         if commit {
-            let dirRight = off < 0
+            let dirRight = effective < 0
             if let target = windowManager.orderingEngine.advanceCursor(directionRight: dirRight, cyclic: cyclic) {
                 let targetName = windowManager.orderingEngine.windowNames[target] ?? "?"
                 logDebug("SLIDE: commit dirRight=\(dirRight) → 激活 [\(targetName)]")
@@ -485,7 +497,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // 之间的陈旧窗口——快速连续手势的预捕（trackingBegan）落进该窗口会读到旧源、
                 // 与 begin 失配，回退全新捕获暴露黑占位闪屏。
                 windowManager.markCommitFrontmost(target)
-                slideTransition.settle(finalOffset: off, commit: true) { [weak self] in
+                slideTransition.settle(finalOffset: effective, commit: true) { [weak self] in
                     self?.windowManager.activateWindow(target)
                     self?.slideTransition.logPostActivationDiagnostics()
                 }
@@ -495,7 +507,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             logDebug("SLIDE: rebound to source")
         }
-        slideTransition.settle(finalOffset: off, commit: false, onComplete: nil)
+        slideTransition.settle(finalOffset: effective, commit: false, onComplete: nil)
     }
 
     /// 启动/重置滑动会话看门狗：2.5s 内无 progress 更新即自动收尾，防止

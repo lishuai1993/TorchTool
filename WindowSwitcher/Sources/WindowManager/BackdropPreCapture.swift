@@ -71,8 +71,10 @@ final class BackdropPreCapturer {
         session = Session(sourceID: sourceID, leftID: leftID, rightID: rightID,
                           screenSize: screenSize, rightSwipe: right, leftSwipe: left)
         logDebug("SLIDE: pre-capture start source=\(sourceID) left=\(leftID.map(String.init) ?? "nil") right=\(rightID.map(String.init) ?? "nil")")
-        Task { @MainActor in await Self.capture(into: right, screenSize: screenSize) }
-        Task { @MainActor in await Self.capture(into: left, screenSize: screenSize) }
+        // 源窗口阴影完全移除：背景预捕同时排除源窗口（背景不自带其真实投影）
+        let excl: Set<CGWindowID> = AppSettings.shared.sourceShadowCleanEnabled ? [sourceID] : []
+        Task { @MainActor in await Self.capture(into: right, screenSize: screenSize, excluding: excl) }
+        Task { @MainActor in await Self.capture(into: left, screenSize: screenSize, excluding: excl) }
     }
 
     /// 预捕会话是否可用于当前 begin 的判定（纯函数，可单测）。
@@ -110,9 +112,9 @@ final class BackdropPreCapturer {
         session = nil
     }
 
-    /// 单方向 SCK 捕获。统一模型背景无窗口排除集（接受目标滑入时与背景真实位重影）；
-    /// windowIDs 仅携带菜单覆盖条等本进程面板窗口号；panelWindowNumber 为该会话全屏面板
-    /// 窗口号（全新捕获路径传入）。
+    /// 单方向 SCK 捕获。统一模型背景默认无窗口排除集（接受目标滑入时与背景真实位重影）；
+    /// windowIDs 携带菜单覆盖条等本进程面板窗口号，以及干净模式（源窗口阴影完全移除）
+    /// 下待排除的源窗口；panelWindowNumber 为该会话全屏面板窗口号（全新捕获路径传入）。
     ///
     /// 排除规则：始终排除本进程自己的窗口（全屏滑动面板 + 菜单覆盖条）。预捕路径
     /// （panelWindowNumber=nil）此前不排除任何本进程窗口，但预捕异步执行可能滞后到
@@ -168,10 +170,11 @@ final class BackdropPreCapturer {
 
     // MARK: - Private
 
-    private static func capture(into direction: Direction, screenSize: CGSize) async {
+    private static func capture(into direction: Direction, screenSize: CGSize,
+                                excluding: Set<CGWindowID>) async {
         do {
             let result = try await captureDesktop(size: screenSize,
-                                                  excluding: [],
+                                                  excluding: excluding,
                                                   panelWindowNumber: nil)
             direction.image = result.image
             direction.excludedCount = result.excluded.count

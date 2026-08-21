@@ -137,7 +137,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var slidingTransitionToggleView: MenuItemView?
     private weak var slidingRatioLabelView: MenuItemView?
     private weak var menuBarGradientToggleView: MenuItemView?
+    private weak var sourceShadowToggleView: MenuItemView?
+    private weak var sourceShadowCleanToggleView: MenuItemView?
     private weak var slidingThreshLabelView: MenuItemView?
+    private weak var momentumToggleView: MenuItemView?
+    private weak var momentumWindowLabelView: MenuItemView?
 
     private let menu: NSMenu = {
         let m = NSMenu()
@@ -405,6 +409,29 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         sub.addItem(.separator())
 
+        let sourceShadow = makeToggleItem(title: "源窗口阴影（动态效果）",
+                                          isOn: AppSettings.shared.sourceShadowEnabled) {
+            AppSettings.shared.sourceShadowEnabled.toggle()
+            self.sourceShadowToggleView?.isOn = AppSettings.shared.sourceShadowEnabled
+        }
+        sourceShadowToggleView = menuItemView(from: sourceShadow)
+        // 干净模式（源窗口阴影完全移除）开启时，动态效果开关被覆盖，置灰不可点击
+        if AppSettings.shared.sourceShadowCleanEnabled {
+            sourceShadowToggleView?.isEnabled = false
+        }
+        sub.addItem(sourceShadow)
+
+        let sourceShadowClean = makeToggleItem(title: "源窗口阴影完全移除（与切换后一致）",
+                                               isOn: AppSettings.shared.sourceShadowCleanEnabled) {
+            AppSettings.shared.sourceShadowCleanEnabled.toggle()
+            self.sourceShadowCleanToggleView?.isOn = AppSettings.shared.sourceShadowCleanEnabled
+            self.sourceShadowToggleView?.isEnabled = !AppSettings.shared.sourceShadowCleanEnabled
+        }
+        sourceShadowCleanToggleView = menuItemView(from: sourceShadowClean)
+        sub.addItem(sourceShadowClean)
+
+        sub.addItem(.separator())
+
         let ratio = AppSettings.shared.slidingRatio
         let ratioLabel = makeLabelItem(title: "跟手比例 \(String(format: "%.2f", ratio))")
         slidingRatioLabelView = menuItemView(from: ratioLabel)
@@ -448,6 +475,39 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             self.slidingThreshLabelView?.title = "提交阈值 \(String(format: "%.2f", v))"
         }
         sub.addItem(threshInc)
+
+        sub.addItem(.separator())
+
+        let momentumToggle = makeToggleItem(title: "甩动动量提交（快甩助力）",
+                                            isOn: AppSettings.shared.momentumCommitEnabled) {
+            AppSettings.shared.momentumCommitEnabled.toggle()
+            self.momentumToggleView?.isOn = AppSettings.shared.momentumCommitEnabled
+        }
+        momentumToggleView = menuItemView(from: momentumToggle)
+        sub.addItem(momentumToggle)
+
+        sub.addItem(.separator())
+
+        let window = AppSettings.shared.momentumBoostWindow
+        let windowLabel = makeLabelItem(title: "甩动动量 \(String(format: "%.2f", window))s")
+        momentumWindowLabelView = menuItemView(from: windowLabel)
+        sub.addItem(windowLabel)
+
+        let windowDec = makeActionItem(title: "减小甩动动量 (−0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = max(0.05, AppSettings.shared.momentumBoostWindow - 0.05)
+            AppSettings.shared.momentumBoostWindow = v
+            self.momentumWindowLabelView?.title = "甩动动量 \(String(format: "%.2f", v))s"
+        }
+        sub.addItem(windowDec)
+
+        let windowInc = makeActionItem(title: "增大甩动动量 (+0.05)", isEnabled: true) { [weak self] in
+            guard let self else { return }
+            let v = min(0.30, AppSettings.shared.momentumBoostWindow + 0.05)
+            AppSettings.shared.momentumBoostWindow = v
+            self.momentumWindowLabelView?.title = "甩动动量 \(String(format: "%.2f", v))s"
+        }
+        sub.addItem(windowInc)
 
         let parentItem = NSMenuItem(title: "快切模式设置", action: nil, keyEquivalent: "")
         parentItem.submenu = sub
@@ -571,7 +631,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         if helpWindow == nil {
             let hosting = NSHostingView(rootView: HelpPanelView())
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 500, height: 560),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: 640),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
