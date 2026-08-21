@@ -104,6 +104,83 @@ private func testLRUOrderingEngine() {
         assertNil(engine.index(of: 99))
     }
 
+    runSuite("neighbors middle window non-cyclic") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        let (l, r) = engine.neighbors(of: 2, cyclic: false)
+        assertEqual(l, 1)
+        assertEqual(r, 3)
+    }
+
+    runSuite("neighbors middle window cyclic same as non-cyclic") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        let (l, r) = engine.neighbors(of: 2, cyclic: true)
+        assertEqual(l, 1)
+        assertEqual(r, 3)
+    }
+
+    runSuite("neighbors left boundary wraps to last with cyclic") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        let (l, r) = engine.neighbors(of: 1, cyclic: true)
+        assertEqual(l, 4)   // 最左窗口的左邻绕回最右
+        assertEqual(r, 2)
+    }
+
+    runSuite("neighbors right boundary wraps to first with cyclic") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        let (l, r) = engine.neighbors(of: 4, cyclic: true)
+        assertEqual(l, 3)
+        assertEqual(r, 1)   // 最右窗口的右邻绕回最左
+    }
+
+    runSuite("neighbors boundaries non-cyclic return nil") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        let (l1, r1) = engine.neighbors(of: 1, cyclic: false)
+        assertNil(l1)
+        assertEqual(r1, 2)
+        let (l2, r2) = engine.neighbors(of: 4, cyclic: false)
+        assertEqual(l2, 3)
+        assertNil(r2)
+    }
+
+    runSuite("neighbors single window never wraps to itself") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [5])
+        let (l, r) = engine.neighbors(of: 5, cyclic: true)
+        assertNil(l)
+        assertNil(r)
+    }
+
+    runSuite("neighbors unknown id returns nil pair") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3])
+        let (l, r) = engine.neighbors(of: 99, cyclic: true)
+        assertNil(l)
+        assertNil(r)
+    }
+
+    runSuite("neighbors(cyclic) boundary matches advanceCursor(cyclic) wrap") {
+        // 画面（neighbors）与激活（advanceCursor）在边界 + 循环时必须指向同一窗口。
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4])
+        engine.userDidSelectWindow(4)   // currentIndex → 3（最右窗口）
+        // 最右窗口右滑：neighbors 右邻 = 1；advanceCursor(right, cyclic) wrap → 1
+        let (_, rNeighbor) = engine.neighbors(of: 4, cyclic: true)
+        assertEqual(rNeighbor, 1)
+        let wrapRight = engine.advanceCursor(directionRight: true, cyclic: true)  // 3→0 wrap
+        assertEqual(wrapRight, 1)
+        // 此时游标在最左窗口（idx=0）。最左窗口左滑：neighbors 左邻 = 4；
+        // advanceCursor(left, cyclic) wrap → 4
+        let (lNeighbor, _) = engine.neighbors(of: 1, cyclic: true)
+        assertEqual(lNeighbor, 4)
+        let wrapLeft = engine.advanceCursor(directionRight: false, cyclic: true)  // 0→3 wrap
+        assertEqual(wrapLeft, 4)
+    }
+
     runSuite("moveToFront moves window to index 0") {
         let engine = LRUOrderingEngine()
         engine.sync(windowIDs: [1, 2, 3])
@@ -156,6 +233,59 @@ private func testLRUOrderingEngine() {
         assertEqual(engine.id(at: 0), 1)
         assertEqual(engine.id(at: 1), 2)
         assertEqual(engine.id(at: 2), 3)
+    }
+
+    runSuite("syncCursor moves cursor to frontmost index without reordering") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3])
+        engine.userDidSelectWindow(3)   // cursor 0 → 2
+        engine.syncCursor(toFrontmost: 2)  // external Cmd+Tab to window 2 (idx 1)
+        // Order unchanged — activation does NOT reorder
+        assertEqual(engine.id(at: 0), 1)
+        assertEqual(engine.id(at: 1), 2)
+        assertEqual(engine.id(at: 2), 3)
+        // Cursor now points at window 2
+        assertEqual(engine.id(at: 3), nil)
+        let left = engine.advanceCursor(directionRight: false)  // idx 1 → 0
+        assertEqual(left, 1)   // window 1 is window 2's more-recent neighbor
+        let right = engine.advanceCursor(directionRight: true)  // idx 0 → 1
+        assertEqual(right, 2)
+    }
+
+    runSuite("syncCursor no-op when already aligned") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3])
+        engine.syncCursor(toFrontmost: 1)  // cursor already 0
+        assertEqual(engine.currentIndex, 0)
+        assertEqual(engine.id(at: 0), 1)
+    }
+
+    runSuite("syncCursor no-op for unknown window") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3])
+        engine.userDidSelectWindow(2)
+        engine.syncCursor(toFrontmost: 99)  // not in orderedIDs
+        assertEqual(engine.currentIndex, 1)
+        assertEqual(engine.count, 3)
+    }
+
+    runSuite("syncCursor then advanceCursor navigates from frontmost neighbors") {
+        // Regression for the slide divergence: user externally switches to 迅雷@idx=11,
+        // cursor was stale at Chrome@idx=4. After syncCursor, a swipe must navigate
+        // from 迅雷's LRU neighbors, and a round-trip must return to 迅雷.
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [1, 2, 3, 4, 5])   // 1..5 LRU order
+        engine.userDidSelectWindow(2)             // last navigation left cursor at 2 (idx 1)
+        engine.syncCursor(toFrontmost: 5)         // user externally switched to 5 (idx 4)
+        // right swipe → window 5's less-recent neighbor (nil here = boundary wall-bump)
+        let right = engine.advanceCursor(directionRight: true, cyclic: false)
+        assertNil(right)                          // 5 is at the right boundary, non-cyclic
+        // left swipe → window 5's more-recent neighbor = 4 (round-trip returns toward 迅雷)
+        let left = engine.advanceCursor(directionRight: false, cyclic: false)
+        assertEqual(left, 4)
+        // another left swipe → 3, continues toward the more-recent end
+        let left2 = engine.advanceCursor(directionRight: false, cyclic: false)
+        assertEqual(left2, 3)
     }
 
     runSuite("advanceCursor right wraps around") {
@@ -648,6 +778,107 @@ private func testMenuBarImageCache() {
     }
 }
 
+// MARK: - BackdropPreCapturer 排除判定 Tests
+// Fix A：预捕 SCK 截屏必须排除本进程自己的窗口（全屏面板 + 菜单覆盖条）。
+// 回归点：预捕异步执行可能晚于 begin() 建面板，若不排除本进程窗口，
+// 会把「面板黑占位罩在真实桌面 + 面板内源/目标图像」自拍进背景图 → 暗层屏闪。
+
+private func testBackdropExclusion() {
+    let ourPid: pid_t = 1111
+
+    runSuite("排除调用方显式指定的 windowIDs") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 5, ownerPid: 99)
+        assertTrue(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [5], panelWindowNumber: nil, ourPid: ourPid))
+    }
+
+    runSuite("排除 panelWindowNumber 对应窗口") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 500, ownerPid: 99)
+        assertTrue(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [], panelWindowNumber: 500, ourPid: ourPid))
+    }
+
+    runSuite("预捕路径(nil)排除本进程全屏面板 —— Fix A 核心回归") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 700, ownerPid: ourPid)
+        assertTrue(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [], panelWindowNumber: nil, ourPid: ourPid))
+    }
+
+    runSuite("本进程菜单覆盖条（非全屏）同样排除") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 701, ownerPid: ourPid)
+        assertTrue(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [], panelWindowNumber: nil, ourPid: ourPid))
+    }
+
+    runSuite("本进程窗口在 panelWindowNumber 指向别窗口时仍排除") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 702, ownerPid: ourPid)
+        assertTrue(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [999], panelWindowNumber: 888, ourPid: ourPid))
+    }
+
+    runSuite("其他进程窗口不排除") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 8, ownerPid: 1234)
+        assertFalse(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [], panelWindowNumber: nil, ourPid: ourPid))
+    }
+
+    runSuite("无 ownerPid 的窗口不排除") {
+        let r = BackdropPreCapturer.WindowRef(windowID: 9, ownerPid: nil)
+        assertFalse(BackdropPreCapturer.shouldExcludeWindow(r, windowIDs: [], panelWindowNumber: nil, ourPid: ourPid))
+    }
+}
+
+// MARK: - BackdropPreCapturer 预捕会话可用性 Tests
+// Fix B2：take() 守卫只校验屏幕尺寸——预捕背景图是「桌面减本进程窗口」，与源/左右邻
+// 身份无关。快速连续手势「提交→激活」间隙的预捕源过期、LRU 邻序漂移都不应让 begin
+// 放弃已就绪背景；仅源窗口换屏（屏幕尺寸变化）才需重捕。
+
+private func testBackdropSessionUsable() {
+    runSuite("同屏幕尺寸 → 会话可用") {
+        assertTrue(BackdropPreCapturer.sessionUsable(sessionScreen: CGSize(width: 1728, height: 1117),
+                                                     beginScreen: CGSize(width: 1728, height: 1117)))
+    }
+
+    runSuite("不同屏幕尺寸（源已换屏）→ 会话不可用") {
+        assertFalse(BackdropPreCapturer.sessionUsable(sessionScreen: CGSize(width: 1728, height: 1117),
+                                                      beginScreen: CGSize(width: 1440, height: 900)))
+    }
+
+    runSuite("高 DPI 整点（Retina 逻辑点）同屏 → 可用") {
+        assertTrue(BackdropPreCapturer.sessionUsable(sessionScreen: CGSize(width: 1512, height: 982),
+                                                     beginScreen: CGSize(width: 1512, height: 982)))
+    }
+
+    runSuite("整数与 CGFloat 精度一致 → 可用") {
+        assertTrue(BackdropPreCapturer.sessionUsable(sessionScreen: CGSize(width: 1512.0, height: 982.0),
+                                                     beginScreen: CGSize(width: 1512, height: 982)))
+    }
+}
+
+// MARK: - SettleFallback 兜底决策 Tests
+// Fix C：淡出停滞兜底不再硬切（不透明面板瞬间消失=黑闪 + 与下一会话预捕竞争）。
+// 面板仍可见 → 先短淡出再拆；面板已透明 → 直接拆；面板已拆 → 无操作。
+
+private func testSettleFallback() {
+    runSuite("面板已拆除 → noPanel") {
+        let a = SettleFallback.action(panelExists: false, panelAlpha: 1.0)
+        assertEqual(a, .noPanel)
+    }
+
+    runSuite("面板仍不透明（停滞 1.00，本次实测 token23 场景）→ refade") {
+        let a = SettleFallback.action(panelExists: true, panelAlpha: 1.00)
+        assertEqual(a, .refadeThenTeardown)
+    }
+
+    runSuite("面板淡出中(0.92/0.19) → refade 后拆，而非硬切") {
+        assertEqual(SettleFallback.action(panelExists: true, panelAlpha: 0.92), .refadeThenTeardown)
+        assertEqual(SettleFallback.action(panelExists: true, panelAlpha: 0.19), .refadeThenTeardown)
+    }
+
+    runSuite("面板已透明(≤0.05) → teardownNow") {
+        assertEqual(SettleFallback.action(panelExists: true, panelAlpha: 0.00), .teardownNow)
+        assertEqual(SettleFallback.action(panelExists: true, panelAlpha: 0.05), .teardownNow)
+    }
+
+    runSuite("边界：alpha 0.06 → refade") {
+        assertEqual(SettleFallback.action(panelExists: true, panelAlpha: 0.06), .refadeThenTeardown)
+    }
+}
+
 private func makeSolidImage(width: Int, height: Int) -> CGImage? {
     guard let ctx = CGContext(data: nil, width: width, height: height,
                               bitsPerComponent: 8, bytesPerRow: 0,
@@ -700,6 +931,18 @@ struct TestRunner {
         print("")
         print("[MenuBarImageCache]")
         testMenuBarImageCache()
+
+        print("")
+        print("[BackdropExclusion]")
+        testBackdropExclusion()
+
+        print("")
+        print("[BackdropSessionUsable]")
+        testBackdropSessionUsable()
+
+        print("")
+        print("[SettleFallback]")
+        testSettleFallback()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")

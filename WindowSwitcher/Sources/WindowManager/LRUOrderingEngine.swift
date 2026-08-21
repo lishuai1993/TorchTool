@@ -39,6 +39,19 @@ final class LRUOrderingEngine {
         return orderedIDs[index]
     }
 
+    /// 计算 id 在列表中的左右邻。cyclic=true 时边界绕回对侧（最左窗口的左邻=最右、
+    /// 最右窗口的右邻=最左），与 advanceCursor 的 wrap 语义一致，保证滑动过渡的
+    /// 画面滑入目标与提交激活目标始终指向同一窗口。cyclic=false 时边界返回 nil
+    ///（wall-bump）。窗口瞬切与跟手滑动两个子模式由此遵守同一行为规范。
+    func neighbors(of id: CGWindowID, cyclic: Bool) -> (left: CGWindowID?, right: CGWindowID?) {
+        guard let idx = orderedIDs.firstIndex(of: id) else { return (nil, nil) }
+        let left: CGWindowID? = idx > 0 ? orderedIDs[idx - 1]
+            : (cyclic && count > 1 ? orderedIDs[count - 1] : nil)
+        let right: CGWindowID? = idx + 1 < count ? orderedIDs[idx + 1]
+            : (cyclic && count > 1 ? orderedIDs[0] : nil)
+        return (left, right)
+    }
+
     // MARK: - Mutations
 
     /// Call when the window list changes (windows added / removed).
@@ -155,6 +168,21 @@ final class LRUOrderingEngine {
         }
         let after = orderedIDs.prefix(5).compactMap { windowNames[$0] }.joined(separator: " → ")
         logDebug("LRU-SELECT: [\(windowNames[id] ?? "?")] cursor→\(currentIndex), order=[\(before)] (unchanged=\(before == after))")
+    }
+
+    /// 保持「currentIndex == index(of: frontmost)」不变量：外部切换（Cmd+Tab/Dock/
+    /// 点击）只更新 frontmost、不重排 LRU（activation ≠ interaction），若游标停在上次
+    /// 导航位置，下一次手势 commit 的 advanceCursor（游标 ±1）就会与画面目标
+    ///（frontmost 的左右邻）脱节。调用方在外部激活更新 frontmost 后调用本方法。
+    /// 只移动游标指针，不改变 orderedIDs 顺序。
+    func syncCursor(toFrontmost id: CGWindowID) {
+        guard let idx = orderedIDs.firstIndex(of: id) else {
+            logDebug("LRU: syncCursor id=\(id) name=\(windowNames[id] ?? "?") NOT FOUND in orderedIDs")
+            return
+        }
+        guard idx != currentIndex else { return }
+        currentIndex = idx
+        logDebug("LRU: cursor synced to frontmost [\(windowNames[id] ?? "?")] idx=\(idx)")
     }
 
     // MARK: - Relative navigation

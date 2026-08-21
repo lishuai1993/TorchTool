@@ -455,9 +455,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let ids = windowManager.orderingEngine.orderedIDs
-        let leftID = idx > 0 ? ids[idx - 1] : nil      // moreRecent — p>0 时滑入
-        let rightID = idx + 1 < ids.count ? ids[idx + 1] : nil  // lessRecent — p<0 时滑入
+        // 循环滚动开启时边界绕回对侧窗口，与 commit 的 advanceCursor(cyclic:) wrap 一致
+        //（画面滑入目标 == 提交激活目标）。
+        let (leftID, rightID) = windowManager.orderingEngine.neighbors(
+            of: sourceID, cyclic: AppSettings.shared.cyclicScrollEnabled)
 
         slideTransition.begin(sourceID: sourceID, leftID: leftID, rightID: rightID, initialProgress: progress)
         armSlideWatchdog()
@@ -479,6 +480,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if let target = windowManager.orderingEngine.advanceCursor(directionRight: dirRight, cyclic: cyclic) {
                 let targetName = windowManager.orderingEngine.windowNames[target] ?? "?"
                 logDebug("SLIDE: commit dirRight=\(dirRight) → 激活 [\(targetName)]")
+                // 方案B1：提交即把目标标记为前置。activateWindow（AX 抬升 + app.activate）
+                // 仍等 settle 淡出完成后执行；提前更新 frontmostWindowID 消除「提交→激活」
+                // 之间的陈旧窗口——快速连续手势的预捕（trackingBegan）落进该窗口会读到旧源、
+                // 与 begin 失配，回退全新捕获暴露黑占位闪屏。
+                windowManager.markCommitFrontmost(target)
                 slideTransition.settle(finalOffset: off, commit: true) { [weak self] in
                     self?.windowManager.activateWindow(target)
                     self?.slideTransition.logPostActivationDiagnostics()

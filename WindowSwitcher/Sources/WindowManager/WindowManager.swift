@@ -148,6 +148,13 @@ final class WindowManager: @unchecked Sendable {
             } else if frontmostWindowID == nil || windows[frontmostWindowID!] == nil {
                 self.frontmostWindowID = orderingEngine.orderedIDs.first
             }
+            // 同步游标到新前置窗口：外部激活只更新 frontmost、不重排 LRU，若游标停在
+            // 上次导航位置，下一次手势 commit 的 advanceCursor 就与画面目标脱节。
+            // 保持「currentIndex == index(of: frontmost)」不变量，使滑动/quickSwitch
+            // 都从当前激活窗口的 LRU 左右邻起算。
+            if let f = self.frontmostWindowID {
+                self.orderingEngine.syncCursor(toFrontmost: f)
+            }
             // Start observing same-app focused-window changes for the new app.
             self.axFocusObserver.startObserving(pid: pid)
         }
@@ -345,6 +352,18 @@ final class WindowManager: @unchecked Sendable {
         logDebug("ACTIVATE-DONE: window=\(info.ownerName) — \(info.windowTitle) idx=\(idxBefore.map(String.init(describing:)) ?? "nil") cursorAfter=\(orderingEngine.orderedIDs.firstIndex(of: windowID).map(String.init(describing:)) ?? "nil") orderedIDs[0]=\(orderingEngine.windowNames[orderingEngine.orderedIDs.first!] ?? "?") isActivating=\(isActivating)")
     }
 
+    /// 方案B1：滑动提交即把目标窗口标记为前置（仅更新 frontmostWindowID）。
+    /// AX 抬升 + app.activate 仍由 activateWindow 在 settle 淡出完成后执行；提前标记
+    /// 让紧随其后的手势预捕/begin 都读到正确源窗口——否则「提交→激活」间隙内
+    /// trackingBegan 预捕读到旧源、与 begin 失配、回退全新捕获并暴露黑占位闪屏。
+    /// frontmostWindowID 已被 refreshWindows（仅 nil/stale 时写）与 activateWindow 保护，
+    /// 此处提前写入不会破坏后续激活流程（activateWindow 幂等）。
+    func markCommitFrontmost(_ windowID: CGWindowID) {
+        guard windows[windowID] != nil else { return }
+        frontmostWindowID = windowID
+        logDebug("SLIDE: commit frontmost → [\(orderingEngine.windowNames[windowID] ?? "?")]")
+    }
+
     // MARK: - Interaction monitoring
 
     func startInteractionMonitoring() -> Bool {
@@ -510,9 +529,10 @@ final class WindowManager: @unchecked Sendable {
               let idx = orderingEngine.index(of: sourceID),
               let sourceInfo = windows[sourceID],
               orderingEngine.orderedIDs.count > 1 else { return }
-        let ids = orderingEngine.orderedIDs
-        let leftID = idx > 0 ? ids[idx - 1] : nil
-        let rightID = idx + 1 < ids.count ? ids[idx + 1] : nil
+        // 与 beginSlideSessionIfNeeded 共用 neighbors（循环滚动开启时边界绕回对侧），
+        // 保证预捕计划与 begin 实际计算一致。
+        let (leftID, rightID) = orderingEngine.neighbors(
+            of: sourceID, cyclic: AppSettings.shared.cyclicScrollEnabled)
         guard let screen = SlideGeometry.screen(containingCGFrame: sourceInfo.frame, screens: NSScreen.screens) else {
             logDebug("SLIDE: pre-capture abort — no screen for source")
             return

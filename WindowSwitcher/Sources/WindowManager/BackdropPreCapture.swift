@@ -75,13 +75,20 @@ final class BackdropPreCapturer {
         Task { @MainActor in await Self.capture(into: left, screenSize: screenSize) }
     }
 
+    /// 预捕会话是否可用于当前 begin 的判定（纯函数，可单测）。
+    /// 方案B2：只校验屏幕尺寸——预捕背景图是「桌面减本进程窗口」，与源/左右邻身份无关；
+    /// 快速连续手势里「提交→激活」间隙的预捕源过期、以及两次刷新间 LRU 邻序漂移，都不
+    /// 应让 begin 放弃已就绪的背景。失配仍采用预捕图（略旧但可用），避免全新捕获回退的
+    /// 不透明黑占位闪屏。仅源窗口换屏才需重捕（屏幕尺寸变化）。
+    static func sessionUsable(sessionScreen: CGSize, beginScreen: CGSize) -> Bool {
+        sessionScreen == beginScreen
+    }
+
     /// begin() 一次性消费：取命中方向的结果并清空会话（无论结果如何，本会话不再复用）。
-    /// 参数不匹配（窗口/方向变化）→ .none，begin 走全新捕获。
+    /// 仅屏幕尺寸不匹配（源已换屏）→ .none，begin 走全新捕获。
     func take(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?,
               screenSize: CGSize, sign: Int) -> TakeResult {
-        guard let session, session.sourceID == sourceID,
-              session.leftID == leftID, session.rightID == rightID,
-              session.screenSize == screenSize else { return .none }
+        guard let session, Self.sessionUsable(sessionScreen: session.screenSize, beginScreen: screenSize) else { return .none }
         let dir = sign >= 0 ? session.rightSwipe : session.leftSwipe
         self.session = nil  // 消费即清空，防旧图被后续手势误用
         if let image = dir.image { return .ready(image) }
@@ -104,8 +111,14 @@ final class BackdropPreCapturer {
     }
 
     /// 单方向 SCK 捕获。统一模型背景无窗口排除集（接受目标滑入时与背景真实位重影）；
-    /// windowIDs 仅携带菜单覆盖条等本进程面板窗口号。panelWindowNumber 非 nil 时额外
-    /// 排除本进程全屏面板（防双影）；预捕阶段面板尚未创建，传 nil。
+    /// windowIDs 仅携带菜单覆盖条等本进程面板窗口号；panelWindowNumber 为该会话全屏面板
+    /// 窗口号（全新捕获路径传入）。
+    ///
+    /// 排除规则：始终排除本进程自己的窗口（全屏滑动面板 + 菜单覆盖条）。预捕路径
+    /// （panelWindowNumber=nil）此前不排除任何本进程窗口，但预捕异步执行可能滞后到
+    /// begin() 建面板之后——本次实测：预捕 24.715 发起、24.813 执行，begin 24.748 建面板
+    /// 落在其中，SCK 把「半透明黑占位罩在真实桌面 + 面板内源/目标图像」自拍进背景图，
+    /// 造成暗层屏闪。真实源/目标窗口均为其他进程，不受排除影响。
     static func captureDesktop(size: CGSize, excluding windowIDs: Set<CGWindowID>,
                                panelWindowNumber: Int?) async throws -> (image: CGImage, excluded: [SCWindow]) {
         let content = try await SCShareableContent.current
@@ -116,21 +129,10 @@ final class BackdropPreCapturer {
                           userInfo: [NSLocalizedDescriptionKey: "no matching display"])
         }
         let ourPid = ProcessInfo.processInfo.processIdentifier
-        let excluded: [SCWindow]
-        if let panelWindowNumber {
-            excluded = content.windows.filter { w in
-                if windowIDs.contains(w.windowID) || w.windowID == CGWindowID(panelWindowNumber) {
-                    return true
-                }
-                // 兜底：本进程覆盖整个目标屏的面板（防 windowNumber 偶发不匹配导致双影）
-                if let owner = w.owningApplication, owner.processID == ourPid,
-                   abs(w.frame.width - size.width) < 1 && abs(w.frame.height - size.height) < 1 {
-                    return true
-                }
-                return false
-            }
-        } else {
-            excluded = content.windows.filter { windowIDs.contains($0.windowID) }
+        let excluded: [SCWindow] = content.windows.filter {
+            Self.shouldExcludeWindow(
+                WindowRef(windowID: $0.windowID, ownerPid: $0.owningApplication?.processID),
+                windowIDs: windowIDs, panelWindowNumber: panelWindowNumber, ourPid: ourPid)
         }
         let filter = SCContentFilter(display: display, excludingWindows: excluded)
         let config = SCStreamConfiguration()
@@ -141,6 +143,27 @@ final class BackdropPreCapturer {
         config.capturesAudio = false
         let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
         return (image, excluded)
+    }
+
+    // MARK: - 排除判定（纯函数，可单测）
+
+    /// 背景截屏排除判定的最小窗口信息（SCWindow 不可直接构造、无法在单测中实例化，
+    /// 用等价值类型承载判定所需的窗口 ID 与进程）。
+    struct WindowRef {
+        let windowID: CGWindowID
+        let ownerPid: pid_t?
+    }
+
+    /// 窗口是否应从背景截屏排除。
+    /// 排除：① 调用方显式指定的 windowIDs；② panelWindowNumber 对应窗口；
+    /// ③ 本进程 PID 的所有窗口（全屏面板、菜单覆盖条——任何时刻都不该入背景图，
+    /// 含预捕路径：异步执行可能晚于 begin 建面板，必须排除否则自拍成暗层屏闪）。
+    static func shouldExcludeWindow(_ ref: WindowRef, windowIDs: Set<CGWindowID>,
+                                    panelWindowNumber: Int?, ourPid: pid_t) -> Bool {
+        if windowIDs.contains(ref.windowID) { return true }
+        if let pn = panelWindowNumber, ref.windowID == CGWindowID(pn) { return true }
+        if let pid = ref.ownerPid, pid == ourPid { return true }
+        return false
     }
 
     // MARK: - Private

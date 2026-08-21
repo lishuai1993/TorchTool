@@ -125,7 +125,9 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/GesturePhase.swift \
                 Sources/Common/SlideOffset.swift \
                 Sources/Common/SlideGeometry.swift \
-                Sources/WindowManager/MenuBarImageCache.swift
+                Sources/Common/SettleFallback.swift \
+                Sources/WindowManager/MenuBarImageCache.swift \
+                Sources/WindowManager/BackdropPreCapture.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests
@@ -140,7 +142,7 @@ $(BUILD_DIR)/WindowSwitcherTests: $(TEST_SOURCES)
 	swiftc \
 		$(TEST_SOURCES) \
 		-D DEBUG \
-		-framework AppKit -framework CoreGraphics -framework ApplicationServices \
+		-framework AppKit -framework CoreGraphics -framework ApplicationServices -framework ScreenCaptureKit \
 		-sdk $(SDK) \
 		-target $(TARGET) \
 		-o $(BUILD_DIR)/WindowSwitcherTests

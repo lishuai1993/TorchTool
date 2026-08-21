@@ -67,6 +67,9 @@ final class SlideTransitionController {
     /// 会话代币：begin 时自增，动画/截屏完成回调仅在 token 匹配时才生效，
     /// 防止旧会话的延迟回调污染新会话。
     private var sessionToken = 0
+    /// 淡出停滞兜底是否已接管拆除：置位后正常淡出 completionHandler 放弃拆除，
+    /// 避免与兜底的手动淡出竞争。在 teardownPanel 中复位（随会话切换重置）。
+    private var settleFallbackEngaged = false
 
     // MARK: - BGFLASH 诊断状态（仅日志，不影响行为）
 
@@ -243,6 +246,30 @@ final class SlideTransitionController {
                             coverWindowNumber: menuCoverPanel?.windowNumber, inflight: inflight)
         }
         scheduleDiagSamples()
+
+        // 揭示诊断：记录会话窗口 ID 快照 + 基线采样（视频/目标窗口内容在会话内变化量，
+        // 用于区分「冻结背景过期跳变」与「目标窗口激活重绘闪白」）。
+        debugSourceWindowID = sourceID
+        debugTargetWindowID = plan.targetID
+        debugReverseWindowID = sign >= 0 ? rightID : leftID
+        let diagPN = panelWindowNumber
+        let diagTarget = plan.targetID
+        let diagReverse = sign >= 0 ? rightID : leftID
+        scheduleRevealDiag("T0+250ms", delay: 0.25, panelWindowNumber: diagPN,
+                           targetID: diagTarget, reverseID: diagReverse)
+
+        // 淡入期真实屏幕存帧诊断（方案4.1）：淡入 0.06s 内密集采样合成画面，
+        // 捕获「淡入首帧黑色占位」的确切时刻——面板 alpha 已高但屏幕仍黑，即淡入
+        // 黑占位（微信 16:54:56 全黑同源）。REVEAL-FRAME 原先只在淡出期采样，
+        // 滑动开始段是诊断盲区：begins 期面板先铺不透明黑底、背景/窗口图纹理
+        // 异步上传，上传未就绪时淡入首帧即纯黑占位。fN 帧与淡出期 cN/rN 帧同存
+        // /tmp/reveal（同名不冲突），panelAlpha≈1 且 mean≈0 即为黑屏帧。
+        for (label, delay) in [("f1", 0.025), ("f2", 0.040), ("f3", 0.055),
+                               ("f4", 0.070), ("f5", 0.090)] {
+            scheduleFrame(label, delay: delay, panelWindowNumber: diagPN,
+                          targetID: diagTarget, reverseID: diagReverse,
+                          extraWindowMeans: false)
+        }
 
         let leftName = leftID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
         let rightName = rightID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
@@ -422,6 +449,35 @@ final class SlideTransitionController {
             guard let self, settleFadeToken == self.sessionToken else { return }
             self.diagSample(label: "finishSettle+60ms")
         }
+        // 存帧诊断（REVEAL-FRAME）：淡出全程密集采集合成画面并存 PNG 到 /tmp/reveal，
+        // 直接查看闪屏帧（3×3 灰度无法捕捉的亚帧/局部瞬变）。首末帧额外采目标/视频
+        // 窗口均值。采样在 revealDiagQueue 上串行、alpha 读取也在后台队列（不占主线程），
+        // 避免淡出期主线程阻塞本身制造/掩盖闪屏。
+        let fadePlan: [(label: String, delay: Double, extra: Bool)]
+        if commit {
+            // commit 淡出 0.30s：0.02s 起每 50ms 一帧覆盖淡出全程，随后拉开间距观察
+            // teardown 后实时桌面是否弹出残留。
+            fadePlan = [
+                ("c1", 0.02, true), ("c2", 0.07, false), ("c3", 0.12, false),
+                ("c4", 0.17, false), ("c5", 0.22, false), ("c6", 0.27, false),
+                ("c7", 0.32, false), ("c8", 0.37, true), ("c9", 0.45, false),
+                ("c10", 0.55, false), ("c11", 0.70, false), ("c12", 0.90, true)
+            ]
+        } else {
+            // 回弹淡出 0.15s：0.02s 起每 40ms 一帧。
+            fadePlan = [
+                ("r1", 0.02, true), ("r2", 0.06, false), ("r3", 0.10, false),
+                ("r4", 0.14, false), ("r5", 0.18, false), ("r6", 0.24, false),
+                ("r7", 0.32, false), ("r8", 0.45, true)
+            ]
+        }
+        let pn = panelWindowNumber
+        let tid = debugTargetWindowID
+        let rid = debugReverseWindowID
+        for (label, delay, extra) in fadePlan {
+            scheduleFrame(label, delay: delay, panelWindowNumber: pn,
+                          targetID: tid, reverseID: rid, extraWindowMeans: extra)
+        }
         NSAnimationContext.runAnimationGroup { ctx in
             // 提交：0.3s easeInOut 让窗口顶栏（面板内容）与真实目标菜单（覆盖条
             // 之下）同步渐显，节奏一致；回弹无窗口/菜单切换，短淡出快速收起。
@@ -432,20 +488,60 @@ final class SlideTransitionController {
         } completionHandler: { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
+            if self.settleFallbackEngaged { return }  // 兜底接管中，交由手动淡出拆除
             self.teardownPanel()
             self.isActive = false
         }
         // 兜底：淡出 completionHandler 偶发不触发（主线程被 SCK 截屏/纹理上传阻塞
         // 超淡出时长，面板滞留全屏不透明并吞掉后续手势——日志中 finishSettle 面板
-        // 冻结、mean 居高不下即此现象）。0.5s 后会话仍存活且面板未收起则强制收起，
+        // 冻结、mean 居高不下即此现象）。0.5s 后会话仍存活且面板未收起则兜底收起，
         // 保证不残留死会话。正常淡出 ~0.12-0.2s 完成、panel 置 nil，兜底自然跳过。
+        // 不再直接 orderOut 硬切（不透明面板瞬间消失=黑闪 + 与下一会话预捕竞争制造
+        // 自拍背景）：判定用屏幕实时透明度——panel.alphaValue 是动画模型值，停滞时
+        // 动画目标已是 0 但视觉仍不透明，模型值不可用。仍可见 → 手动驱动淡出后拆，
+        // 已透明 → 直接拆。
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
             guard token == self.sessionToken else { return }
-            guard self.panel != nil else { return }
-            logDebug("SLIDE: finishSettle fade fallback — forcing teardown (stall detected)")
-            self.teardownPanel()
-            self.isActive = false
+            let onScreenAlpha = Self.panelOnScreenAlpha(self.panelWindowNumber) ?? 1.0
+            switch SettleFallback.action(panelExists: self.panel != nil, panelAlpha: onScreenAlpha) {
+            case .noPanel:
+                break
+            case .teardownNow:
+                logDebug("SLIDE: finishSettle fade fallback — panel already transparent, tearing down")
+                self.teardownPanel()
+                self.isActive = false
+            case .refadeThenTeardown:
+                logDebug("SLIDE: finishSettle fade fallback — panel stuck visible, manual fade then teardown")
+                self.settleFallbackEngaged = true
+                let start = ProcessInfo.processInfo.systemUptime
+                // 手动驱动 alpha（绕过可能失效的 animator/completionHandler），0.15s 淡出后拆除。
+                let timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] timer in
+                    guard let self else { timer.invalidate(); return }
+                    guard token == self.sessionToken else { timer.invalidate(); return }
+                    guard let panel = self.panel else { timer.invalidate(); return }
+                    let t = min(1.0, (ProcessInfo.processInfo.systemUptime - start) / 0.15)
+                    panel.alphaValue = 1.0 - t
+                    self.menuCoverPanel?.alphaValue = 1.0 - t
+                    if t >= 1.0 {
+                        timer.invalidate()
+                        logDebug("SLIDE: finishSettle fade fallback — manual fade done, tearing down")
+                        self.teardownPanel()
+                        self.isActive = false
+                    }
+                }
+                // 跟踪触控板期间默认 runloop 模式可能不派发 timer，挂 .common 保证淡出持续。
+                RunLoop.main.add(timer, forMode: .common)
+                // 二重兜底：手动淡出若也被主线程阻塞，0.3s 后强制拆除，绝不残留全屏不透明面板。
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    guard let self else { return }
+                    guard token == self.sessionToken else { return }
+                    guard self.panel != nil else { return }
+                    logDebug("SLIDE: finishSettle fade fallback manual fade stall — forcing teardown")
+                    self.teardownPanel()
+                    self.isActive = false
+                }
+            }
         }
     }
 
@@ -563,26 +659,35 @@ final class SlideTransitionController {
 
     // MARK: - 像素级诊断（仅日志，不影响行为）
 
-    /// 采样 CGImage 亮度：缩放到 3×3 灰度网格，输出网格各点灰度 + 均值（0=纯黑，255=纯白）。
-    private func sampleBrightness(_ image: CGImage) -> String {
+    /// 3×3 灰度网格 + 均值（0=纯黑，255=纯白）。共享给 panelLum 与揭示诊断。
+    private static func grayStats(_ image: CGImage) -> (grid: [Int], mean: Int) {
         let n = 3
         let buf = UnsafeMutableRawPointer.allocate(byteCount: n * n, alignment: 1)
         defer { buf.deallocate() }
-        guard let ctx = CGContext(data: buf, width: n, height: n,
-                                  bitsPerComponent: 8, bytesPerRow: n,
-                                  space: CGColorSpaceCreateDeviceGray(),
-                                  bitmapInfo: CGImageAlphaInfo.none.rawValue) else {
-            return "ctx-fail"
+        var grid: [Int] = []
+        if let ctx = CGContext(data: buf, width: n, height: n,
+                               bitsPerComponent: 8, bytesPerRow: n,
+                               space: CGColorSpaceCreateDeviceGray(),
+                               bitmapInfo: CGImageAlphaInfo.none.rawValue) {
+            ctx.interpolationQuality = .medium
+            ctx.draw(image, in: CGRect(x: 0, y: 0, width: n, height: n))
+            let bytes = buf.assumingMemoryBound(to: UInt8.self)
+            grid = (0..<(n * n)).map { Int(bytes[$0]) }
         }
-        ctx.interpolationQuality = .medium
-        ctx.draw(image, in: CGRect(x: 0, y: 0, width: n, height: n))
-        let bytes = buf.assumingMemoryBound(to: UInt8.self)
-        let vals = (0..<(n * n)).map { Int(bytes[$0]) }
-        let mean = vals.reduce(0, +) / max(vals.count, 1)
-        return "grid=[\(vals.map { String($0) }.joined(separator: ","))] mean=\(mean)"
+        let mean = grid.isEmpty ? 0 : grid.reduce(0, +) / grid.count
+        return (grid, mean)
+    }
+
+    /// 采样 CGImage 亮度：缩放到 3×3 灰度网格，输出网格各点灰度 + 均值。
+    private func sampleBrightness(_ image: CGImage) -> String {
+        let s = Self.grayStats(image)
+        return "grid=[\(s.grid.map { String($0) }.joined(separator: ","))] mean=\(s.mean)"
     }
 
     /// 记录面板合成输出（用户实际看到的像素）+ panel/背景图 presentation 透明度。
+    /// 方案E1：面板图捕获（弃用的 CGWindowListCreateImage，WindowServer 繁忙时可挂 ~1s，
+    /// 主线程执行会冻结淡出动画——会话 E 停滞实测根因）移到后台串行队列；主线程只读
+    /// 廉价 layer presentation 值。异步闭包捕获会话 token 并校验，防过期会话写回日志。
     private func diagSample(label: String) {
         guard let panel else {
             logDebug("SLIDE:DIAG \(label) no-panel")
@@ -590,13 +695,18 @@ final class SlideTransitionController {
         }
         let contentAlpha = (panel.contentView?.layer?.presentation()?.opacity).map { String(format: "%.2f", $0) } ?? "n/a"
         let bgAlpha = (backdropImageView?.layer?.presentation()?.opacity).map { String(format: "%.2f", $0) } ?? "n/a"
-        var lum = "n/a"
-        if let cg = WindowSwitcher_CaptureWindowImage(CGWindowID(panel.windowNumber))?.takeRetainedValue() {
-            lum = sampleBrightness(cg)
-        } else {
-            lum = "capture-nil"
+        let pn = panel.windowNumber
+        let token = sessionToken
+        diagQueue.async { [weak self] in
+            guard let self, token == self.sessionToken else { return }
+            var lum = "n/a"
+            if let cg = WindowSwitcher_CaptureWindowImage(CGWindowID(pn))?.takeRetainedValue() {
+                lum = self.sampleBrightness(cg)
+            } else {
+                lum = "capture-nil"
+            }
+            logDebug("SLIDE:DIAG \(label) contentAlpha=\(contentAlpha) bgImageAlpha=\(bgAlpha) panelLum=\(lum)")
         }
-        logDebug("SLIDE:DIAG \(label) contentAlpha=\(contentAlpha) bgImageAlpha=\(bgAlpha) panelLum=\(lum)")
     }
 
     /// 调度会话关键时刻采样（begin+30/150/400ms），复现「初期干净 vs 后期黑闪」的亮度轨迹。
@@ -619,6 +729,140 @@ final class SlideTransitionController {
                     .map { String(format: "%.2f", $0) } ?? "n/a"
                 logDebug("SLIDE:DIAG \(label) bgImageAlpha=\(alpha)")
             }
+        }
+    }
+
+    // MARK: - 揭示环节诊断（REVEAL-DIAG，仅日志，不影响行为）
+
+    /// 会话内窗口 ID 快照（诊断用）：源=滑出窗口，目标=被激活窗口（如系统设置），
+    /// 反向=反向邻居（如迅雷影音视频窗口）。仅主线程读写在调度点快照给后台队列。
+    private var debugSourceWindowID: CGWindowID?
+    private var debugTargetWindowID: CGWindowID?
+    private var debugReverseWindowID: CGWindowID?
+
+    /// 揭示诊断截图走后台串行队列：淡出期主线程若再被全屏截图阻塞，反而会制造或
+    /// 掩盖闪屏帧，故与功能路径隔离。
+    private let revealDiagQueue = DispatchQueue(label: "com.windowswitcher.revealdiag", qos: .utility)
+
+    /// 面板合成图采样走独立后台串行队列：弃用的 CGWindowListCreateImage 在 WindowServer
+    /// 繁忙时可挂 ~1s（会话 E 停滞实测根因），若主线程执行会冻结淡出动画；与 revealDiagQueue
+    /// 分开，避免一次挂起的面板捕获延迟定时 reveal 帧。
+    private let diagQueue = DispatchQueue(label: "com.windowswitcher.diag", qos: .utility)
+
+    /// 面板当前在 WindowServer 上的实际透明度（动画 presentation 真值）。后台队列调用。
+    private static func panelOnScreenAlpha(_ pn: CGWindowID) -> Double? {
+        guard pn != 0 else { return nil }
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+        for w in list {
+            if let num = w[kCGWindowNumber as String] as? Int, num == Int(pn) {
+                return (w[kCGWindowAlpha as String] as? NSNumber)?.doubleValue
+            }
+        }
+        return nil
+    }
+
+    /// 全屏合成画面（用户看到）原始 CGImage。后台队列调用。
+    private static func captureScreenImage(_ bounds: CGRect) -> CGImage? {
+        WindowSwitcher_CaptureScreenImage(bounds)?.takeRetainedValue()
+    }
+
+    /// 全屏合成画面（用户看到）的 3×3 灰度统计。后台队列调用。
+    private static func captureScreenStats(bounds: CGRect) -> (grid: [Int], mean: Int)? {
+        guard let cg = captureScreenImage(bounds) else { return nil }
+        return Self.grayStats(cg)
+    }
+
+    /// 单窗口内容均值。后台队列调用；窗口被遮挡时返回其 WindowServer 侧缓存内容。
+    private static func captureWindowMean(_ windowID: CGWindowID) -> Int? {
+        guard let cg = WindowSwitcher_CaptureWindowImage(windowID)?.takeRetainedValue() else { return nil }
+        return Self.grayStats(cg).mean
+    }
+
+    /// 采集一次揭示诊断样本：面板 alpha + 合成画面 + 目标窗口 + 视频窗口内容。
+    private func revealDiagSample(_ label: String, panelWindowNumber: CGWindowID,
+                                  targetID: CGWindowID?, reverseID: CGWindowID?) {
+        let bounds = screenRect
+        let alpha = Self.panelOnScreenAlpha(panelWindowNumber)
+        let alphaStr = alpha.map { String(format: "%.2f", $0) } ?? "n/a"
+        revealDiagQueue.async {
+            let screen = Self.captureScreenStats(bounds: bounds)
+            let ss = targetID.flatMap { Self.captureWindowMean($0) }
+            let video = reverseID.flatMap { Self.captureWindowMean($0) }
+            let screenStr = screen.map { "\($0.mean) grid=[\($0.grid.map { String($0) }.joined(separator: ","))]" } ?? "capture-nil"
+            let ssStr = ss.map { "\($0)" } ?? "nil"
+            let videoStr = video.map { "\($0)" } ?? "nil"
+            logDebug("REVEAL-DIAG \(label) panelAlpha=\(alphaStr) screen=\(screenStr) ss=\(ssStr) video=\(videoStr)")
+        }
+    }
+
+    /// 延迟调度一次揭示诊断样本（主线程调度，后台采集）。
+    private func scheduleRevealDiag(_ label: String, delay: TimeInterval,
+                                    panelWindowNumber: CGWindowID,
+                                    targetID: CGWindowID?, reverseID: CGWindowID?) {
+        let token = sessionToken
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, token == self.sessionToken else { return }
+            self.revealDiagSample(label, panelWindowNumber: panelWindowNumber,
+                                  targetID: targetID, reverseID: reverseID)
+        }
+    }
+
+    // MARK: - 存帧诊断（REVEAL-FRAME，仅诊断不影响行为）
+
+    /// 存帧输出目录（/tmp/reveal）。静态初始化时清空旧帧，保证每次运行的帧文件均为
+    /// 本次会话产生；帧文件名含会话代币，同一运行内多次滑动互不覆盖。
+    private static let revealDirURL: URL = {
+        let dir = URL(fileURLWithPath: "/tmp/reveal", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        if let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+            for f in files { try? FileManager.default.removeItem(at: f) }
+        }
+        return dir
+    }()
+
+    /// 将 CGImage 降采样（默认最长边 1280px）后存为 PNG。降采样使编码快、文件小，
+    /// 全屏闪白/闪黑/局部瞬变在低分辨率下仍清晰可见，且不拖累采样节奏。
+    private static func savePNG(_ image: CGImage, to url: URL, maxDimension: Int = 1280) {
+        let w = image.width, h = image.height
+        let scale = min(1.0, CGFloat(maxDimension) / CGFloat(max(w, h)))
+        let dw = max(1, Int(CGFloat(w) * scale)), dh = max(1, Int(CGFloat(h) * scale))
+        guard let ctx = CGContext(data: nil, width: dw, height: dh,
+                                  bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpaceCreateDeviceRGB(),
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return }
+        ctx.interpolationQuality = .high
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: dw, height: dh))
+        guard let small = ctx.makeImage(),
+              let data = NSBitmapImageRep(cgImage: small).representation(using: .png, properties: [:]) else { return }
+        try? data.write(to: url)
+    }
+
+    /// 在揭示队列上延迟采集一帧存盘诊断：合成画面 → 存 PNG → 3×3 灰度统计 → 日志。
+    /// 全程在 revealDiagQueue 串行执行（alpha 读取亦在后台），不经主线程，避免阻塞淡出动画。
+    private func scheduleFrame(_ label: String, delay: TimeInterval,
+                               panelWindowNumber: CGWindowID,
+                               targetID: CGWindowID?, reverseID: CGWindowID?,
+                               extraWindowMeans: Bool) {
+        let token = sessionToken
+        let bounds = screenRect
+        revealDiagQueue.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, token == self.sessionToken else { return }
+            let alpha = Self.panelOnScreenAlpha(panelWindowNumber)
+            let alphaStr = alpha.map { String(format: "%.2f", $0) } ?? "n/a"
+            guard let cg = Self.captureScreenImage(bounds) else {
+                logDebug("REVEAL-FRAME \(label) panelAlpha=\(alphaStr) capture-nil")
+                return
+            }
+            let url = Self.revealDirURL.appendingPathComponent("\(token)_\(label).png")
+            Self.savePNG(cg, to: url)
+            let s = Self.grayStats(cg)
+            var extra = ""
+            if extraWindowMeans {
+                let ss = targetID.flatMap { Self.captureWindowMean($0) }
+                let video = reverseID.flatMap { Self.captureWindowMean($0) }
+                extra = " ss=\(ss.map { "\($0)" } ?? "nil") video=\(video.map { "\($0)" } ?? "nil")"
+            }
+            logDebug("REVEAL-FRAME \(label) panelAlpha=\(alphaStr) mean=\(s.mean) grid=[\(s.grid.map { String($0) }.joined(separator: ","))]\(extra)")
         }
     }
 
@@ -670,6 +914,7 @@ final class SlideTransitionController {
     }
 
     private func teardownPanel() {
+        settleFallbackEngaged = false
         panel?.orderOut(nil)
         panel = nil
         backdrop = nil
