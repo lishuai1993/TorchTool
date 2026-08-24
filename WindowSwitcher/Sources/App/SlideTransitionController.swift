@@ -24,6 +24,21 @@ final class SlideTransitionController {
     private(set) var isActive = false
     /// 当前横向位移（像素，右为正，clamp 在 ±屏宽）。供释放判定使用。
     private(set) var currentOffset: CGFloat = 0
+    /// 链式会话进位偏移：打断时继承的位移（新会话 currentOffset 从 carry 起算）。
+    private(set) var carryOffset: CGFloat = 0
+    /// 是否处于收尾动画（settle/fade）而非跟手：链式打断与三态派发的判定依据。
+    private(set) var isSettling = false
+    /// 最近一次 settle 的推进方向符号（finalOffset<0 → -1）。链式同向判定依据。
+    private(set) var lastSettleSign: CGFloat = 1
+    /// settle 已走完「目标已激活/fade」阶段：链式只能在激活前打断收尾动画；激活后
+    /// 复用 stale 背景图会制造双重影像，应交给全新会话。finishSettle 置位、begin/chain 复位。
+    private(set) var settleComplete = false
+    /// 已 commit 但尚未执行窗口激活的目标（受 settle 300ms 与 token 保护）。链式接续时
+    /// 由新 commit 覆盖（中间步按设计不激活）；会话被非链式方式结束（tap/纵向手势/
+    /// 边界丢弃）时，cancel 补激活它，杜绝「滑了没切」与光标/真实前置不一致。
+    private(set) var pendingActivationTarget: CGWindowID?
+    /// 会话非链式结束时补激活 pending 目标的回调（AppDelegate 注入 activateWindow）。
+    var onFlushPending: ((CGWindowID) -> Void)?
     /// 边界（目标侧无窗口）：无目标视图，源随手指按弹性公式 wall-bump，释放回弹。
     private var boundary = false
     /// 源窗口所在屏幕宽度（点）。
@@ -84,6 +99,18 @@ final class SlideTransitionController {
     /// 采样开关：begin 置 true，settle 起置 false（收尾动画阶段不再追加）。
     private var samplingEnabled = true
 
+    /// 会话峰值横向速度（progress/sec，带符号）。由 C 引擎按 MT 帧时间戳计算、
+    /// gestureEnd 前一刻经 GestureSwipePeakVelocity 送达（方案A 动量助推），
+    /// 规避主线程批处理/折返反号/抬手停顿导致的释放速度失真。
+    private(set) var lastPeakVelocity: CGFloat = 0
+
+    // MARK: - 屏闪诊断旁路开关
+
+    /// 旁路全部屏闪诊断代码（REVEAL-FRAME /tmp/reveal 存图、REVEAL-DIAG、
+    /// SLIDE:DIAG 亮度采样）：置 true 时各诊断函数立即返回，避免全屏截图/PNG
+    /// 编码/弃用捕获 API 挤占窗口切换期间资源。恢复诊断：改为 false 即可。
+    private let diagBypassed = true
+
     // MARK: - BGFLASH 诊断状态（仅日志，不影响行为）
 
     /// 会话诊断快照：begin 时记录，teardownPanel **不清除**（供目标激活后的
@@ -119,8 +146,27 @@ final class SlideTransitionController {
         teardownPanel()
 
         let wm = WindowManager.shared
-        guard let sourceInfo = wm.windows[sourceID],
-              let sourceImage = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName) else {
+        guard let sourceInfo = wm.windows[sourceID] else {
+            logDebug("SLIDE: abort — source window missing (id=\(sourceID))")
+            return
+        }
+        // 方案一：优先消费 trackingBegan 预取的窗口图像（命中即免同步截屏，压缩 begin
+        // 关键路径阻塞）。会话失配 / 未就绪 / 窗口尺寸已变 → 回退同步截屏（正确性不变）。
+        let precap = WindowImagePreCapturer.shared.take(
+            sourceID: sourceID, leftID: leftID, rightID: rightID)
+        if let precap {
+            logDebug("SLIDE: windowImagePreCapturer hit source=\(precap.source != nil) left=\(precap.left != nil) right=\(precap.right != nil)")
+        } else {
+            logDebug("SLIDE: windowImagePreCapturer miss — sync capture fallback")
+        }
+        let sourceImage: NSImage?
+        if let e = precap?.source,
+           WindowImagePreCapturer.frameMatches(entryFrame: e.frame, frame: sourceInfo.frame) {
+            sourceImage = e.image
+        } else {
+            sourceImage = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName)
+        }
+        guard let sourceImage else {
             logDebug("SLIDE: abort — source capture failed (id=\(sourceID))")
             return
         }
@@ -197,14 +243,23 @@ final class SlideTransitionController {
         //（baseX=屏宽）——手指一动即露边、从第一像素跟手，消除小窗口「先滑屏外、
         // 后冒出」的不可见预行程。到达真实位由 applyCurrentOffset 钳制停住。
         // 边界（目标侧无窗口）→ 无目标视图，源随手指按弹性公式 wall-bump。
-        if let info = targetInfo,
-           let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
-            let real = localRect(forCG: info.frame)
-            let baseX = sign < 0 ? screenRect.width : -real.width
-            let tv = makeImageView(image: image,
-                                   frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
-            content.addSubview(tv)
-            extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
+        if let info = targetInfo {
+            let targetEntry = sign < 0 ? precap?.right : precap?.left
+            let image: NSImage?
+            if let e = targetEntry,
+               WindowImagePreCapturer.frameMatches(entryFrame: e.frame, frame: info.frame) {
+                image = e.image
+            } else {
+                image = wm.captureRawImage(for: info.id, ownerName: info.ownerName)
+            }
+            if let image {
+                let real = localRect(forCG: info.frame)
+                let baseX = sign < 0 ? screenRect.width : -real.width
+                let tv = makeImageView(image: image,
+                                       frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
+                content.addSubview(tv)
+                extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
+            }
         }
 
         panel.contentView = content
@@ -242,7 +297,11 @@ final class SlideTransitionController {
         self.panel = panel
         panelWindowNumber = CGWindowID(panel.windowNumber)
         currentOffset = 0
+        carryOffset = 0
+        isSettling = false
+        settleComplete = false
         offsetSamples.removeAll()
+        lastPeakVelocity = 0
         samplingEnabled = true
         isActive = true
 
@@ -324,14 +383,126 @@ final class SlideTransitionController {
     /// 按最新 progress 平移窗口图像。offset = SlideOffset.eased(progress)，
     /// 严格跟手、全程连续无瞬移：任何一帧的位置都由当前 progress 经软起步曲线
     /// 推导，clamp 在 ±屏宽。静态源模式下源窗口不移动。
+    /// 链式会话（carryOffset≠0）从进位位置起算：currentOffset = carry + eased(progress)。
     func update(progress: CGFloat) {
-        guard isActive else { return }
-        currentOffset = SlideOffset.eased(progress: progress,
-                                          pointsPerProgress: pointsPerProgress,
-                                          screenWidth: screenRect.width)
+        guard isActive, !isSettling else { return }
+        currentOffset = SlideOffset.chained(progress: progress,
+                                            carry: carryOffset,
+                                            pointsPerProgress: pointsPerProgress,
+                                            screenWidth: screenRect.width)
         recordOffsetSample()
         applyCurrentOffset()
         applyMenuCover()
+    }
+
+    /// 链式接续（连甩连贯）：同向新快甩打断正在收尾（settle/fade）的会话，复用面板
+    /// （不 teardown、不淡出），从被打断位置**继续**滑动下一目标。位置继承由
+    /// carryOffset 实现：新目标 currentOffset = 打断位置 + eased(progress)，运动位置
+    /// 不回跳，仅内容切换到新目标。背景图不重捕（链式期间无激活、窗口未移动，
+    /// 原背景始终正确）。仅同向链式；反向/边界由调用方（AppDelegate）裁决。
+    func chainBegin(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?,
+                    initialProgress: CGFloat) {
+        guard isActive, isSettling else {
+            logDebug("SLIDE-CHAIN: skip — not settling (isActive=\(isActive) isSettling=\(isSettling))")
+            return
+        }
+        guard !settleComplete else {
+            logDebug("SLIDE-CHAIN: skip — settle already activated target（fade 期不链式）")
+            return
+        }
+        sessionToken += 1                 // 失效旧 settle/fade 的全部延迟回调
+        settleFallbackEngaged = false
+        isSettling = false
+        settleComplete = false
+        // 打断位置继承：读取旧滑动视图 presentation 真值（settle 动画行进中 model frame
+        // 已是动画目标、currentOffset 冻结在抬手值，均非屏幕当前位）。必须在取消动画前读取。
+        if let s = extraSlideViews.first {
+            let presX = s.view.layer?.presentation()?.frame.minX ?? s.view.frame.minX
+            carryOffset = presX - s.baseX
+        } else {
+            carryOffset = currentOffset
+        }
+        cancelSettleAnimations()
+        if (panel?.alphaValue ?? 1) < 1 {
+            panel?.alphaValue = 1          // 淡出中被打断 → 恢复全不透明，避免闪帧
+        }
+
+        let wm = WindowManager.shared
+        guard let sourceInfo = wm.windows[sourceID] else {
+            logDebug("SLIDE-CHAIN: abort — source window missing (id=\(sourceID))")
+            return
+        }
+        slideSourceID = sourceID
+
+        let sign = initialProgress > 0 ? 1 : (initialProgress < 0 ? -1 : 0)
+        let plan = SlideResolver.plan(sign: sign, leftID: leftID, rightID: rightID)
+        let targetInfo = plan.targetID.flatMap { wm.windows[$0] }
+        boundary = targetInfo == nil
+        if boundary {
+            // 边界（目标侧无窗口）不链式（调用方已裁决），此处防御性回落。
+            logDebug("SLIDE-CHAIN: boundary, dropping chain")
+            cancel()
+            return
+        }
+
+        // 面板复用：保留 panel/backdrop/sourceView/菜单覆盖条，仅替换目标滑动视图。
+        // 源/目标背景图中已有（未激活、窗口未移动），不再维护冗余滑动视图。
+        sourceView = nil
+        sourceBase = .zero
+        for s in extraSlideViews {
+            s.view.removeFromSuperview()
+        }
+        extraSlideViews = []
+
+        if let info = targetInfo,
+           let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
+            let real = localRect(forCG: info.frame)
+            let baseX = sign < 0 ? screenRect.width : -real.width
+            let tv = makeImageView(image: image,
+                                   frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
+            panel?.contentView?.addSubview(tv)
+            extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
+        }
+
+        // 菜单覆盖条目标文字层更新为新目标（缓存；无缓存则 commit 瞬显，与现状一致）。
+        // 源文字层不变——链式期间真实前置仍是最初源应用（未激活），其菜单即背景截图。
+        if AppSettings.shared.menuBarGradientEnabled,
+           let targetPID = targetInfo?.ownerPid,
+           let strip = MenuBarImageCache.shared.strip(pid: targetPID),
+           let targetImage = targetMenuImageView {
+            let coverW = targetImage.frame.width
+            if coverW > 0 {
+                targetImage.image = NSImage(cgImage: strip,
+                                            size: NSSize(width: coverW, height: targetImage.frame.height))
+            }
+        }
+
+        offsetSamples.removeAll()
+        lastPeakVelocity = 0
+        samplingEnabled = true
+        update(progress: initialProgress)
+
+        // 诊断：链式会话骨架。
+        bgDiag.sourceID = sourceID
+        bgDiag.sourceName = sourceInfo.ownerName
+        bgDiag.leftID = leftID
+        bgDiag.rightID = rightID
+        bgDiag.leftName = leftID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
+        bgDiag.rightName = rightID.flatMap { wm.windows[$0]?.ownerName } ?? "nil"
+        bgDiag.targetName = sign >= 0 ? bgDiag.leftName : bgDiag.rightName
+        bgDiag.reverseName = sign >= 0 ? bgDiag.rightName : bgDiag.leftName
+        logDebug("SLIDE-CHAIN: carry=\(Int(carryOffset)) source=[\(bgDiag.sourceName)] target=[\(bgDiag.targetName)]")
+    }
+
+    /// 取消面板内容上所有进行中的动画（settle 滑动 / 淡出 / 菜单文字层），
+    /// 避免与链式新会话打架。
+    private func cancelSettleAnimations() {
+        func cancel(_ v: NSView?) {
+            v?.layer?.removeAllAnimations()
+            v?.subviews.forEach { cancel($0) }
+        }
+        cancel(panel?.contentView)
+        cancel(menuCoverPanel?.contentView)
     }
 
     /// 追加 offset 采样：距上个样本 <4ms 则覆盖（防饱和区冗余），否则追加；仅保留
@@ -368,6 +539,29 @@ final class SlideTransitionController {
         }
         guard den > 1e-9 else { return 0 }
         return CGFloat(num / den)
+    }
+
+    /// 记录 C 引擎送达的会话峰值横向速度（progress/sec，带符号）。AppDelegate 在
+    /// swipePeakVelocity 事件到达时调用（紧随其后即 gestureEnd）。
+    func recordPeakVelocity(_ velocity: CGFloat) {
+        lastPeakVelocity = velocity
+    }
+
+    /// commit 时登记「待激活目标」：settle 落定前若被非链式方式结束，cancel 会补激活。
+    /// 链式接续时新的 commit 会覆盖它（中间步按设计不激活）。
+    func markCommitPending(_ target: CGWindowID) {
+        pendingActivationTarget = target
+        logDebug("SLIDE: pending commit target=\(target)")
+    }
+
+    /// 会话峰值速度 → 偏移域速度（px/s）：快甩时 |p| 远超软起步膝点，eased 斜率≈1，
+    /// 故 progress/sec × pointsPerProgress ≈ offset px/s（近似误差 <10%）。加速下限
+    /// 拦截 settle 边缘微动误判：|峰值| 折算后 < 800 px/s 视为无速度（真实快甩
+    /// 2000+ px/s，慢速拖拽 <500 px/s），与关闭动量时行为一致。
+    func peakOffsetVelocity() -> CGFloat {
+        let minFlickPxPerSec: CGFloat = 800
+        let pxPerSec = lastPeakVelocity * pointsPerProgress
+        return abs(pxPerSec) >= minFlickPxPerSec ? pxPerSec : 0
     }
 
     /// 菜单文字层 alpha = 随 progress 顺序淡化（不重叠）：源菜单截图先完全消失
@@ -419,6 +613,8 @@ final class SlideTransitionController {
             onComplete?()
             return
         }
+        isSettling = true
+        lastSettleSign = finalOffset < 0 ? -1 : 1
         samplingEnabled = false
         diagSample(label: "settle")
         let targetOffset: CGFloat
@@ -495,6 +691,9 @@ final class SlideTransitionController {
     /// 顶栏随面板渐显、真实目标菜单随覆盖条渐显，两者同节奏，无弹跳。
     /// 回弹无内容切换，仅面板淡出平滑收起。
     private func finishSettle(commit: Bool, onComplete: (() -> Void)?) {
+        // settle 落定（token 匹配、未被链式/取消打断）：onComplete 即将激活目标，
+        // 消费 pending（正常路径的激活由 onComplete 执行，cancel 不再补激活）。
+        pendingActivationTarget = nil
         guard let panel else {
             onComplete?()
             teardownPanel()
@@ -502,6 +701,7 @@ final class SlideTransitionController {
             return
         }
         let token = sessionToken
+        settleComplete = true   // 目标已激活/进入 fade：链式应被阻断，后续交给全新会话
         onComplete?()
         diagSample(label: "finishSettle")
         let settleFadeToken = token
@@ -605,12 +805,28 @@ final class SlideTransitionController {
         }
     }
 
-    /// 立即终止会话（服务停止 / 被其它手势打断），不触发任何激活。
-    func cancel() {
+    /// 立即终止会话（服务停止 / 被其它手势打断 / 边界丢弃）。
+    /// - Parameter flushPending: 为 true 时，若存在已 commit 但未激活的目标（tap/纵向
+    ///   手势/边界丢弃打断 settle），通过 onFlushPending 补激活它，避免「滑了没切」；
+    ///   反向 cancelAndFresh（用户反悔改向）与服务停止传 false（丢弃但不激活）。
+    func cancel(flushPending: Bool = true) {
+        if let target = pendingActivationTarget {
+            pendingActivationTarget = nil
+            if flushPending {
+                logDebug("SLIDE: FLUSH pending activation target=\(target)")
+                onFlushPending?(target)
+            } else {
+                logDebug("SLIDE: drop pending activation target=\(target) (flushPending=false)")
+            }
+        }
         sessionToken += 1
         teardownPanel()
         isActive = false
+        isSettling = false
+        settleComplete = false
+        carryOffset = 0
         currentOffset = 0
+        lastPeakVelocity = 0
         logDebug("SLIDE: cancelled")
     }
 
@@ -753,6 +969,7 @@ final class SlideTransitionController {
     /// 主线程执行会冻结淡出动画——会话 E 停滞实测根因）移到后台串行队列；主线程只读
     /// 廉价 layer presentation 值。异步闭包捕获会话 token 并校验，防过期会话写回日志。
     private func diagSample(label: String) {
+        guard !diagBypassed else { return }
         guard let panel else {
             logDebug("SLIDE:DIAG \(label) no-panel")
             return
@@ -775,6 +992,7 @@ final class SlideTransitionController {
 
     /// 调度会话关键时刻采样（begin+30/150/400ms），复现「初期干净 vs 后期黑闪」的亮度轨迹。
     private func scheduleDiagSamples() {
+        guard !diagBypassed else { return }
         let token = sessionToken
         for (offset, label) in [(0.03, "begin+30ms"), (0.15, "begin+150ms"), (0.40, "begin+400ms")] {
             DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
@@ -786,6 +1004,7 @@ final class SlideTransitionController {
 
     /// 调度背景图淡入期间的 presentation 轨迹采样（+30/60/100ms，验证是否真的 0→1 渐变）。
     private func scheduleBackdropFadeSamples(token: Int) {
+        guard !diagBypassed else { return }
         for (offset, label) in [(0.03, "fade+30ms"), (0.06, "fade+60ms"), (0.10, "fade+100ms")] {
             DispatchQueue.main.asyncAfter(deadline: .now() + offset) { [weak self] in
                 guard let self, token == self.sessionToken else { return }
@@ -845,6 +1064,7 @@ final class SlideTransitionController {
     /// 采集一次揭示诊断样本：面板 alpha + 合成画面 + 目标窗口 + 视频窗口内容。
     private func revealDiagSample(_ label: String, panelWindowNumber: CGWindowID,
                                   targetID: CGWindowID?, reverseID: CGWindowID?) {
+        guard !diagBypassed else { return }
         let bounds = screenRect
         let alpha = Self.panelOnScreenAlpha(panelWindowNumber)
         let alphaStr = alpha.map { String(format: "%.2f", $0) } ?? "n/a"
@@ -863,6 +1083,7 @@ final class SlideTransitionController {
     private func scheduleRevealDiag(_ label: String, delay: TimeInterval,
                                     panelWindowNumber: CGWindowID,
                                     targetID: CGWindowID?, reverseID: CGWindowID?) {
+        guard !diagBypassed else { return }
         let token = sessionToken
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self, token == self.sessionToken else { return }
@@ -907,6 +1128,7 @@ final class SlideTransitionController {
                                panelWindowNumber: CGWindowID,
                                targetID: CGWindowID?, reverseID: CGWindowID?,
                                extraWindowMeans: Bool) {
+        guard !diagBypassed else { return }
         let token = sessionToken
         let bounds = screenRect
         revealDiagQueue.asyncAfter(deadline: .now() + delay) { [weak self] in
@@ -981,6 +1203,9 @@ final class SlideTransitionController {
 
     private func teardownPanel() {
         settleFallbackEngaged = false
+        isSettling = false
+        settleComplete = false
+        carryOffset = 0
         panel?.orderOut(nil)
         panel = nil
         backdrop = nil

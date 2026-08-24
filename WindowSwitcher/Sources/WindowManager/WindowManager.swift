@@ -542,6 +542,21 @@ final class WindowManager: @unchecked Sendable {
         logDebug("SLIDE: pre-capture begin source=[\(sourceInfo.ownerName)] left=\(leftName) right=\(rightName) screen=\(Int(screen.frame.width))x\(Int(screen.frame.height))")
         BackdropPreCapturer.shared.start(sourceID: sourceID, leftID: leftID, rightID: rightID,
                                          screenSize: screen.frame.size)
+        // 方案一：与背景预捕并行，预取源 + 左右邻窗口图像，begin() 命中缓存即免同步截屏。
+        beginWindowImagePreCapture(sourceID: sourceID, leftID: leftID, rightID: rightID)
+    }
+
+    /// 方案一：trackingBegan 时并行预取滑动面板的源/目标窗口图像（后台并发截屏）。
+    /// 截屏函数与窗口帧经闭包注入 WindowImagePreCapturer，本类不持其状态。
+    func beginWindowImagePreCapture(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?) {
+        WindowImagePreCapturer.shared.start(sourceID: sourceID, leftID: leftID, rightID: rightID,
+                                            capture: { [weak self] id in
+            guard let self else { return nil }
+            let name = self.windows[id]?.ownerName ?? "?"
+            return self.captureRawImage(for: id, ownerName: name)
+        }, frames: { [weak self] id in
+            self?.windows[id]?.frame ?? .zero
+        })
     }
 
     func stopInteractionMonitoring() {

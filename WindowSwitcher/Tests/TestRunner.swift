@@ -736,6 +736,131 @@ private func testSlideOffset() {
     }
 }
 
+// MARK: - SlideChain（链式会话：连甩连贯）Tests
+// 覆盖三态派发决策、位置继承（carry）、以及链式游标推进序列。
+
+private func testSlideChain() {
+    let W: CGFloat = 1470
+    let ppp: CGFloat = 1.5 * 0.08 * W          // pointsPerProgress = 176.4
+
+    runSuite("decision 全表：未激活/跟手/收尾同向/收尾反向/fade期") {
+        // 未激活：一律 freshBegin（不论 settling 与方向）
+        assertEqual(SlideChain.decision(isActive: false, isSettling: false, settleComplete: false, newSign: 1, lastSettleSign: 1), .freshBegin)
+        assertEqual(SlideChain.decision(isActive: false, isSettling: true, settleComplete: false, newSign: -1, lastSettleSign: 1), .freshBegin)
+        // 激活且跟手：update（newSign 不参与——非收尾态不看方向）
+        assertEqual(SlideChain.decision(isActive: true, isSettling: false, settleComplete: false, newSign: 1, lastSettleSign: -1), .update)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: false, settleComplete: false, newSign: -1, lastSettleSign: -1), .update)
+        // 激活且收尾 + 同向：chain
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: false, newSign: 1, lastSettleSign: 1), .chain)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: false, newSign: -1, lastSettleSign: -1), .chain)
+        // 激活且收尾 + 反向：cancelAndFresh（取消旧会话、全新 begin）
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: false, newSign: 1, lastSettleSign: -1), .cancelAndFresh)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: false, newSign: -1, lastSettleSign: 1), .cancelAndFresh)
+        // 方案C：fade 期（settleComplete=true）无论方向一律 cancelAndFresh（不再链式静默跳过）
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: true, newSign: 1, lastSettleSign: 1), .cancelAndFresh)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: true, newSign: -1, lastSettleSign: 1), .cancelAndFresh)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: true, newSign: 1, lastSettleSign: -1), .cancelAndFresh)
+        assertEqual(SlideChain.decision(isActive: true, isSettling: true, settleComplete: true, newSign: -1, lastSettleSign: -1), .cancelAndFresh)
+        // 未激活时 settleComplete 不影响（仍 freshBegin）
+        assertEqual(SlideChain.decision(isActive: false, isSettling: true, settleComplete: true, newSign: 1, lastSettleSign: -1), .freshBegin)
+    }
+
+    runSuite("sign(ofProgress:)：progress≥0 → 1，否则 -1") {
+        assertEqual(SlideChain.sign(ofProgress: 0), 1)
+        assertEqual(SlideChain.sign(ofProgress: 0.5), 1)
+        assertEqual(SlideChain.sign(ofProgress: -0.0001), -1)
+        assertEqual(SlideChain.sign(ofProgress: -1.5), -1)
+    }
+
+    runSuite("chained carry=0 退化为普通 eased（与既有映射一致）") {
+        for p in stride(from: -2.0, through: 2.0, by: 0.05) {
+            let direct = SlideOffset.eased(progress: p, pointsPerProgress: ppp, screenWidth: W)
+            let chained = SlideChain.chainedOffset(progress: p, carry: 0, pointsPerProgress: ppp, screenWidth: W)
+            assertEqual(chained, direct)
+        }
+    }
+
+    runSuite("chained 位置继承：progress=0 时即从 carry 起算（运动位置不回跳）") {
+        let carry: CGFloat = -0.6 * W
+        let at0 = SlideChain.chainedOffset(progress: 0, carry: carry, pointsPerProgress: ppp, screenWidth: W)
+        assertEqual(at0, carry)                    // 新会话起点 = 被打断位置
+        let at1 = SlideChain.chainedOffset(progress: 1.0, carry: carry, pointsPerProgress: ppp, screenWidth: W)
+        assertTrue(at1 > carry)                    // 同向继续前移（朝提交方向推进）
+    }
+
+    runSuite("chained 连续性：carry+progress 全程无跳变（步长 0.01 增量有界）") {
+        let carry: CGFloat = -0.45 * W
+        var prev = SlideChain.chainedOffset(progress: 0.01, carry: carry, pointsPerProgress: ppp, screenWidth: W)
+        var maxDelta: CGFloat = 0
+        var i: CGFloat = 0.02
+        while i <= 5.0 {
+            let cur = SlideChain.chainedOffset(progress: i, carry: carry, pointsPerProgress: ppp, screenWidth: W)
+            maxDelta = max(maxDelta, abs(cur - prev))
+            prev = cur
+            i += 0.01
+        }
+        assertTrue(maxDelta <= 2.0)
+    }
+
+    runSuite("chained 反向对称：chained(-p, carry=+c) = -chained(p, carry=-c)") {
+        let pos = SlideChain.chainedOffset(progress: 0.7, carry: -0.3 * W, pointsPerProgress: ppp, screenWidth: W)
+        let neg = SlideChain.chainedOffset(progress: -0.7, carry: 0.3 * W, pointsPerProgress: ppp, screenWidth: W)
+        assertEqual(neg, -pos)
+    }
+
+    runSuite("链式游标序列：同向连续快甩逐窗口推进、最后一下落定、全程不重排") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [400, 300, 200, 100])   // 400=A(最近) 300=B 200=C 100=D(最旧)
+        engine.windowNames[400] = "A"; engine.windowNames[300] = "B"
+        engine.windowNames[200] = "C"; engine.windowNames[100] = "D"
+        engine.syncCursor(toFrontmost: 400)            // 游标停在 A
+
+        // 快甩1（左滑=方向右→较旧窗口）：提交 A→B
+        guard let t1 = engine.advanceCursor(directionRight: true, cyclic: true) else {
+            assertTrue(false); return
+        }
+        assertEqual(t1, 300)
+        assertEqual(engine.id(at: engine.currentIndex), 300)
+
+        // 快甩2 链式：源 = 游标窗口(B)，目标 = 其右邻(C)——同方向推进
+        let src2 = engine.id(at: engine.currentIndex)!
+        let n2 = engine.neighbors(of: src2, cyclic: true)
+        assertEqual(src2, 300)
+        assertEqual(n2.right, 200)
+
+        // 快甩2 提交：B→C
+        guard let t2 = engine.advanceCursor(directionRight: true, cyclic: true) else {
+            assertTrue(false); return
+        }
+        assertEqual(t2, 200)
+
+        // 快甩3 链式：源 = C，目标 = D；最后一下提交落定 C→D
+        let src3 = engine.id(at: engine.currentIndex)!
+        assertEqual(src3, 200)
+        assertEqual(engine.neighbors(of: src3, cyclic: true).right, 100)
+        guard let t3 = engine.advanceCursor(directionRight: true, cyclic: true) else {
+            assertTrue(false); return
+        }
+        assertEqual(t3, 100)
+
+        // 链式期间从未重排：LRU 顺序保持原样（仅游标推进）
+        assertEqual(engine.orderedIDs, [400, 300, 200, 100])
+        assertEqual(engine.currentIndex, 3)
+    }
+
+    runSuite("链式边界：循环滚动开启时最旧窗口继续同向推进绕回最近窗口") {
+        let engine = LRUOrderingEngine()
+        engine.sync(windowIDs: [400, 300, 200, 100])
+        engine.syncCursor(toFrontmost: 100)            // 游标停在最旧 D（index 3）
+        let n = engine.neighbors(of: 100, cyclic: true)
+        assertEqual(n.right, 400)                       // 右邻绕回 A（循环）
+        guard let t = engine.advanceCursor(directionRight: true, cyclic: true) else {
+            assertTrue(false); return
+        }
+        assertEqual(t, 400)
+    }
+}
+
 // MARK: - MenuBarImageCache（菜单横条真实像素缓存）Tests
 // 纯内存缓存 + 顶部裁剪，无外部依赖、无 SCK 权限要求。
 
@@ -853,6 +978,56 @@ private func testBackdropSessionUsable() {
 // Fix C：淡出停滞兜底不再硬切（不透明面板瞬间消失=黑闪 + 与下一会话预捕竞争）。
 // 面板仍可见 → 先短淡出再拆；面板已透明 → 直接拆；面板已拆 → 无操作。
 
+private func testWindowImagePreCapturer() {
+    runSuite("会话参数完全一致 → 消费") {
+        assertTrue(WindowImagePreCapturer.sessionMatches(
+            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
+            sourceID: 86, leftID: 73, rightID: 74))
+    }
+
+    runSuite("源窗口重建（sourceID 变化）→ 失配") {
+        assertFalse(WindowImagePreCapturer.sessionMatches(
+            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
+            sourceID: 87, leftID: 73, rightID: 74))
+    }
+
+    runSuite("左邻变化 → 失配") {
+        assertFalse(WindowImagePreCapturer.sessionMatches(
+            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
+            sourceID: 86, leftID: 90, rightID: 74))
+    }
+
+    runSuite("边界（左右邻为 nil）一致 → 消费") {
+        assertTrue(WindowImagePreCapturer.sessionMatches(
+            sessionSource: 86, sessionLeft: nil, sessionRight: nil,
+            sourceID: 86, leftID: nil, rightID: nil))
+    }
+
+    runSuite("边界预取后右邻出现 → 失配") {
+        assertFalse(WindowImagePreCapturer.sessionMatches(
+            sessionSource: 86, sessionLeft: nil, sessionRight: nil,
+            sourceID: 86, leftID: nil, rightID: 837))
+    }
+
+    runSuite("捕获帧与当前帧同尺寸 → 采用") {
+        assertTrue(WindowImagePreCapturer.frameMatches(
+            entryFrame: CGRect(x: 0, y: 39, width: 1470, height: 918),
+            frame: CGRect(x: 0, y: 39, width: 1470, height: 918)))
+    }
+
+    runSuite("捕获后窗口改尺寸 → 弃用（防拉伸）") {
+        assertFalse(WindowImagePreCapturer.frameMatches(
+            entryFrame: CGRect(x: 0, y: 39, width: 1470, height: 918),
+            frame: CGRect(x: 0, y: 100, width: 800, height: 600)))
+    }
+
+    runSuite("亚像素级误差（<1pt）→ 仍采用") {
+        assertTrue(WindowImagePreCapturer.frameMatches(
+            entryFrame: CGRect(x: 0, y: 39.4, width: 1470.0, height: 918.0),
+            frame: CGRect(x: 0, y: 39, width: 1470, height: 918)))
+    }
+}
+
 private func testSettleFallback() {
     runSuite("面板已拆除 → noPanel") {
         let a = SettleFallback.action(panelExists: false, panelAlpha: 1.0)
@@ -929,6 +1104,10 @@ struct TestRunner {
         testSlideOffset()
 
         print("")
+        print("[SlideChain]")
+        testSlideChain()
+
+        print("")
         print("[MenuBarImageCache]")
         testMenuBarImageCache()
 
@@ -943,6 +1122,10 @@ struct TestRunner {
         print("")
         print("[SettleFallback]")
         testSettleFallback()
+
+        print("")
+        print("[WindowImagePreCapturer]")
+        testWindowImagePreCapturer()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")

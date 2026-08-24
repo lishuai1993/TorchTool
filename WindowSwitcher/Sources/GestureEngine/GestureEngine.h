@@ -14,6 +14,8 @@ typedef enum {
     GestureSwipeUpdate,   // ongoing swipe, signed progress (right=+, left=-)
     GestureTrackingBegan, // 3 fingers landed; tracking session started (pre-capture hook)
     GestureEnd,           // fingers lifted, gesture finished
+    GestureSwipePeakVelocity, // session peak horizontal swipe velocity (progress/sec, signed),
+                              // emitted just before GestureEnd; frame-level MT time base (方案A)
 } GestureType;
 
 typedef void (*GestureCallback)(GestureType type, float progress);

@@ -157,8 +157,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ScrollSuppressionTap.shared.stop()
         windowManager.stopInteractionMonitoring()
         overlayController.hide()
-        slideTransition.cancel()
+        slideTransition.cancel(flushPending: false)   // 服务停止：丢弃 pending，不补激活
         BackdropPreCapturer.shared.cancel()
+        WindowImagePreCapturer.shared.cancel()
     }
 
     /// Restart the service: stop then start (clears the log again).
@@ -177,6 +178,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         gestureEngine.onGesture = { [weak self] event in
             self?.handleGesture(event)
+        }
+        // 会话非链式结束时（tap/纵向手势/边界丢弃）补激活已 commit 但未落定的目标，
+        // 消除「滑了没切」（BUG #2：settle 被打断导致最后一甩丢失）。
+        slideTransition.onFlushPending = { [weak self] windowID in
+            guard let self else { return }
+            let name = self.windowManager.orderingEngine.windowNames[windowID] ?? "?"
+            logDebug("SLIDE: FLUSH activate pending target=[\(name)]")
+            self.windowManager.activateWindow(windowID)
+            self.slideTransition.logPostActivationDiagnostics()
         }
         elasticDrag.onShowHint = { [weak self] windowID in
             self?.showQuickSwitchHint(for: windowID)
@@ -253,11 +263,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerTap:
             logDebug("GESTURE: threeFingerTap, overlayVisible=\(overlayController.isVisible)")
             if slideTransition.isActive {
+                // 轻点不构成新的滑动意图：cancel 会补激活已提交目标（BUG #2 最后一甩不丢）。
                 slideTransition.cancel()
                 invalidateSlideWatchdog()
             }
             // tap 手势不产生滑动：清掉 trackingBegan 时启动的预捕会话（若未消费）
             BackdropPreCapturer.shared.cancel()
+            WindowImagePreCapturer.shared.cancel()
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
@@ -279,6 +291,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeUp:
             logDebug("GESTURE: threeFingerSwipeUp, overlayVisible=\(overlayController.isVisible)")
             if slideTransition.isActive {
+                // 纵向手势打断滑动会话：cancel 补激活已提交目标，再进入纵向操作。
                 slideTransition.cancel()
                 invalidateSlideWatchdog()
             }
@@ -302,6 +315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .threeFingerSwipeDown:
             logDebug("GESTURE: threeFingerSwipeDown, overlayVisible=\(overlayController.isVisible)")
             if slideTransition.isActive {
+                // 纵向手势打断滑动会话：cancel 补激活已提交目标，再进入纵向操作。
                 slideTransition.cancel()
                 invalidateSlideWatchdog()
             }
@@ -326,11 +340,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard !overlayController.isVisible else { return }
             if settings.slidingTransitionEnabled {
                 guard settings.quickSwitchModeEnabled else { return }
-                if slideTransition.isActive {
-                    // 会话进行中：离散方向事件不改变画面——offset 严格由 swipeUpdate 跟手，
+                if slideTransition.isActive && !slideTransition.isSettling {
+                    // 会话跟手中：离散方向事件不改变画面——offset 严格由 swipeUpdate 跟手，
                     // 避免「闪现半屏」瞬移。抬手提交/回弹完全交给 finishSlideSession 的阈值判定。
                     logDebug("SLIDE: mid-session swipeLeft — ignored（严格跟手，离散事件不改画面）")
                 } else {
+                    // 会话收尾中（settle/fade）：快扫兜底进入三态派发（同向链式/反向重开）。
                     beginSlideSessionIfNeeded(progress: slideInitialProgress(sign: -1))
                 }
                 return
@@ -350,9 +365,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard !overlayController.isVisible else { return }
             if settings.slidingTransitionEnabled {
                 guard settings.quickSwitchModeEnabled else { return }
-                if slideTransition.isActive {
+                if slideTransition.isActive && !slideTransition.isSettling {
+                    // 会话跟手中：离散方向事件不改变画面——offset 严格由 swipeUpdate 跟手，
+                    // 避免「闪现半屏」瞬移。抬手提交/回弹完全交给 finishSlideSession 的阈值判定。
                     logDebug("SLIDE: mid-session swipeRight — ignored（严格跟手，离散事件不改画面）")
                 } else {
+                    // 会话收尾中（settle/fade）：快扫兜底进入三态派发（同向链式/反向重开）。
                     beginSlideSessionIfNeeded(progress: slideInitialProgress(sign: 1))
                 }
                 return
@@ -372,13 +390,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard !overlayController.isVisible else { return }
             if settings.slidingTransitionEnabled {
                 guard settings.quickSwitchModeEnabled else { return }
-                let p = CGFloat(progress)
-                if slideTransition.isActive {
-                    slideTransition.update(progress: p)
-                    armSlideWatchdog()
-                } else {
-                    beginSlideSessionIfNeeded(progress: p)
-                }
+                // 三态派发：跟手 update / 收尾同向链式 / 未激活或反向全新 begin。
+                beginSlideSessionIfNeeded(progress: CGFloat(progress))
                 return
             }
             guard settings.quickSwitchModeEnabled, !settings.cyclicScrollEnabled else { return }
@@ -398,14 +411,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 elasticDrag.scheduleWatchdog()
             }
 
+        case .swipePeakVelocity(let velocity):
+            // 方案A：C 引擎按 MT 帧时间戳算出的会话峰值横向速度（progress/sec，
+            // 带符号），紧随其后即 gestureEnd。记录供 finishSlideSession 动量助推。
+            logDebug("GESTURE: swipePeakVelocity v=\(String(format: "%.3f", velocity)) progress/s")
+            slideTransition.recordPeakVelocity(CGFloat(velocity))
+
         case .gestureEnd:
             elasticDrag.cancelWatchdog()
             windowManager.lastGestureEndAt = ProcessInfo.processInfo.systemUptime
             invalidateSlideWatchdog()
+            // 连续快甩诊断：手势收尾时的会话状态快照。
+            let snapGE = "active=\(slideTransition.isActive) settling=\(slideTransition.isSettling) settleDone=\(slideTransition.settleComplete) lastSettleSign=\(Int(slideTransition.lastSettleSign)) off=\(Int(slideTransition.currentOffset)) carry=\(Int(slideTransition.carryOffset)) peak=\(Int(slideTransition.lastPeakVelocity))"
+            logDebug("GESTURE-TRACE t=\(String(format: "%.4f", CACurrentMediaTime())) event=gestureEnd [\(snapGE)]")
             // 手势结束：未消费的预捕会话随手势清理（已消费的会话早已被 begin 的 take 清空）
             BackdropPreCapturer.shared.cancel()
+            WindowImagePreCapturer.shared.cancel()
             if slideTransition.isActive {
-                finishSlideSession()
+                // 收尾中（isSettling）：settle/fade 动画自行完成，不重复结算（防双重 settle）。
+                if !slideTransition.isSettling {
+                    finishSlideSession()
+                } else {
+                    logDebug("SLIDE: gestureEnd during settle — skipping（settle 动画进行中）")
+                }
                 windowManager.gesturePhase = .idle
                 return
             }
@@ -432,15 +460,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         1.0 * sign
     }
 
-    /// 开启（或继续）滑动过渡会话。首个合格 swipeUpdate 或 Left/Right 快扫兜底
-    /// 时调用。会话已在推进时仅把 progress 喂给控制器。
+    /// 开启/继续/链式接续滑动过渡会话。首个合格 swipeUpdate 或 Left/Right 快扫兜底
+    /// 时调用。三态派发（SlideChain.decision）：
+    ///   - 会话未激活 → 全新 begin；
+    ///   - 会话跟手中 → 仅喂 progress（update）；
+    ///   - 会话收尾中（settle/fade）同向 → 链式接续（复用面板，从打断位置继续）；
+    ///   - 会话收尾中反向 → 取消旧会话、全新 begin。
     private func beginSlideSessionIfNeeded(progress: CGFloat) {
         guard AppSettings.shared.quickSwitchModeEnabled else { return }
-        guard !slideTransition.isActive else {
+        let decision = SlideChain.decision(
+            isActive: slideTransition.isActive,
+            isSettling: slideTransition.isSettling,
+            settleComplete: slideTransition.settleComplete,
+            newSign: SlideChain.sign(ofProgress: progress),
+            lastSettleSign: slideTransition.lastSettleSign)
+        // 连续快甩诊断：每个 swipeUpdate/快扫兜底 的派发轨迹。
+        let snapshot = "active=\(slideTransition.isActive) settling=\(slideTransition.isSettling) settleDone=\(slideTransition.settleComplete) lastSettleSign=\(Int(slideTransition.lastSettleSign)) off=\(Int(slideTransition.currentOffset)) carry=\(Int(slideTransition.carryOffset)) peak=\(Int(slideTransition.lastPeakVelocity))"
+        logDebug("GESTURE-TRACE t=\(String(format: "%.4f", CACurrentMediaTime())) p=\(String(format: "%+.3f", progress)) [\(snapshot)] → decision=\(decision)")
+        switch decision {
+        case .update:
             slideTransition.update(progress: progress)
+            armSlideWatchdog()
+        case .chain:
+            chainToNextSession(progress: progress)
+            armSlideWatchdog()
+        case .freshBegin:
+            beginFreshSlideSession(progress: progress)
+        case .cancelAndFresh:
+            if slideTransition.isActive {
+                // 反向/重置：用户反悔改向，丢弃已提交目标（不补激活），从新前置重开。
+                slideTransition.cancel(flushPending: false)
+                invalidateSlideWatchdog()
+            }
+            beginFreshSlideSession(progress: progress)
+        }
+    }
+
+    /// 链式接续（连甩连贯）：同向新快甩打断正在收尾的会话，从被打断位置继续滑向
+    /// 下一目标。源 = 游标所在窗口（最近一次 commit 已把游标推进到目标位），目标 =
+    /// 其 LRU 左右邻。不重捕背景（链式期间未激活、窗口未移动，原背景始终正确）。
+    private func chainToNextSession(progress: CGFloat) {
+        guard slideTransition.isActive else { return }
+        guard let sourceID = windowManager.orderingEngine.id(at: windowManager.orderingEngine.currentIndex) else {
+            logDebug("SLIDE-CHAIN: abort — no cursor window")
+            slideTransition.cancel()
+            invalidateSlideWatchdog()
             return
         }
+        let (leftID, rightID) = windowManager.orderingEngine.neighbors(
+            of: sourceID, cyclic: AppSettings.shared.cyclicScrollEnabled)
+        slideTransition.chainBegin(sourceID: sourceID, leftID: leftID, rightID: rightID,
+                                   initialProgress: progress)
+    }
 
+    /// 全新滑动过渡会话：刷新窗口取源与 LRU 左右邻，begin 建面板。
+    private func beginFreshSlideSession(progress: CGFloat) {
         windowManager.gesturePhase = .slidingTransition
         // 会话开始：取消该滑动自身 scroll 可能已挂起的延迟重排，并记录开始时刻
         //（延迟重排触发时据此识别滑动产物）。此时刷新窗口会同步 LRU。
@@ -448,7 +522,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let windows = windowManager.refreshWindows()
         guard windows.count > 1,
               let sourceID = windowManager.frontmostWindowID,
-              let idx = windowManager.orderingEngine.index(of: sourceID) else {
+              windowManager.orderingEngine.index(of: sourceID) != nil else {
             logDebug("SLIDE: abort — need >=2 windows and a valid source (count=\(windows.count))")
             windowManager.gesturePhase = .idle
             invalidateSlideWatchdog()
@@ -472,9 +546,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settings = AppSettings.shared
         let thresholdPx = CGFloat(settings.slidingCommitThreshold) * slideTransition.screenWidth
 
-        // 甩动动量：有效位移 = 当前位移 + 释放速度外推助推。慢速拖拽速度近零 → 助推≈0，
-        // 行为与关闭时一致；快甩（小位移、高速度）经助推后即可越过提交阈值完成切换。
-        let vel = slideTransition.releaseVelocity()
+        // 甩动动量（方案A）：有效位移 = 当前位移 + 会话峰值速度外推助推。速度取 C
+        // 引擎帧级时间基的会话峰值（规避主线程批处理/折返反号/抬手停顿导致的释放
+        // 速度失真）；releaseVelocity 仅保留用于日志对比诊断。慢速拖拽峰值小 →
+        // 助推≈0，行为与关闭动量时一致；快甩经助推越过提交阈值完成切换。
+        let releaseVel = slideTransition.releaseVelocity()
+        let vel = slideTransition.peakOffsetVelocity()
         let boost: CGFloat
         if settings.momentumCommitEnabled {
             let maxBoostPx = CGFloat(settings.momentumMaxBoostRatio) * slideTransition.screenWidth
@@ -484,7 +561,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let effective = off + boost
         let commit = abs(effective) >= thresholdPx
-        logDebug("SLIDE: gestureEnd offset=\(Int(off)) vel=\(Int(vel))px/s boost=\(Int(boost)) effective=\(Int(effective)) threshold=\(Int(thresholdPx)) commit=\(commit)")
+        logDebug("SLIDE: gestureEnd offset=\(Int(off)) peakVel=\(Int(vel))px/s releaseVel=\(Int(releaseVel))px/s boost=\(Int(boost)) effective=\(Int(effective)) threshold=\(Int(thresholdPx)) commit=\(commit)")
 
         let cyclic = settings.cyclicScrollEnabled
         if commit {
@@ -497,6 +574,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // 之间的陈旧窗口——快速连续手势的预捕（trackingBegan）落进该窗口会读到旧源、
                 // 与 begin 失配，回退全新捕获暴露黑占位闪屏。
                 windowManager.markCommitFrontmost(target)
+                // 登记待激活目标：settle 落定前若被非链式方式结束（tap/边界丢弃），
+                // cancel 会补激活它，避免「滑了没切」（BUG #2）。
+                slideTransition.markCommitPending(target)
                 slideTransition.settle(finalOffset: effective, commit: true) { [weak self] in
                     self?.windowManager.activateWindow(target)
                     self?.slideTransition.logPostActivationDiagnostics()
@@ -516,7 +596,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         slideWatchdogTimer?.invalidate()
         slideWatchdogTimer = Timer.scheduledTimer(withTimeInterval: slideWatchdogPeriod, repeats: false) { [weak self] _ in
             guard let self else { return }
-            if self.slideTransition.isActive {
+            if self.slideTransition.isActive && !self.slideTransition.isSettling {
                 logDebug("SLIDE: watchdog fired — auto-settling stalled session")
                 self.finishSlideSession()
             }

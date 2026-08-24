@@ -160,6 +160,16 @@ static bool    swipeActionFired    = false;
 static bool    isHorizontalSwipe   = false; // true for LEFT/RIGHT, false for UP/DOWN
 static int     lastFrame           = 0;   // for detecting callback interruption
 
+// 会话峰值横向速度（progress/sec，带符号，取 |值| 最大者）。帧级时间基来自 MT
+// 帧时间戳，规避 Swift 主线程批处理导致的退化时间戳。每次 IDLE→TRACKING 重置，
+// 在 gestureEnd 前一刻以 GestureSwipePeakVelocity 发射给上层（方案A 动量助推）。
+static float  sessionPeakVel     = 0;
+static float  lastVelProgress    = 0;
+static double lastVelTimestamp   = 0;
+// 会话内 |progress| 最大值（带符号）：符号即主甩动方向，用于过滤折返/回摆阶段
+// 的相反方向瞬时速度（详见 updatePeakVelocity）。
+static float  sessionMaxProgress = 0;
+
 // Per-frame finger count tracking (reset on engine start).
 static int     prevFingerCount     = 0;
 static int     lastFingerCount     = 0;
@@ -494,6 +504,41 @@ static void contactFrameCallback6(int deviceIndex, void *data,
 // Shared callback logic — gesture recognition
 // ──────────────────────────────────────────────────
 
+// 连续快甩诊断：swipeUpdate 轨迹（15ms 限流 ≈60Hz，还原方向/峰值/折返，防刷屏）。
+// timestamp 为 MT 帧时间戳（单调递增），session 为 gestureSessionID。
+static void logSwipeUpdateDiag(double timestamp, int session, float progress,
+                               float dispX, float settledX) {
+    static double lastLog = 0;
+    if (timestamp - lastLog < 0.015) return;
+    lastLog = timestamp;
+    ws_log("[WS-DBG] SESSION[%d] swipeUpdate p=%.3f dispX=%.4f settledX=%.4f\n",
+           session, progress, dispX, settledX);
+}
+
+// 会话峰值横向速度（progress/sec，带符号）：用 MT 帧时间戳计算逐帧瞬时速度，取
+// |值| 最大者。甩动中段的峰值方向=甩动方向，规避「抬手最后 50ms 速度」的三种
+// 失真（主线程批处理时间基退化/折返反号/抬手前停顿）。首个采样帧仅记录不做速度
+// 计算（lastVelTimestamp==0），从第二帧起连续计算。
+//
+// 方向过滤：峰值只计入与主甩动方向一致的瞬时速度。sessionMaxProgress 记录会话内
+// |progress| 最大值（带符号），其符号即主方向；折返/回摆阶段的 instVel 与主方向
+// 相反，一律排除——否则 boost 与 offset 反向相消会把 effective 拉回阈值以下造成
+// 误回弹（实测 19:41:41.377：offset=-1297 但峰值捕获 +88.5/s 回摆速度 → 回弹）。
+static void updatePeakVelocity(double timestamp, float progress) {
+    if (fabsf(progress) > fabsf(sessionMaxProgress)) sessionMaxProgress = progress;
+    if (lastVelTimestamp > 0) {
+        double dt = timestamp - lastVelTimestamp;
+        if (dt > 0.001) {
+            float instVel = (float)((progress - lastVelProgress) / dt);
+            if (sessionMaxProgress == 0 || instVel * sessionMaxProgress > 0) {
+                if (fabsf(instVel) > fabsf(sessionPeakVel)) sessionPeakVel = instVel;
+            }
+        }
+    }
+    lastVelProgress = progress;
+    lastVelTimestamp = timestamp;
+}
+
 static void processContactData(int deviceIndex, void *data,
                                 int count, double timestamp, int frame) {
     (void)deviceIndex;
@@ -590,6 +635,10 @@ static void processContactData(int deviceIndex, void *data,
                 atomic_store(&trackingActive, true);
                 gestureSessionID++;
                 userCallback(GestureTrackingBegan, 0);
+                sessionPeakVel = 0;
+                lastVelProgress = 0;
+                lastVelTimestamp = 0;
+                sessionMaxProgress = 0;
                 touchStartTime = timestamp;
                 settlingEndTime = timestamp + SETTLING_DURATION;
                 touchStartCentroidX = centroidX;
@@ -636,6 +685,9 @@ static void processContactData(int deviceIndex, void *data,
                 ws_log("[WS-DBG] GESTURE: Three-finger tap [session=%d] (%.0fms, postSettleDisp=%.4f)\n",
                        gestureSessionID, elapsed * 1000, maxPostSettleDisp);
             } else {
+                ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                       gestureSessionID, sessionPeakVel, sessionMaxProgress);
+                userCallback(GestureSwipePeakVelocity, sessionPeakVel);
                 userCallback(GestureEnd, 0);
                 if (elapsed > tapMaxDurationSec) {
                     ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (lift after %.0fms > %.0fms) GestureEnd fired\n",
@@ -731,6 +783,8 @@ static void processContactData(int deviceIndex, void *data,
                     // 并为上层甩动动量提供真实的释放速度采样。弹性拖拽路径内部自带钳制，
                     // 不依赖此处的 ±1 上限。
                     float progress = dispX / swipeMinDisplacement;
+                    logSwipeUpdateDiag(timestamp, gestureSessionID, progress, dispX, settledCentroidX);
+                    updatePeakVelocity(timestamp, progress);
                     userCallback(GestureSwipeUpdate, progress);
                 }
             }
@@ -744,6 +798,9 @@ static void processContactData(int deviceIndex, void *data,
         // Detect callback interruption: if the system frame counter jumped,
         // callbacks were suspended and fingers likely lifted during the gap.
         if (frame - lastFrame > 30) {
+            ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                   gestureSessionID, sessionPeakVel, sessionMaxProgress);
+            userCallback(GestureSwipePeakVelocity, sessionPeakVel);
             userCallback(GestureEnd, 0);
             ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (callback gap, frame %d->%d) GestureEnd fired\n",
                    gestureSessionID, lastFrame, frame);
@@ -752,6 +809,9 @@ static void processContactData(int deviceIndex, void *data,
             swipeActionFired = false;
             isHorizontalSwipe = false;
         } else if (fingerCount < 3) {
+            ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                   gestureSessionID, sessionPeakVel, sessionMaxProgress);
+            userCallback(GestureSwipePeakVelocity, sessionPeakVel);
             userCallback(GestureEnd, 0);
             {
                 float finalDX = centroidX - settledCentroidX;
@@ -769,6 +829,8 @@ static void processContactData(int deviceIndex, void *data,
         } else if (isHorizontalSwipe) {
             float dispX = centroidX - settledCentroidX;
             float progress = dispX / swipeMinDisplacement;
+            logSwipeUpdateDiag(timestamp, gestureSessionID, progress, dispX, settledCentroidX);
+            updatePeakVelocity(timestamp, progress);
             userCallback(GestureSwipeUpdate, progress);
         }
         break;

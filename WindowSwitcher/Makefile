@@ -124,10 +124,13 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/Constants.swift \
                 Sources/Common/GesturePhase.swift \
                 Sources/Common/SlideOffset.swift \
+                Sources/Common/SlideChain.swift \
                 Sources/Common/SlideGeometry.swift \
+                Sources/Common/AppSettings.swift \
                 Sources/Common/SettleFallback.swift \
                 Sources/WindowManager/MenuBarImageCache.swift \
-                Sources/WindowManager/BackdropPreCapture.swift
+                Sources/WindowManager/BackdropPreCapture.swift \
+                Sources/WindowManager/WindowImagePreCapturer.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests

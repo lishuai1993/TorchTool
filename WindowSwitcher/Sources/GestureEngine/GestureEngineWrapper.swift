@@ -14,6 +14,7 @@ enum GestureEvent {
     case swipeUpdate(progress: Float)  // signed: positive=right, negative=left
     case trackingBegan  // 3 fingers landed; tracking session started
     case gestureEnd
+    case swipePeakVelocity(velocity: Float)  // 会话峰值横向速度（progress/sec，带符号），gestureEnd 前一刻到达
 }
 
 final class GestureEngine: @unchecked Sendable {
@@ -121,10 +122,16 @@ final class GestureEngine: @unchecked Sendable {
                 logDebug("GestureEngine(C): SWIPE DOWN detected")
             case GestureSwipeUpdate:
                 event = .swipeUpdate(progress: progress)
+                logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) swipeUpdate p=\(String(format: "%.3f", progress))")
             case GestureTrackingBegan:
                 event = .trackingBegan
+                logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) trackingBegan")
             case GestureEnd:
                 event = .gestureEnd
+                logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) gestureEnd")
+            case GestureSwipePeakVelocity:
+                event = .swipePeakVelocity(velocity: progress)
+                logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) swipePeakVelocity v=\(String(format: "%.3f", progress))")
             default:
                 return
             }
