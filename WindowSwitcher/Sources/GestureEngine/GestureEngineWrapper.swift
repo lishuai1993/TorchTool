@@ -15,6 +15,7 @@ enum GestureEvent {
     case trackingBegan  // 3 fingers landed; tracking session started
     case gestureEnd
     case swipePeakVelocity(velocity: Float)  // 会话峰值横向速度（progress/sec，带符号），gestureEnd 前一刻到达
+    case releaseVelocity(velocity: Float)    // 抬手前即时速度（progress/sec，带符号，最近3帧均值），peak 之后、gestureEnd 之前到达
 }
 
 final class GestureEngine: @unchecked Sendable {
@@ -132,6 +133,9 @@ final class GestureEngine: @unchecked Sendable {
             case GestureSwipePeakVelocity:
                 event = .swipePeakVelocity(velocity: progress)
                 logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) swipePeakVelocity v=\(String(format: "%.3f", progress))")
+            case GestureReleaseVelocity:
+                event = .releaseVelocity(velocity: progress)
+                logDebug("GESTURE-RAW t=\(String(format: "%.4f", CACurrentMediaTime())) releaseVelocity v=\(String(format: "%.3f", progress))")
             default:
                 return
             }

@@ -128,6 +128,7 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/SlideGeometry.swift \
                 Sources/Common/AppSettings.swift \
                 Sources/Common/SettleFallback.swift \
+                Sources/Common/SlideMomentum.swift \
                 Sources/WindowManager/MenuBarImageCache.swift \
                 Sources/WindowManager/BackdropPreCapture.swift
 

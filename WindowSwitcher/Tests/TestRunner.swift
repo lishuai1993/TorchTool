@@ -41,6 +41,16 @@ private func assertNotNil<T>(_ value: T?, file: String = #file, line: Int = #lin
     }
 }
 
+private func assertNear(_ actual: CGFloat, _ expected: CGFloat, tolerance: CGFloat = 0.001,
+                        file: String = #file, line: Int = #line) {
+    if abs(actual - expected) <= tolerance {
+        passed += 1
+    } else {
+        failed += 1
+        print("  ✘ [\(testName)] expected ≈\(expected), got \(actual) — \(file):\(line)")
+    }
+}
+
 private func runSuite(_ name: String, _ block: () -> Void) {
     testName = name
     print("  \(name)...")
@@ -1004,6 +1014,72 @@ private func testSettleFallback() {
     }
 }
 
+// MARK: - SlideMomentum Tests（路径A 动量助推）
+
+private func testSlideMomentum() {
+    // 默认参数：window=0.15s，maxBoost=735（0.5×1470 屏宽）
+    runSuite("快甩同向高速度 → 助推补足") {
+        let b = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, -600)
+    }
+
+    runSuite("同向但低于 800px/s 下限（已拦截为 0）→ 无助推") {
+        let b = momentumBoost(off: -150, releaseVel: 0, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 0)
+    }
+
+    runSuite("零速（停顿抬手）→ 无助推") {
+        let b = momentumBoost(off: -300, releaseVel: 0, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 0)
+    }
+
+    runSuite("反向速度（与主方向相反）→ 方向保护归零") {
+        let b = momentumBoost(off: -200, releaseVel: 1500, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 0)
+    }
+
+    runSuite("clamp 正上限") {
+        let b = momentumBoost(off: 200, releaseVel: 6000, mainDirSign: 1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 735)
+    }
+
+    runSuite("clamp 负上限") {
+        let b = momentumBoost(off: -200, releaseVel: -6000, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, -735)
+    }
+
+    runSuite("主方向未知（dir=0）→ 无助推") {
+        let b = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: 0, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 0)
+    }
+
+    runSuite("off 近零时快甩 → 助推仍有效（方向保护不依赖 off）") {
+        let b1 = momentumBoost(off: -1, releaseVel: -4000, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        let b2 = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: -1, window: 0.15, maxBoostPx: 735)
+        assertNear(b1, b2)
+    }
+
+    runSuite("window 放大至 0.30 → clamp 到负上限") {
+        let b = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: -1, window: 0.30, maxBoostPx: 735)
+        assertNear(b, -735)
+    }
+
+    runSuite("window 缩小至 0.05 → 助推 200") {
+        let b = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: -1, window: 0.05, maxBoostPx: 735)
+        assertNear(b, -200)
+    }
+
+    runSuite("maxBoost 足够大（不 clamp）") {
+        let b = momentumBoost(off: -200, releaseVel: -4000, mainDirSign: -1, window: 0.15, maxBoostPx: 1470)
+        assertNear(b, -600)
+    }
+
+    runSuite("左滑方向（dir=+1，vel 正）→ 正向助推") {
+        let b = momentumBoost(off: 200, releaseVel: 2500, mainDirSign: 1, window: 0.15, maxBoostPx: 735)
+        assertNear(b, 375)
+    }
+}
+
 private func makeSolidImage(width: Int, height: Int) -> CGImage? {
     guard let ctx = CGContext(data: nil, width: width, height: height,
                               bitsPerComponent: 8, bytesPerRow: 0,
@@ -1072,6 +1148,10 @@ struct TestRunner {
         print("")
         print("[SettleFallback]")
         testSettleFallback()
+
+        print("")
+        print("[SlideMomentum]")
+        testSlideMomentum()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")

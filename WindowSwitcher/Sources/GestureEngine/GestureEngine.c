@@ -170,6 +170,15 @@ static double lastVelTimestamp   = 0;
 // 的相反方向瞬时速度（详见 updatePeakVelocity）。
 static float  sessionMaxProgress = 0;
 
+// 抬手前即时速度（progress/sec，带符号）：最近 3 帧 instVel 的滑动平均，反映抬手
+// 瞬间的真实速度方向/大小。与 sessionPeakVel（会话峰值，仅诊断）不同——慢速拖拽
+// 中会话峰值会很大，但抬手前速度在停顿/反向时趋零或反向，正是路径A方向保护的依据。
+// 每帧在 updatePeakVelocity 中更新，抬手帧读取；IDLE→TRACKING 重置。
+static float  releaseInstVel     = 0;
+static float  instVelBuffer[3]   = {0, 0, 0};
+static int    instVelCount       = 0;
+static int    instVelIdx         = 0;
+
 // Per-frame finger count tracking (reset on engine start).
 static int     prevFingerCount     = 0;
 static int     lastFingerCount     = 0;
@@ -530,6 +539,16 @@ static void updatePeakVelocity(double timestamp, float progress) {
         double dt = timestamp - lastVelTimestamp;
         if (dt > 0.001) {
             float instVel = (float)((progress - lastVelProgress) / dt);
+            // 抬手前即时速度均值：保留真实符号（不过滤方向），供路径A方向保护使用。
+            instVelBuffer[instVelIdx] = instVel;
+            instVelIdx = (instVelIdx + 1) % 3;
+            if (instVelCount < 3) instVelCount++;
+            if (instVelCount > 0) {
+                float sum = 0;
+                for (int i = 0; i < instVelCount; i++) sum += instVelBuffer[i];
+                releaseInstVel = sum / instVelCount;
+            }
+            // 峰值仅计入与主甩动方向一致的瞬时速度（折返/回摆阶段反向帧排除）。
             if (sessionMaxProgress == 0 || instVel * sessionMaxProgress > 0) {
                 if (fabsf(instVel) > fabsf(sessionPeakVel)) sessionPeakVel = instVel;
             }
@@ -639,6 +658,9 @@ static void processContactData(int deviceIndex, void *data,
                 lastVelProgress = 0;
                 lastVelTimestamp = 0;
                 sessionMaxProgress = 0;
+                releaseInstVel = 0;
+                instVelCount = 0;
+                instVelIdx = 0;
                 touchStartTime = timestamp;
                 settlingEndTime = timestamp + SETTLING_DURATION;
                 touchStartCentroidX = centroidX;
@@ -688,6 +710,7 @@ static void processContactData(int deviceIndex, void *data,
                 ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
                        gestureSessionID, sessionPeakVel, sessionMaxProgress);
                 userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+                userCallback(GestureReleaseVelocity, releaseInstVel);
                 userCallback(GestureEnd, 0);
                 if (elapsed > tapMaxDurationSec) {
                     ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (lift after %.0fms > %.0fms) GestureEnd fired\n",
@@ -801,6 +824,7 @@ static void processContactData(int deviceIndex, void *data,
             ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
                    gestureSessionID, sessionPeakVel, sessionMaxProgress);
             userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+            userCallback(GestureReleaseVelocity, releaseInstVel);
             userCallback(GestureEnd, 0);
             ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (callback gap, frame %d->%d) GestureEnd fired\n",
                    gestureSessionID, lastFrame, frame);
@@ -812,6 +836,7 @@ static void processContactData(int deviceIndex, void *data,
             ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
                    gestureSessionID, sessionPeakVel, sessionMaxProgress);
             userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+            userCallback(GestureReleaseVelocity, releaseInstVel);
             userCallback(GestureEnd, 0);
             {
                 float finalDX = centroidX - settledCentroidX;

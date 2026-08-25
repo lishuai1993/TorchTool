@@ -94,21 +94,19 @@ final class SlideTransitionController {
     /// 异步窗口图像回填队列：并发执行后台截取，主线程只做回填赋值。
     private let windowFillQueue = DispatchQueue(label: "ws.windowFill", attributes: .concurrent)
 
-    // MARK: - 甩动动量：速度采样
-
-    /// 采样点（offset 域）。缓冲保留最近 50ms，速度取末 4 点最小二乘斜率。
-    private struct OffsetSample {
-        let time: CFTimeInterval
-        let offset: Double
-    }
-    private var offsetSamples: [OffsetSample] = []
-    /// 采样开关：begin 置 true，settle 起置 false（收尾动画阶段不再追加）。
-    private var samplingEnabled = true
+    // MARK: - 甩动动量：C 引擎速度
 
     /// 会话峰值横向速度（progress/sec，带符号）。由 C 引擎按 MT 帧时间戳计算、
     /// gestureEnd 前一刻经 GestureSwipePeakVelocity 送达（方案A 动量助推），
     /// 规避主线程批处理/折返反号/抬手停顿导致的释放速度失真。
+    /// 路径A 起仅用于「会话主方向」判定与日志诊断，不再参与助推计算。
     private(set) var lastPeakVelocity: CGFloat = 0
+
+    /// 抬手前即时速度（progress/sec，带符号，最近3帧均值）。由 C 引擎按 MT 帧
+    /// 时间戳计算、peak 之后 gestureEnd 之前经 GestureReleaseVelocity 送达。
+    /// 路径A 动量助推的唯一速度源：反映抬手瞬间真实意图（停顿/反向→趋零或反向），
+    /// 替代会话峰值消除「慢速拖拽被助推误提交」。
+    private(set) var lastReleaseVelocity: CGFloat = 0
 
     // MARK: - 屏闪诊断旁路开关
 
@@ -302,9 +300,8 @@ final class SlideTransitionController {
         carryOffset = 0
         isSettling = false
         settleComplete = false
-        offsetSamples.removeAll()
         lastPeakVelocity = 0
-        samplingEnabled = true
+        lastReleaseVelocity = 0
         isActive = true
 
         // 顶部菜单栏覆盖条（level 25）：材质背景 + AX 自绘源/目标菜单文字随手指交叉淡化。
@@ -392,7 +389,6 @@ final class SlideTransitionController {
                                             carry: carryOffset,
                                             pointsPerProgress: pointsPerProgress,
                                             screenWidth: screenRect.width)
-        recordOffsetSample()
         applyCurrentOffset()
         applyMenuCover()
     }
@@ -480,9 +476,8 @@ final class SlideTransitionController {
             }
         }
 
-        offsetSamples.removeAll()
         lastPeakVelocity = 0
-        samplingEnabled = true
+        lastReleaseVelocity = 0
         update(progress: initialProgress)
 
         // 诊断：链式会话骨架。
@@ -508,46 +503,16 @@ final class SlideTransitionController {
         cancel(menuCoverPanel?.contentView)
     }
 
-    /// 追加 offset 采样：距上个样本 <4ms 则覆盖（防饱和区冗余），否则追加；仅保留
-    /// 最近 50ms。随跟踪期钳制取消，offset 全程反映真实位移，速度采样不再被截平。
-    private func recordOffsetSample() {
-        guard samplingEnabled else { return }
-        let now = CACurrentMediaTime()
-        let value = Double(currentOffset)
-        if let last = offsetSamples.last, now - last.time < 0.004 {
-            offsetSamples[offsetSamples.count - 1] = OffsetSample(time: now, offset: value)
-        } else {
-            offsetSamples.append(OffsetSample(time: now, offset: value))
-        }
-        while let first = offsetSamples.first, now - first.time > 0.050 {
-            offsetSamples.removeFirst()
-        }
-    }
-
-    /// 释放速度（offset 域，px/s）：对缓冲内最近至多 4 个样本做最小二乘线性回归。
-    /// 样本 <3 或时间跨度 <16ms → 返回 0（视为无速度，动量助推为 0）。
-    func releaseVelocity() -> CGFloat {
-        let samples = Array(offsetSamples.suffix(4))
-        guard samples.count >= 3,
-              let t0 = samples.first?.time,
-              let t1 = samples.last?.time,
-              t1 - t0 >= 0.016 else { return 0 }
-        let tMean = samples.reduce(0.0) { $0 + $1.time } / Double(samples.count)
-        let oMean = samples.reduce(0.0) { $0 + $1.offset } / Double(samples.count)
-        var num = 0.0
-        var den = 0.0
-        for s in samples {
-            num += (s.offset - oMean) * (s.time - tMean)
-            den += (s.time - tMean) * (s.time - tMean)
-        }
-        guard den > 1e-9 else { return 0 }
-        return CGFloat(num / den)
-    }
-
     /// 记录 C 引擎送达的会话峰值横向速度（progress/sec，带符号）。AppDelegate 在
     /// swipePeakVelocity 事件到达时调用（紧随其后即 gestureEnd）。
     func recordPeakVelocity(_ velocity: CGFloat) {
         lastPeakVelocity = velocity
+    }
+
+    /// 记录 C 引擎送达的抬手前即时速度（progress/sec，带符号）。AppDelegate 在
+    /// releaseVelocity 事件到达时调用（peak 之后、gestureEnd 之前）。
+    func recordReleaseVelocity(_ velocity: CGFloat) {
+        lastReleaseVelocity = velocity
     }
 
     /// commit 时登记「待激活目标」：settle 落定前若被非链式方式结束，cancel 会补激活。
@@ -557,13 +522,19 @@ final class SlideTransitionController {
         logDebug("SLIDE: pending commit target=\(target)")
     }
 
-    /// 会话峰值速度 → 偏移域速度（px/s）：快甩时 |p| 远超软起步膝点，eased 斜率≈1，
-    /// 故 progress/sec × pointsPerProgress ≈ offset px/s（近似误差 <10%）。加速下限
-    /// 拦截 settle 边缘微动误判：|峰值| 折算后 < 800 px/s 视为无速度（真实快甩
-    /// 2000+ px/s，慢速拖拽 <500 px/s），与关闭动量时行为一致。
+    /// 会话峰值速度 → 偏移域速度（px/s）：progress/sec × pointsPerProgress。仅用于
+    /// 会话主方向（峰值符号）与日志诊断，不参与路径A助推计算。
     func peakOffsetVelocity() -> CGFloat {
+        lastPeakVelocity * pointsPerProgress
+    }
+
+    /// 抬手前即时速度 → 偏移域速度（px/s）：快甩时 |p| 远超软起步膝点，eased 斜率≈1，
+    /// 故 progress/sec × pointsPerProgress ≈ offset px/s（近似误差 <10%）。加速下限
+    /// 拦截 settle 边缘微动误判：|折算后| < 800 px/s 视为无速度（真实快甩 2000+ px/s，
+    /// 慢速拖拽抬手前 <500 px/s），与关闭动量时行为一致。路径A 动量助推的唯一速度源。
+    func releaseOffsetVelocity() -> CGFloat {
         let minFlickPxPerSec: CGFloat = 800
-        let pxPerSec = lastPeakVelocity * pointsPerProgress
+        let pxPerSec = lastReleaseVelocity * pointsPerProgress
         return abs(pxPerSec) >= minFlickPxPerSec ? pxPerSec : 0
     }
 
@@ -618,7 +589,6 @@ final class SlideTransitionController {
         }
         isSettling = true
         lastSettleSign = finalOffset < 0 ? -1 : 1
-        samplingEnabled = false
         diagSample(label: "settle")
         let targetOffset: CGFloat
         if commit {
@@ -833,6 +803,7 @@ final class SlideTransitionController {
         carryOffset = 0
         currentOffset = 0
         lastPeakVelocity = 0
+        lastReleaseVelocity = 0
         logDebug("SLIDE: cancelled")
     }
 

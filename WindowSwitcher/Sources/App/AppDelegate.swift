@@ -412,9 +412,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         case .swipePeakVelocity(let velocity):
             // 方案A：C 引擎按 MT 帧时间戳算出的会话峰值横向速度（progress/sec，
-            // 带符号），紧随其后即 gestureEnd。记录供 finishSlideSession 动量助推。
+            // 带符号）。路径A 起仅作会话主方向判定与日志诊断，不参与助推。
             logDebug("GESTURE: swipePeakVelocity v=\(String(format: "%.3f", velocity)) progress/s")
             slideTransition.recordPeakVelocity(CGFloat(velocity))
+
+        case .releaseVelocity(let velocity):
+            // 路径A：C 引擎按 MT 帧时间戳算出的抬手前即时速度（progress/sec，
+            // 带符号，最近3帧均值）。动量助推的唯一速度源——慢速拖拽抬手前停顿/
+            // 反向时趋零或反号，方向保护据此让助推归零，回归纯位移判定。
+            logDebug("GESTURE: releaseVelocity v=\(String(format: "%.3f", velocity)) progress/s")
+            slideTransition.recordReleaseVelocity(CGFloat(velocity))
 
         case .gestureEnd:
             elasticDrag.cancelWatchdog()
@@ -544,22 +551,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settings = AppSettings.shared
         let thresholdPx = CGFloat(settings.slidingCommitThreshold) * slideTransition.screenWidth
 
-        // 甩动动量（方案A）：有效位移 = 当前位移 + 会话峰值速度外推助推。速度取 C
-        // 引擎帧级时间基的会话峰值（规避主线程批处理/折返反号/抬手停顿导致的释放
-        // 速度失真）；releaseVelocity 仅保留用于日志对比诊断。慢速拖拽峰值小 →
-        // 助推≈0，行为与关闭动量时一致；快甩经助推越过提交阈值完成切换。
-        let releaseVel = slideTransition.releaseVelocity()
-        let vel = slideTransition.peakOffsetVelocity()
+        // 甩动动量（路径A）：有效位移 = 当前位移 + 抬手前即时速度外推助推。速度取 C
+        // 引擎帧级时间基的抬手前即时速度（最近3帧均值），反映抬手瞬间真实意图：
+        // 快甩 → 速度高 → 助推补足；慢速拖拽到位后停顿 → 速度≈0 → 助推归零（纯位移
+        // 判定）；反向回退 → 速度与主方向相反 → 方向保护归零助推 → 回归纯位移判定。
+        // 会话峰值仅用于主方向符号（方向保护）与日志诊断，不参与助推。
+        let releaseVel = slideTransition.releaseOffsetVelocity()   // 抬手前即时速度（px/s，带符号，800px/s 下限已拦截）
+        let peakVel = slideTransition.peakOffsetVelocity()         // 会话峰值（px/s，仅诊断）
+        let mainDirSign = slideTransition.lastPeakVelocity > 0 ? 1
+                        : (slideTransition.lastPeakVelocity < 0 ? -1 : 0)
         let boost: CGFloat
         if settings.momentumCommitEnabled {
             let maxBoostPx = CGFloat(settings.momentumMaxBoostRatio) * slideTransition.screenWidth
-            boost = max(-maxBoostPx, min(maxBoostPx, vel * CGFloat(settings.momentumBoostWindow)))
+            boost = momentumBoost(off: off,
+                                  releaseVel: releaseVel,
+                                  mainDirSign: mainDirSign,
+                                  window: CGFloat(settings.momentumBoostWindow),
+                                  maxBoostPx: maxBoostPx)
         } else {
             boost = 0
         }
         let effective = off + boost
         let commit = abs(effective) >= thresholdPx
-        logDebug("SLIDE: gestureEnd offset=\(Int(off)) peakVel=\(Int(vel))px/s releaseVel=\(Int(releaseVel))px/s boost=\(Int(boost)) effective=\(Int(effective)) threshold=\(Int(thresholdPx)) commit=\(commit)")
+        logDebug("SLIDE: gestureEnd offset=\(Int(off)) releaseVel=\(Int(releaseVel))px/s peakVel=\(Int(peakVel))px/s mainDir=\(mainDirSign) boost=\(Int(boost)) effective=\(Int(effective)) threshold=\(Int(thresholdPx)) commit=\(commit)")
 
         let cyclic = settings.cyclicScrollEnabled
         if commit {

@@ -16,6 +16,9 @@ typedef enum {
     GestureEnd,           // fingers lifted, gesture finished
     GestureSwipePeakVelocity, // session peak horizontal swipe velocity (progress/sec, signed),
                               // emitted just before GestureEnd; frame-level MT time base (方案A)
+    GestureReleaseVelocity,  // pre-lift instantaneous velocity (progress/sec, signed, recent-3-frame
+                             // average), emitted after peak velocity and before GestureEnd; the
+                             // release-intent signal used by path-A momentum (方案A 动量)
 } GestureType;
 
 typedef void (*GestureCallback)(GestureType type, float progress);
