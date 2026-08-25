@@ -11,6 +11,11 @@ private final class MenuItemView: NSView {
     var selectable: Bool
     var onClick: (() -> Void)?
     var debugTag: String = "?"
+    /// 标题额外右移像素。仅用于「滑动过渡 vs 瞬切」与带缩进图的普通父项文本左端对齐。
+    var titleIndent: CGFloat = 0 { didSet { needsDisplay = true } }
+    /// 所属三级菜单（画面与截图/提交判定）。非空且进入窗口时通知控制器强制定位；
+    /// 其余菜单项保持 nil，不参与定位。
+    weak var ownerMenu: NSMenu?
 
     private(set) var isHighlighted = false {
         didSet {
@@ -39,6 +44,9 @@ private final class MenuItemView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         logDebug("[MENU-VIEW] [\(debugTag)] viewDidMoveToWindow, window=\(window != nil ? "yes" : "nil"), showsHighlight=\(showsHighlight), isEnabled=\(isEnabled)")
+        if window != nil, let ownerMenu {
+            MenuBarController.shared.submenuWindowDidDisplay(ownerMenu)
+        }
         if window != nil, showsHighlight, isEnabled {
             startHoverTimer()
         } else {
@@ -107,7 +115,7 @@ private final class MenuItemView: NSView {
 
         let t = NSAttributedString(string: title, attributes: attrs)
         let tSize = t.size()
-        t.draw(at: NSPoint(x: 23, y: (bounds.height - tSize.height) / 2))
+        t.draw(at: NSPoint(x: 23 + titleIndent, y: (bounds.height - tSize.height) / 2))
     }
 }
 
@@ -151,6 +159,11 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         m.autoenablesItems = false
         return m
     }()
+
+    /// 快切模式设置二级/三级菜单引用（方案A：三级菜单紧贴二级菜单右缘定位的锚点）
+    private weak var quickSwitchSubmenu: NSMenu?
+    private weak var visualSubmenu: NSMenu?
+    private weak var commitSubmenu: NSMenu?
 
     private override init() {
         super.init()
@@ -390,16 +403,26 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private func buildQuickSwitchSubmenu() {
         let sub = NSMenu()
         sub.autoenablesItems = false
+        quickSwitchSubmenu = sub
 
-        let slidingToggle = makeToggleItem(title: "滑动过渡切换（跟随手指）",
+        // 总开关：滑动过渡 vs 瞬切（常驻二级，不藏进分类）
+        let slidingToggle = makeToggleItem(title: "滑动过渡 vs 瞬切",
                                            isOn: AppSettings.shared.slidingTransitionEnabled) {
             AppSettings.shared.slidingTransitionEnabled.toggle()
             self.slidingTransitionToggleView?.isOn = AppSettings.shared.slidingTransitionEnabled
         }
         slidingTransitionToggleView = menuItemView(from: slidingToggle)
+        // 与带缩进图的普通父项（画面与截图/提交判定）文本左端对齐
+        slidingTransitionToggleView?.titleIndent = 4
         sub.addItem(slidingToggle)
 
         sub.addItem(.separator())
+
+        // 三级分类一：画面与截图
+        let visualSub = NSMenu()
+        visualSub.autoenablesItems = false
+        visualSub.delegate = self
+        visualSubmenu = visualSub
 
         // 背景大图截取（SCK）：关闭则跳过全屏桌面快照，透明占位直通实时桌面
         let backdropCapture = makeToggleItem(title: "背景大图截取（SCK）",
@@ -409,7 +432,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             self.applyCaptureDependencies()
         }
         backdropCaptureToggleView = menuItemView(from: backdropCapture)
-        sub.addItem(backdropCapture)
+        visualSub.addItem(backdropCapture)
 
         // 源窗口截取：关闭则不截取源窗口，源区域由背景图或实时桌面兜底
         let sourceCapture = makeToggleItem(title: "源窗口截取",
@@ -419,45 +442,50 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             self.applyCaptureDependencies()
         }
         sourceCaptureToggleView = menuItemView(from: sourceCapture)
-        sub.addItem(sourceCapture)
+        visualSub.addItem(sourceCapture)
 
-        sub.addItem(.separator())
-
-        let menuBarGradient = makeToggleItem(title: "菜单栏跟随手指渐变（淡出淡入）",
+        let menuBarGradient = makeToggleItem(title: "屏幕顶栏渐变（淡出淡入）",
                                              isOn: AppSettings.shared.menuBarGradientEnabled) {
             AppSettings.shared.menuBarGradientEnabled.toggle()
             self.menuBarGradientToggleView?.isOn = AppSettings.shared.menuBarGradientEnabled
         }
         menuBarGradientToggleView = menuItemView(from: menuBarGradient)
-        sub.addItem(menuBarGradient)
+        visualSub.addItem(menuBarGradient)
 
-        sub.addItem(.separator())
-
-        let sourceShadow = makeToggleItem(title: "源窗口阴影（动态效果）",
+        let sourceShadow = makeToggleItem(title: "源窗口阴影增强",
                                           isOn: AppSettings.shared.sourceShadowEnabled) {
             AppSettings.shared.sourceShadowEnabled.toggle()
             self.sourceShadowToggleView?.isOn = AppSettings.shared.sourceShadowEnabled
         }
         sourceShadowToggleView = menuItemView(from: sourceShadow)
-        sub.addItem(sourceShadow)
+        visualSub.addItem(sourceShadow)
 
-        let sourceShadowClean = makeToggleItem(title: "源窗口阴影完全移除（与切换后一致）",
+        let sourceShadowClean = makeToggleItem(title: "源窗口阴影完全移除",
                                                isOn: AppSettings.shared.sourceShadowCleanEnabled) {
             AppSettings.shared.sourceShadowCleanEnabled.toggle()
             self.sourceShadowCleanToggleView?.isOn = AppSettings.shared.sourceShadowCleanEnabled
             self.applyCaptureDependencies()
         }
         sourceShadowCleanToggleView = menuItemView(from: sourceShadowClean)
-        sub.addItem(sourceShadowClean)
+        visualSub.addItem(sourceShadowClean)
 
-        applyCaptureDependencies()
+        let visualParent = NSMenuItem(title: "画面与截图", action: nil, keyEquivalent: "")
+        visualParent.submenu = visualSub
+        visualParent.image = menuIndentImage()
+        sub.addItem(visualParent)
 
         sub.addItem(.separator())
+
+        // 三级分类二：提交判定（跟手比例 / 提交阈值 / 甩动动量 同式耦合，归一组）
+        let commitSub = NSMenu()
+        commitSub.autoenablesItems = false
+        commitSub.delegate = self
+        commitSubmenu = commitSub
 
         let ratio = AppSettings.shared.slidingRatio
         let ratioLabel = makeLabelItem(title: "跟手比例 \(String(format: "%.2f", ratio))")
         slidingRatioLabelView = menuItemView(from: ratioLabel)
-        sub.addItem(ratioLabel)
+        commitSub.addItem(ratioLabel)
 
         let ratioDec = makeActionItem(title: "减小跟手比例 (−0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -465,7 +493,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.slidingRatio = v
             self.slidingRatioLabelView?.title = "跟手比例 \(String(format: "%.2f", v))"
         }
-        sub.addItem(ratioDec)
+        commitSub.addItem(ratioDec)
 
         let ratioInc = makeActionItem(title: "增大跟手比例 (+0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -473,14 +501,14 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.slidingRatio = v
             self.slidingRatioLabelView?.title = "跟手比例 \(String(format: "%.2f", v))"
         }
-        sub.addItem(ratioInc)
+        commitSub.addItem(ratioInc)
 
-        sub.addItem(.separator())
+        commitSub.addItem(.separator())
 
         let thresh = AppSettings.shared.slidingCommitThreshold
         let threshLabel = makeLabelItem(title: "提交阈值 \(String(format: "%.2f", thresh))")
         slidingThreshLabelView = menuItemView(from: threshLabel)
-        sub.addItem(threshLabel)
+        commitSub.addItem(threshLabel)
 
         let threshDec = makeActionItem(title: "减小提交阈值 (−0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -488,7 +516,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.slidingCommitThreshold = v
             self.slidingThreshLabelView?.title = "提交阈值 \(String(format: "%.2f", v))"
         }
-        sub.addItem(threshDec)
+        commitSub.addItem(threshDec)
 
         let threshInc = makeActionItem(title: "增大提交阈值 (+0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -496,9 +524,9 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.slidingCommitThreshold = v
             self.slidingThreshLabelView?.title = "提交阈值 \(String(format: "%.2f", v))"
         }
-        sub.addItem(threshInc)
+        commitSub.addItem(threshInc)
 
-        sub.addItem(.separator())
+        commitSub.addItem(.separator())
 
         let momentumToggle = makeToggleItem(title: "甩动动量提交（快甩助力）",
                                             isOn: AppSettings.shared.momentumCommitEnabled) {
@@ -506,14 +534,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             self.momentumToggleView?.isOn = AppSettings.shared.momentumCommitEnabled
         }
         momentumToggleView = menuItemView(from: momentumToggle)
-        sub.addItem(momentumToggle)
-
-        sub.addItem(.separator())
+        commitSub.addItem(momentumToggle)
 
         let window = AppSettings.shared.momentumBoostWindow
         let windowLabel = makeLabelItem(title: "甩动动量 \(String(format: "%.2f", window))s")
         momentumWindowLabelView = menuItemView(from: windowLabel)
-        sub.addItem(windowLabel)
+        commitSub.addItem(windowLabel)
 
         let windowDec = makeActionItem(title: "减小甩动动量 (−0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -521,7 +547,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.momentumBoostWindow = v
             self.momentumWindowLabelView?.title = "甩动动量 \(String(format: "%.2f", v))s"
         }
-        sub.addItem(windowDec)
+        commitSub.addItem(windowDec)
 
         let windowInc = makeActionItem(title: "增大甩动动量 (+0.05)", isEnabled: true) { [weak self] in
             guard let self else { return }
@@ -529,12 +555,29 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             AppSettings.shared.momentumBoostWindow = v
             self.momentumWindowLabelView?.title = "甩动动量 \(String(format: "%.2f", v))s"
         }
-        sub.addItem(windowInc)
+        commitSub.addItem(windowInc)
+
+        let commitParent = NSMenuItem(title: "提交判定", action: nil, keyEquivalent: "")
+        commitParent.submenu = commitSub
+        commitParent.image = menuIndentImage()
+        sub.addItem(commitParent)
+
+        tagLevel3Items(visualSub)
+        tagLevel3Items(commitSub)
+
+        applyCaptureDependencies()
 
         let parentItem = NSMenuItem(title: "快切模式设置", action: nil, keyEquivalent: "")
         parentItem.submenu = sub
         parentItem.image = menuIndentImage()
         menu.addItem(parentItem)
+    }
+
+    /// 给三级菜单所有自定义项标记所属菜单，供 viewDidMoveToWindow 触发强制定位。
+    private func tagLevel3Items(_ menu: NSMenu) {
+        for item in menu.items {
+            (item.view as? MenuItemView)?.ownerMenu = menu
+        }
     }
 
     /// 截取开关间的依赖置灰：
@@ -550,7 +593,47 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     func menuWillOpen(_ menu: NSMenu) {
+        guard menu === self.menu else { return }  // 仅顶层菜单打开时重建；子菜单打开不重建，仅夹紧
         rebuildMenuItems()
+    }
+
+    /// 三级菜单项视图进入其菜单窗口时触发。menuDidOpen 在本 App 的 NSStatusItem 菜单
+    /// 跟踪路径下实测不会触发，改由 viewDidMoveToWindow（日志已确证可靠）驱动。
+    /// 延迟到下一 runloop，等 AppKit 完成初始定位后再强制定位，避免被覆盖。
+    func submenuWindowDidDisplay(_ menu: NSMenu) {
+        guard menu === visualSubmenu || menu === commitSubmenu else { return }
+        DispatchQueue.main.async { [weak self, weak menu] in
+            guard let self, let menu else { return }
+            self.positionLevel3Submenu(menu)
+        }
+    }
+
+    /// 方案A：三级菜单强制紧贴二级菜单右缘；右侧空间不足时右缘对齐「屏幕右缘−20pt」
+    /// （此时三级菜单会与二级菜单右侧重叠，属于空间不足时的让步）。
+    private func positionLevel3Submenu(_ menu: NSMenu) {
+        guard let window = menu.items.first(where: { $0.view != nil })?.view?.window,
+              let parentWin = quickSwitchSubmenu?.items.first(where: { $0.view != nil })?.view?.window,
+              let screen = window.screen ?? NSScreen.main else { return }
+        let margin: CGFloat = 20
+        let vis = screen.visibleFrame
+        var f = window.frame
+        f.origin.x = parentWin.frame.maxX  // 紧贴二级菜单右缘
+        if f.maxX > vis.maxX - margin {
+            f.origin.x = vis.maxX - margin - f.width  // 空间不足：让位给右缘 20pt 余量
+        }
+        if f.minX < vis.minX + margin {
+            f.origin.x = vis.minX + margin
+        }
+        if f.maxY > vis.maxY - margin {
+            f.origin.y = vis.maxY - margin - f.height
+        }
+        if f.minY < vis.minY + margin {
+            f.origin.y = vis.minY + margin
+        }
+        if f != window.frame {
+            logDebug("MENU-POSITION: \(menu.items.first?.title ?? "?") → \(NSStringFromRect(f))")
+            window.setFrame(f, display: false)
+        }
     }
 
     // MARK: - View factories

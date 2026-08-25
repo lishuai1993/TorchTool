@@ -222,9 +222,11 @@ final class SlideTransitionController {
         // 干净模式（sourceShadowCleanEnabled）下强制不加人工阴影——背景已排除源窗口
         // （无真实投影），叠加只会重新引入阴影，与「完全移除」目标相悖。
         sourceBase = localRect(forCG: sourceInfo.frame)
-        // 源窗口截取关闭 → 不创建源快照视图：源区域由背景图（若开，含冻结源）或
-        // 实时桌面（背景亦关）兜底，applyCurrentOffset/settle 均有 if let sourceView 守卫。
-        if AppSettings.shared.sourceCaptureEnabled {
+        // 源窗口截取关闭 → 非边界会话不创建源快照视图：源区域由背景图（若开，含冻结源）
+        // 或实时桌面（背景亦关）兜底，applyCurrentOffset/settle 均有 if let sourceView 守卫。
+        // 边界会话无条件创建：边界弹性 wall-bump/回弹的唯一移动元素就是源窗口图像，
+        // 源窗口截取开关只约束静态留背景的源快照，不约束跟手的动态边界元素。
+        if AppSettings.shared.sourceCaptureEnabled || boundary {
             let sourceShadowOn = !AppSettings.shared.sourceShadowCleanEnabled
                 && AppSettings.shared.sourceShadowEnabled
             let sv = makeImageView(image: nil, frame: sourceBase, shadow: sourceShadowOn)
