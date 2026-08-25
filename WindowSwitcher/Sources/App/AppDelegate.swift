@@ -329,7 +329,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // 三指刚落地、滑动方向未知：若滑动过渡开启，按左右两方向预捕 SCK 背景，
             // 使会话 begin 时背景图已就绪（面板弹出即带完整桌面，根治非全屏源黑闪）。
             // 该手势若最终不是横滑（tap/纵向 swipe），由 gestureEnd/tap 清理预捕会话。
-            if settings.slidingTransitionEnabled && settings.quickSwitchModeEnabled && !overlayController.isVisible {
+            if settings.slidingTransitionEnabled && settings.quickSwitchModeEnabled
+                && settings.backdropCaptureEnabled && !overlayController.isVisible {
                 windowManager.beginBackdropPreCapture()
             }
 

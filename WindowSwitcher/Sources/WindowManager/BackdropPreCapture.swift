@@ -71,8 +71,10 @@ final class BackdropPreCapturer {
         session = Session(sourceID: sourceID, leftID: leftID, rightID: rightID,
                           screenSize: screenSize, rightSwipe: right, leftSwipe: left)
         logDebug("SLIDE: pre-capture start source=\(sourceID) left=\(leftID.map(String.init) ?? "nil") right=\(rightID.map(String.init) ?? "nil")")
-        // 源窗口阴影完全移除：背景预捕同时排除源窗口（背景不自带其真实投影）
-        let excl: Set<CGWindowID> = AppSettings.shared.sourceShadowCleanEnabled ? [sourceID] : []
+        // 源窗口阴影完全移除：背景预捕同时排除源窗口（背景不自带其真实投影）。
+        // 源截取关闭时源区域无 sourceView 兜底，保留源在背景中，避免露出背后桌面。
+        let excl: Set<CGWindowID> = AppSettings.shared.sourceShadowCleanEnabled
+            && AppSettings.shared.sourceCaptureEnabled ? [sourceID] : []
         Task { @MainActor in await Self.capture(into: right, screenSize: screenSize, excluding: excl) }
         Task { @MainActor in await Self.capture(into: left, screenSize: screenSize, excluding: excl) }
     }

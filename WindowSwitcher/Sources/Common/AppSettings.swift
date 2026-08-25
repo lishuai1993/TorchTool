@@ -109,6 +109,17 @@ final class AppSettings: ObservableObject {
     @Published var momentumMaxBoostRatio: Double {
         didSet { defaults.set(momentumMaxBoostRatio, forKey: Keys.momentumMaxBoostRatio) }
     }
+    /// 背景 SCK 大图截取：开启=当前实现（全屏桌面快照平铺 + 菜单覆盖条材质来源）；
+    /// 关闭=跳过全部背景截取（trackingBegan 预捕 / begin 消费 / 异步捕获 / 收尾落图），
+    /// 透明占位直通实时桌面，源/目标区域由源快照（若开）或真实窗口兜底。
+    @Published var backdropCaptureEnabled: Bool {
+        didSet { defaults.set(backdropCaptureEnabled, forKey: Keys.backdropCaptureEnabled) }
+    }
+    /// 源窗口截取：开启=当前实现（源窗口快照盖住实时源窗口）；关闭=不截取源窗口，
+    /// 源区域由背景图（若开，含冻结源）或实时桌面（背景亦关时）兜底。
+    @Published var sourceCaptureEnabled: Bool {
+        didSet { defaults.set(sourceCaptureEnabled, forKey: Keys.sourceCaptureEnabled) }
+    }
 
     // MARK: - Elastic drag
     @Published var elasticDragEnabled: Bool {
@@ -186,6 +197,8 @@ final class AppSettings: ObservableObject {
             Keys.momentumCommitEnabled: true,
             Keys.momentumBoostWindow: 0.15,
             Keys.momentumMaxBoostRatio: 0.5,
+            Keys.backdropCaptureEnabled: true,
+            Keys.sourceCaptureEnabled: true,
         ])
 
         _thumbnailHeight = .init(initialValue: defaults.double(forKey: Keys.thumbnailHeight))
@@ -218,6 +231,8 @@ final class AppSettings: ObservableObject {
         _momentumCommitEnabled = .init(initialValue: defaults.bool(forKey: Keys.momentumCommitEnabled))
         _momentumBoostWindow = .init(initialValue: defaults.double(forKey: Keys.momentumBoostWindow))
         _momentumMaxBoostRatio = .init(initialValue: defaults.double(forKey: Keys.momentumMaxBoostRatio))
+        _backdropCaptureEnabled = .init(initialValue: defaults.bool(forKey: Keys.backdropCaptureEnabled))
+        _sourceCaptureEnabled = .init(initialValue: defaults.bool(forKey: Keys.sourceCaptureEnabled))
     }
 
     func resetToDefaults() {
@@ -251,6 +266,8 @@ final class AppSettings: ObservableObject {
         momentumCommitEnabled = true
         momentumBoostWindow = 0.15
         momentumMaxBoostRatio = 0.5
+        backdropCaptureEnabled = true
+        sourceCaptureEnabled = true
     }
 }
 
@@ -282,6 +299,8 @@ private enum Keys {
     static let momentumCommitEnabled = "momentumCommitEnabled"
     static let momentumBoostWindow = "momentumBoostWindow"
     static let momentumMaxBoostRatio = "momentumMaxBoostRatio"
+    static let backdropCaptureEnabled = "backdropCaptureEnabled"
+    static let sourceCaptureEnabled = "sourceCaptureEnabled"
     static let serviceEnabled = "serviceEnabled"
     static let elasticDragEnabled = "elasticDragEnabled"
     static let hintShakeEnabled = "hintShakeEnabled"

@@ -139,6 +139,8 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     private weak var menuBarGradientToggleView: MenuItemView?
     private weak var sourceShadowToggleView: MenuItemView?
     private weak var sourceShadowCleanToggleView: MenuItemView?
+    private weak var backdropCaptureToggleView: MenuItemView?
+    private weak var sourceCaptureToggleView: MenuItemView?
     private weak var slidingThreshLabelView: MenuItemView?
     private weak var momentumToggleView: MenuItemView?
     private weak var momentumWindowLabelView: MenuItemView?
@@ -399,6 +401,28 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         sub.addItem(.separator())
 
+        // 背景大图截取（SCK）：关闭则跳过全屏桌面快照，透明占位直通实时桌面
+        let backdropCapture = makeToggleItem(title: "背景大图截取（SCK）",
+                                             isOn: AppSettings.shared.backdropCaptureEnabled) {
+            AppSettings.shared.backdropCaptureEnabled.toggle()
+            self.backdropCaptureToggleView?.isOn = AppSettings.shared.backdropCaptureEnabled
+            self.applyCaptureDependencies()
+        }
+        backdropCaptureToggleView = menuItemView(from: backdropCapture)
+        sub.addItem(backdropCapture)
+
+        // 源窗口截取：关闭则不截取源窗口，源区域由背景图或实时桌面兜底
+        let sourceCapture = makeToggleItem(title: "源窗口截取",
+                                           isOn: AppSettings.shared.sourceCaptureEnabled) {
+            AppSettings.shared.sourceCaptureEnabled.toggle()
+            self.sourceCaptureToggleView?.isOn = AppSettings.shared.sourceCaptureEnabled
+            self.applyCaptureDependencies()
+        }
+        sourceCaptureToggleView = menuItemView(from: sourceCapture)
+        sub.addItem(sourceCapture)
+
+        sub.addItem(.separator())
+
         let menuBarGradient = makeToggleItem(title: "菜单栏跟随手指渐变（淡出淡入）",
                                              isOn: AppSettings.shared.menuBarGradientEnabled) {
             AppSettings.shared.menuBarGradientEnabled.toggle()
@@ -415,20 +439,18 @@ final class MenuBarController: NSObject, NSMenuDelegate {
             self.sourceShadowToggleView?.isOn = AppSettings.shared.sourceShadowEnabled
         }
         sourceShadowToggleView = menuItemView(from: sourceShadow)
-        // 干净模式（源窗口阴影完全移除）开启时，动态效果开关被覆盖，置灰不可点击
-        if AppSettings.shared.sourceShadowCleanEnabled {
-            sourceShadowToggleView?.isEnabled = false
-        }
         sub.addItem(sourceShadow)
 
         let sourceShadowClean = makeToggleItem(title: "源窗口阴影完全移除（与切换后一致）",
                                                isOn: AppSettings.shared.sourceShadowCleanEnabled) {
             AppSettings.shared.sourceShadowCleanEnabled.toggle()
             self.sourceShadowCleanToggleView?.isOn = AppSettings.shared.sourceShadowCleanEnabled
-            self.sourceShadowToggleView?.isEnabled = !AppSettings.shared.sourceShadowCleanEnabled
+            self.applyCaptureDependencies()
         }
         sourceShadowCleanToggleView = menuItemView(from: sourceShadowClean)
         sub.addItem(sourceShadowClean)
+
+        applyCaptureDependencies()
 
         sub.addItem(.separator())
 
@@ -513,6 +535,18 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         parentItem.submenu = sub
         parentItem.image = menuIndentImage()
         menu.addItem(parentItem)
+    }
+
+    /// 截取开关间的依赖置灰：
+    /// - 背景大图关闭 → 菜单栏渐变（材质来自背景裁剪）置灰；
+    /// - 背景或源任一关闭 → 源阴影完全移除（依赖背景排除源 + 源快照兜底）置灰；
+    /// - 源截取关闭 → 源窗口阴影动态效果（作用于 sourceView）置灰；干净模式开启时亦置灰。
+    private func applyCaptureDependencies() {
+        let backdrop = AppSettings.shared.backdropCaptureEnabled
+        let source = AppSettings.shared.sourceCaptureEnabled
+        menuBarGradientToggleView?.isEnabled = backdrop
+        sourceShadowCleanToggleView?.isEnabled = backdrop && source
+        sourceShadowToggleView?.isEnabled = source && !AppSettings.shared.sourceShadowCleanEnabled
     }
 
     func menuWillOpen(_ menu: NSMenu) {

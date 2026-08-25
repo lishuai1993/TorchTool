@@ -222,16 +222,20 @@ final class SlideTransitionController {
         // 干净模式（sourceShadowCleanEnabled）下强制不加人工阴影——背景已排除源窗口
         // （无真实投影），叠加只会重新引入阴影，与「完全移除」目标相悖。
         sourceBase = localRect(forCG: sourceInfo.frame)
-        let sourceShadowOn = !AppSettings.shared.sourceShadowCleanEnabled
-            && AppSettings.shared.sourceShadowEnabled
-        let sv = makeImageView(image: nil, frame: sourceBase, shadow: sourceShadowOn)
-        content.addSubview(sv)
-        sourceView = sv
-        if AppSettings.shared.sourceShadowCleanEnabled {
-            // 干净模式：背景已排除源窗口，需同步回填源图避免源区域露出桌面。
-            sv.image = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName)
-        } else {
-            fillAsync(view: sv, windowID: sourceID, ownerName: sourceInfo.ownerName)
+        // 源窗口截取关闭 → 不创建源快照视图：源区域由背景图（若开，含冻结源）或
+        // 实时桌面（背景亦关）兜底，applyCurrentOffset/settle 均有 if let sourceView 守卫。
+        if AppSettings.shared.sourceCaptureEnabled {
+            let sourceShadowOn = !AppSettings.shared.sourceShadowCleanEnabled
+                && AppSettings.shared.sourceShadowEnabled
+            let sv = makeImageView(image: nil, frame: sourceBase, shadow: sourceShadowOn)
+            content.addSubview(sv)
+            sourceView = sv
+            if AppSettings.shared.sourceShadowCleanEnabled {
+                // 干净模式：背景已排除源窗口，需同步回填源图避免源区域露出桌面。
+                sv.image = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName)
+            } else {
+                fillAsync(view: sv, windowID: sourceID, ownerName: sourceInfo.ownerName)
+            }
         }
 
         // 统一模型：仅目标窗口图像从屏幕边缘滑入真实位（滑动对象=目标）；源、遮挡者、
@@ -256,22 +260,28 @@ final class SlideTransitionController {
 
         // 背景预捕消费（一次消费即清空会话）：图已就绪 → 面板弹出前平铺（零黑，
         // 根治非全屏源黑闪）；图在途 → 异步路径短等该 Direction；无匹配 → 全新捕获。
+        // 背景大图截取关闭 → 跳过全部预捕消费，透明占位直通实时桌面。
         var inflight: BackdropPreCapturer.Direction?
         var needAsyncBackdrop = true
-        switch BackdropPreCapturer.shared.take(
-            sourceID: sourceID, leftID: leftID, rightID: rightID,
-            screenSize: screenRect.size, sign: sign) {
-        case .ready(let image):
-            applyBackdropImage(image, animate: false)
-            // 预捕图就绪即同步喂菜单覆盖条：材质（模糊）+ 源文字（清晰裁剪）都取自
-            // 同一张整屏图，避免预捕路径下覆盖条停留在占位透明态、源菜单不随手指渐隐。
-            applyMenuBarContent(from: image)
-            logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）")
+        if AppSettings.shared.backdropCaptureEnabled {
+            switch BackdropPreCapturer.shared.take(
+                sourceID: sourceID, leftID: leftID, rightID: rightID,
+                screenSize: screenRect.size, sign: sign) {
+            case .ready(let image):
+                applyBackdropImage(image, animate: false)
+                // 预捕图就绪即同步喂菜单覆盖条：材质（模糊）+ 源文字（清晰裁剪）都取自
+                // 同一张整屏图，避免预捕路径下覆盖条停留在占位透明态、源菜单不随手指渐隐。
+                applyMenuBarContent(from: image)
+                logDebug("SLIDE: backdrop pre-captured → 直接平铺（零黑）")
+                needAsyncBackdrop = false
+            case .inflight(let dir):
+                inflight = dir
+            case .none:
+                break
+            }
+        } else {
             needAsyncBackdrop = false
-        case .inflight(let dir):
-            inflight = dir
-        case .none:
-            break
+            logDebug("SLIDE: backdrop capture disabled — 透明占位直通实时桌面")
         }
 
         panel.alphaValue = 0
@@ -299,7 +309,9 @@ final class SlideTransitionController {
         // 菜单栏渐变开关关闭时跳过覆盖条创建（下游调用自然空转），采用原生顶栏切换动效。
         let sourcePID = sourceInfo.ownerPid
         let targetPID = plan.targetID.flatMap { wm.windows[$0]?.ownerPid }
-        if AppSettings.shared.menuBarGradientEnabled {
+        // 菜单覆盖条材质/源文字全部来自背景大图裁剪：背景截取关闭 → 覆盖条无材质来源，
+        // 跳过创建（等效渐变关闭），采用原生顶栏切换动效。
+        if AppSettings.shared.menuBarGradientEnabled && AppSettings.shared.backdropCaptureEnabled {
             createMenuCover(sourcePID: sourcePID, targetPID: targetPID)
         }
 
@@ -844,8 +856,9 @@ final class SlideTransitionController {
             do {
                 var excl = Set<CGWindowID>()
                 if let coverWindowNumber { excl.insert(CGWindowID(coverWindowNumber)) }
-                // 干净模式：排除源窗口，背景不再携带其真实投影
-                if AppSettings.shared.sourceShadowCleanEnabled {
+                // 干净模式：排除源窗口，背景不再携带其真实投影。源截取关闭时源区域
+                // 无 sourceView 兜底，须保留源在背景中，否则露出其背后桌面（洞）。
+                if AppSettings.shared.sourceShadowCleanEnabled && AppSettings.shared.sourceCaptureEnabled {
                     excl.insert(slideSourceID)
                 }
                 let result = try await BackdropPreCapturer.captureDesktop(
