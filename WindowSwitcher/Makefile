@@ -129,8 +129,7 @@ TEST_SOURCES := Tests/TestRunner.swift \
                 Sources/Common/AppSettings.swift \
                 Sources/Common/SettleFallback.swift \
                 Sources/WindowManager/MenuBarImageCache.swift \
-                Sources/WindowManager/BackdropPreCapture.swift \
-                Sources/WindowManager/WindowImagePreCapturer.swift
+                Sources/WindowManager/BackdropPreCapture.swift
 
 .PHONY: test
 test: $(BUILD_DIR)/WindowSwitcherTests

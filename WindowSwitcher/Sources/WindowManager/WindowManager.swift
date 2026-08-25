@@ -10,6 +10,7 @@ final class WindowManager: @unchecked Sendable {
     let axFocusObserver = AXFocusObserver()
     private let axMatcher = AXWindowMatcher.shared
     private let thumbCapturer = ThumbnailCapturer.shared
+    private let windowWarmupQueue = DispatchQueue(label: "ws.windowWarmup", attributes: .concurrent)
 
     /// 真实菜单栏高度（点）。实测非刘海屏/刘海屏 MacBook 均为 37pt（非
     /// NSStatusBar.system.thickness 的 22）。菜单栏覆盖条（level 25）用它定位与定高。
@@ -519,14 +520,13 @@ final class WindowManager: @unchecked Sendable {
 
     /// 三指落地（trackingBegan）时启动双方向背景预捕。先刷新窗口列表：滑动会话
     /// begin（beginSlideSessionIfNeeded）同样先 refreshWindows 再取源/左右邻，预捕若不
-    /// 刷新，两次刷新之间发生的窗口重建/增删会让 take 参数不匹配、回退全新捕获
+    /// 刷新，两次刷新之间发生的窗口重建/增删会让预捕计划与 begin 实际不一致
     ///（正是首次滑动黑闪的根因）。刷新会同步 LRU，但本函数在会话 begin 前调用
     ///（trackingBegan，尚无滑动会话），不违反「滑动会话期间禁刷新」约束。
     /// 门控（滑动过渡开启等）由 AppDelegate 负责。
     func beginBackdropPreCapture() {
         _ = refreshWindows()
         guard let sourceID = frontmostWindowID,
-              let idx = orderingEngine.index(of: sourceID),
               let sourceInfo = windows[sourceID],
               orderingEngine.orderedIDs.count > 1 else { return }
         // 与 beginSlideSessionIfNeeded 共用 neighbors（循环滚动开启时边界绕回对侧），
@@ -543,20 +543,25 @@ final class WindowManager: @unchecked Sendable {
         BackdropPreCapturer.shared.start(sourceID: sourceID, leftID: leftID, rightID: rightID,
                                          screenSize: screen.frame.size)
         // 方案一：与背景预捕并行，预取源 + 左右邻窗口图像，begin() 命中缓存即免同步截屏。
-        beginWindowImagePreCapture(sourceID: sourceID, leftID: leftID, rightID: rightID)
+        beginWindowImageWarmUp(sourceID: sourceID, leftID: leftID, rightID: rightID)
     }
 
-    /// 方案一：trackingBegan 时并行预取滑动面板的源/目标窗口图像（后台并发截屏）。
-    /// 截屏函数与窗口帧经闭包注入 WindowImagePreCapturer，本类不持其状态。
-    func beginWindowImagePreCapture(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?) {
-        WindowImagePreCapturer.shared.start(sourceID: sourceID, leftID: leftID, rightID: rightID,
-                                            capture: { [weak self] id in
-            guard let self else { return nil }
+    /// 方案一（简化版）：trackingBegan 时后台并发预热源 + 左右邻窗口图像。
+    /// 截屏结果直接丢弃——目的不是缓存投递，而是借截屏动作烧热 OS 捕获路径，
+    /// 使 begin() 的同步兜底截屏（source + target）变快（实测热截 4-12 倍提速）。
+    func beginWindowImageWarmUp(sourceID: CGWindowID, leftID: CGWindowID?, rightID: CGWindowID?) {
+        let warm = { [weak self] (id: CGWindowID) in
+            guard let self else { return }
             let name = self.windows[id]?.ownerName ?? "?"
-            return self.captureRawImage(for: id, ownerName: name)
-        }, frames: { [weak self] id in
-            self?.windows[id]?.frame ?? .zero
-        })
+            _ = self.captureRawImage(for: id, ownerName: name)
+        }
+        windowWarmupQueue.async { warm(sourceID) }
+        if let leftID {
+            windowWarmupQueue.async { warm(leftID) }
+        }
+        if let rightID {
+            windowWarmupQueue.async { warm(rightID) }
+        }
     }
 
     func stopInteractionMonitoring() {

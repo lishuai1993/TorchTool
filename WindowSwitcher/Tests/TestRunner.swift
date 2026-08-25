@@ -978,56 +978,6 @@ private func testBackdropSessionUsable() {
 // Fix C：淡出停滞兜底不再硬切（不透明面板瞬间消失=黑闪 + 与下一会话预捕竞争）。
 // 面板仍可见 → 先短淡出再拆；面板已透明 → 直接拆；面板已拆 → 无操作。
 
-private func testWindowImagePreCapturer() {
-    runSuite("会话参数完全一致 → 消费") {
-        assertTrue(WindowImagePreCapturer.sessionMatches(
-            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
-            sourceID: 86, leftID: 73, rightID: 74))
-    }
-
-    runSuite("源窗口重建（sourceID 变化）→ 失配") {
-        assertFalse(WindowImagePreCapturer.sessionMatches(
-            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
-            sourceID: 87, leftID: 73, rightID: 74))
-    }
-
-    runSuite("左邻变化 → 失配") {
-        assertFalse(WindowImagePreCapturer.sessionMatches(
-            sessionSource: 86, sessionLeft: 73, sessionRight: 74,
-            sourceID: 86, leftID: 90, rightID: 74))
-    }
-
-    runSuite("边界（左右邻为 nil）一致 → 消费") {
-        assertTrue(WindowImagePreCapturer.sessionMatches(
-            sessionSource: 86, sessionLeft: nil, sessionRight: nil,
-            sourceID: 86, leftID: nil, rightID: nil))
-    }
-
-    runSuite("边界预取后右邻出现 → 失配") {
-        assertFalse(WindowImagePreCapturer.sessionMatches(
-            sessionSource: 86, sessionLeft: nil, sessionRight: nil,
-            sourceID: 86, leftID: nil, rightID: 837))
-    }
-
-    runSuite("捕获帧与当前帧同尺寸 → 采用") {
-        assertTrue(WindowImagePreCapturer.frameMatches(
-            entryFrame: CGRect(x: 0, y: 39, width: 1470, height: 918),
-            frame: CGRect(x: 0, y: 39, width: 1470, height: 918)))
-    }
-
-    runSuite("捕获后窗口改尺寸 → 弃用（防拉伸）") {
-        assertFalse(WindowImagePreCapturer.frameMatches(
-            entryFrame: CGRect(x: 0, y: 39, width: 1470, height: 918),
-            frame: CGRect(x: 0, y: 100, width: 800, height: 600)))
-    }
-
-    runSuite("亚像素级误差（<1pt）→ 仍采用") {
-        assertTrue(WindowImagePreCapturer.frameMatches(
-            entryFrame: CGRect(x: 0, y: 39.4, width: 1470.0, height: 918.0),
-            frame: CGRect(x: 0, y: 39, width: 1470, height: 918)))
-    }
-}
-
 private func testSettleFallback() {
     runSuite("面板已拆除 → noPanel") {
         let a = SettleFallback.action(panelExists: false, panelAlpha: 1.0)
@@ -1122,10 +1072,6 @@ struct TestRunner {
         print("")
         print("[SettleFallback]")
         testSettleFallback()
-
-        print("")
-        print("[WindowImagePreCapturer]")
-        testWindowImagePreCapturer()
 
         print("")
         print("Results: \(passed) passed, \(failed) failed")

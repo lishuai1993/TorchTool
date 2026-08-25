@@ -88,6 +88,9 @@ final class SlideTransitionController {
     /// 避免与兜底的手动淡出竞争。在 teardownPanel 中复位（随会话切换重置）。
     private var settleFallbackEngaged = false
 
+    /// 异步窗口图像回填队列：并发执行后台截取，主线程只做回填赋值。
+    private let windowFillQueue = DispatchQueue(label: "ws.windowFill", attributes: .concurrent)
+
     // MARK: - 甩动动量：速度采样
 
     /// 采样点（offset 域）。缓冲保留最近 50ms，速度取末 4 点最小二乘斜率。
@@ -150,26 +153,10 @@ final class SlideTransitionController {
             logDebug("SLIDE: abort — source window missing (id=\(sourceID))")
             return
         }
-        // 方案一：优先消费 trackingBegan 预取的窗口图像（命中即免同步截屏，压缩 begin
-        // 关键路径阻塞）。会话失配 / 未就绪 / 窗口尺寸已变 → 回退同步截屏（正确性不变）。
-        let precap = WindowImagePreCapturer.shared.take(
-            sourceID: sourceID, leftID: leftID, rightID: rightID)
-        if let precap {
-            logDebug("SLIDE: windowImagePreCapturer hit source=\(precap.source != nil) left=\(precap.left != nil) right=\(precap.right != nil)")
-        } else {
-            logDebug("SLIDE: windowImagePreCapturer miss — sync capture fallback")
-        }
-        let sourceImage: NSImage?
-        if let e = precap?.source,
-           WindowImagePreCapturer.frameMatches(entryFrame: e.frame, frame: sourceInfo.frame) {
-            sourceImage = e.image
-        } else {
-            sourceImage = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName)
-        }
-        guard let sourceImage else {
-            logDebug("SLIDE: abort — source capture failed (id=\(sourceID))")
-            return
-        }
+        // 方案二（异步面板）：不再同步阻塞截 source/target。源/目标视图先以空图像就位，
+        // 图像由后台队列异步回填（trackingBegan 预热保证热缓存，实测 ~15-50ms）。
+        // 默认模式背景未排除源窗口 → 源区域由背景真实像素兜底，晚到回填无黑/空效应；
+        // 干净模式背景排除源窗口 → 源图像需同步回填，避免源区域短暂露出桌面。
         slideSourceID = sourceID
 
         // 目标窗口所在屏幕：取源窗口 NS 坐标中心点所在屏幕。
@@ -216,12 +203,13 @@ final class SlideTransitionController {
 
         let content = NSView(frame: NSRect(origin: .zero, size: screenRect.size))
 
-        // 背景层：先放不透明黑做占位。SCK 截屏到达前必须盖住真实窗口——
-        // 源窗口已从 SCK 排除但真实窗口仍停在原位，半透明占位会让滑动起点
-        // 出现源窗口残像；不透明占位在 ~75ms 捕获延迟窗口内彻底遮挡。
+        // 背景层：全程透明占位。SCK 截屏到达前的空窗期直接显示真实桌面（面板之下），
+        // 从机制上消除「不透明黑占位」在背景图晚于动画到达时的整屏黑闪；源/目标快照
+        // 视图在其上盖顶（源快照 frame 与真实源重合、不残像），背景图就位后以不透明
+        // 全屏图平铺覆盖透明底。捕获失败保持透明即自然回退为真实桌面。
         let bg = NSView(frame: content.bounds)
         bg.wantsLayer = true
-        bg.layer?.backgroundColor = NSColor.black.cgColor
+        bg.layer?.backgroundColor = NSColor.clear.cgColor
         content.addSubview(bg)
         backdrop = bg
 
@@ -233,9 +221,15 @@ final class SlideTransitionController {
         sourceBase = localRect(forCG: sourceInfo.frame)
         let sourceShadowOn = !AppSettings.shared.sourceShadowCleanEnabled
             && AppSettings.shared.sourceShadowEnabled
-        let sv = makeImageView(image: sourceImage, frame: sourceBase, shadow: sourceShadowOn)
+        let sv = makeImageView(image: nil, frame: sourceBase, shadow: sourceShadowOn)
         content.addSubview(sv)
         sourceView = sv
+        if AppSettings.shared.sourceShadowCleanEnabled {
+            // 干净模式：背景已排除源窗口，需同步回填源图避免源区域露出桌面。
+            sv.image = wm.captureRawImage(for: sourceID, ownerName: sourceInfo.ownerName)
+        } else {
+            fillAsync(view: sv, windowID: sourceID, ownerName: sourceInfo.ownerName)
+        }
 
         // 统一模型：仅目标窗口图像从屏幕边缘滑入真实位（滑动对象=目标）；源、遮挡者、
         // 反向邻居全部静态留背景（背景无窗口排除集，接受目标滑入时与背景真实位重影）。
@@ -244,22 +238,15 @@ final class SlideTransitionController {
         // 后冒出」的不可见预行程。到达真实位由 applyCurrentOffset 钳制停住。
         // 边界（目标侧无窗口）→ 无目标视图，源随手指按弹性公式 wall-bump。
         if let info = targetInfo {
-            let targetEntry = sign < 0 ? precap?.right : precap?.left
-            let image: NSImage?
-            if let e = targetEntry,
-               WindowImagePreCapturer.frameMatches(entryFrame: e.frame, frame: info.frame) {
-                image = e.image
-            } else {
-                image = wm.captureRawImage(for: info.id, ownerName: info.ownerName)
-            }
-            if let image {
-                let real = localRect(forCG: info.frame)
-                let baseX = sign < 0 ? screenRect.width : -real.width
-                let tv = makeImageView(image: image,
-                                       frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
-                content.addSubview(tv)
-                extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
-            }
+            let real = localRect(forCG: info.frame)
+            let baseX = sign < 0 ? screenRect.width : -real.width
+            // 目标图像异步回填：边缘锚定（前缘贴屏幕边缘），回填到达前目标视图在
+            // 屏幕外/边缘不可见，晚到感知不到，无需同步阻塞。
+            let tv = makeImageView(image: nil,
+                                   frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
+            content.addSubview(tv)
+            extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
+            fillAsync(view: tv, windowID: info.id, ownerName: info.ownerName)
         }
 
         panel.contentView = content
@@ -339,12 +326,10 @@ final class SlideTransitionController {
         scheduleRevealDiag("T0+250ms", delay: 0.25, panelWindowNumber: diagPN,
                            targetID: diagTarget, reverseID: diagReverse)
 
-        // 淡入期真实屏幕存帧诊断（方案4.1）：淡入 0.06s 内密集采样合成画面，
-        // 捕获「淡入首帧黑色占位」的确切时刻——面板 alpha 已高但屏幕仍黑，即淡入
-        // 黑占位（微信 16:54:56 全黑同源）。REVEAL-FRAME 原先只在淡出期采样，
-        // 滑动开始段是诊断盲区：begins 期面板先铺不透明黑底、背景/窗口图纹理
-        // 异步上传，上传未就绪时淡入首帧即纯黑占位。fN 帧与淡出期 cN/rN 帧同存
-        // /tmp/reveal（同名不冲突），panelAlpha≈1 且 mean≈0 即为黑屏帧。
+        // 淡入期真实屏幕存帧诊断（方案4.1）：淡入 0.06s 内密集采样合成画面。
+        // 占位层透明后淡入首帧=真实桌面（非黑），fN 帧用于验证空窗期无黑闪——若
+        // 背景图晚到但画面保持真实桌面亮度，即证明根治；mean≈0 的黑帧将不复现。
+        // fN 帧与淡出期 cN/rN 帧同存 /tmp/reveal（同名不冲突）。
         for (label, delay) in [("f1", 0.025), ("f2", 0.040), ("f3", 0.055),
                                ("f4", 0.070), ("f5", 0.090)] {
             scheduleFrame(label, delay: delay, panelWindowNumber: diagPN,
@@ -454,14 +439,15 @@ final class SlideTransitionController {
         }
         extraSlideViews = []
 
-        if let info = targetInfo,
-           let image = wm.captureRawImage(for: info.id, ownerName: info.ownerName) {
+        if let info = targetInfo {
             let real = localRect(forCG: info.frame)
             let baseX = sign < 0 ? screenRect.width : -real.width
-            let tv = makeImageView(image: image,
+            // 链式目标同样异步回填：边缘锚定，回填到达前不可见，无需同步阻塞。
+            let tv = makeImageView(image: nil,
                                    frame: NSRect(x: baseX, y: real.minY, width: real.width, height: real.height))
             panel?.contentView?.addSubview(tv)
             extraSlideViews.append(SlidingImage(view: tv, baseX: baseX, realFrame: real))
+            fillAsync(view: tv, windowID: info.id, ownerName: info.ownerName)
         }
 
         // 菜单覆盖条目标文字层更新为新目标（缓存；无缓存则 commit 瞬显，与现状一致）。
@@ -833,8 +819,8 @@ final class SlideTransitionController {
     // MARK: - Backdrop (ScreenCaptureKit)
 
     /// 异步截取整屏桌面作为背景层（无窗口排除集，接受目标滑入时与背景真实位重影；
-    /// 仅排除本面板与菜单覆盖条，防双影/防覆盖条入镜）。截屏到达前以不透明黑层
-    /// 占位（杜绝源窗口残像），失败则回退为近乎透明黑，让真实桌面可见。
+    /// 仅排除本面板与菜单覆盖条，防双影/防覆盖条入镜）。截屏到达前的空窗期占位层
+    /// 全程透明、显示真实桌面（根治黑闪），失败则保持透明继续显示真实桌面。
     private func captureBackdrop(panelWindowNumber: Int,
                                  coverWindowNumber: Int?, inflight: BackdropPreCapturer.Direction?) {
         let token = sessionToken
@@ -860,8 +846,9 @@ final class SlideTransitionController {
                 let result = try await BackdropPreCapturer.captureDesktop(
                     size: scr.size, excluding: excl, panelWindowNumber: panelWindowNumber)
                 guard token == self.sessionToken else { return }
-                // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。不透明黑占位保留在
-                // 底层（防源残像），图像视图淡入覆盖其上，消除「黑 → 桌面」硬切闪跳。
+                // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。透明占位保留在底层
+                //（实时桌面），图像视图淡入覆盖其上，从「实时桌面」平滑过渡到「背景
+                // 快照」，消除「黑 → 桌面」硬切闪跳。
                 self.applyBackdropImage(result.image, animate: true)
                 self.applyMenuBarContent(from: result.image)
                 // 像素诊断①：SCK 背景帧内容亮度（mean≈0 → 后期返回黑帧，坐实假设①）。
@@ -874,14 +861,13 @@ final class SlideTransitionController {
                 logDebug("BGFLASH:capture excluded=[\(excludedNames)] count=\(result.excluded.count)")
             } catch {
                 logDebug("SLIDE: backdrop capture failed — \(error.localizedDescription)")
-                // 捕获失败：回退为近乎透明黑，让真实桌面在滑动中可见（而非不透明占位永久黑屏）。
-                backdrop?.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.25).cgColor
+                // 捕获失败：占位层保持透明即显示真实桌面，自然回退，无需再改颜色。
             }
         }
     }
 
     /// 背景图像视图：animate=false 时直接平铺（预捕就绪、零黑）；animate=true 时以
-    /// ~100ms easeOut 从透明淡入覆盖在不透明黑占位之上（黑占位保留、防源残像）。
+    /// ~100ms easeOut 从透明淡入覆盖在透明占位之上（空窗期显示真实桌面，无黑闪）。
     private func applyBackdropImage(_ image: CGImage, animate: Bool) {
         guard let backdrop else { return }
         let imageView = NSImageView(frame: backdrop.bounds)
@@ -1186,9 +1172,11 @@ final class SlideTransitionController {
         "(\(Int(r.minX)),\(Int(r.minY)),\(Int(r.width)),\(Int(r.height)))"
     }
 
-    private func makeImageView(image: NSImage, frame: NSRect, shadow: Bool = true) -> NSImageView {
+    private func makeImageView(image: NSImage?, frame: NSRect, shadow: Bool = true) -> NSImageView {
         let iv = NSImageView(frame: frame)
-        iv.image = image
+        if let image {
+            iv.image = image
+        }
         iv.imageScaling = .scaleProportionallyUpOrDown
         iv.wantsLayer = true
         if shadow {
@@ -1199,6 +1187,24 @@ final class SlideTransitionController {
             iv.shadow = nsShadow
         }
         return iv
+    }
+
+    /// 异步回填窗口图像到滑动视图：后台队列截取（受益于 trackingBegan 预热的热缓存，
+    /// 实测 ~15-50ms），主线程回填。会话代币 guard 丢弃旧会话的迟到结果；视图已从
+    /// 面板移除（window==nil）时不回填。
+    private func fillAsync(view: NSImageView?, windowID: CGWindowID, ownerName: String) {
+        guard let view else { return }
+        let wm = WindowManager.shared
+        let token = sessionToken
+        windowFillQueue.async { [weak self] in
+            let image = wm.captureRawImage(for: windowID, ownerName: ownerName)
+            DispatchQueue.main.async { [weak self] in
+                guard let self, token == self.sessionToken else { return }
+                if let image, view.window != nil {
+                    view.image = image
+                }
+            }
+        }
     }
 
     private func teardownPanel() {

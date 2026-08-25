@@ -159,7 +159,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlayController.hide()
         slideTransition.cancel(flushPending: false)   // 服务停止：丢弃 pending，不补激活
         BackdropPreCapturer.shared.cancel()
-        WindowImagePreCapturer.shared.cancel()
     }
 
     /// Restart the service: stop then start (clears the log again).
@@ -269,7 +268,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             // tap 手势不产生滑动：清掉 trackingBegan 时启动的预捕会话（若未消费）
             BackdropPreCapturer.shared.cancel()
-            WindowImagePreCapturer.shared.cancel()
             if elasticDrag.isInProgress {
                 logDebug("ElasticDrag: tap intercepted [session=\(elasticDrag.sessionID)], triggering spring-back")
                 elasticDrag.finishDrag()
@@ -426,7 +424,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             logDebug("GESTURE-TRACE t=\(String(format: "%.4f", CACurrentMediaTime())) event=gestureEnd [\(snapGE)]")
             // 手势结束：未消费的预捕会话随手势清理（已消费的会话早已被 begin 的 take 清空）
             BackdropPreCapturer.shared.cancel()
-            WindowImagePreCapturer.shared.cancel()
             if slideTransition.isActive {
                 // 收尾中（isSettling）：settle/fade 动画自行完成，不重复结算（防双重 settle）。
                 if !slideTransition.isSettling {
