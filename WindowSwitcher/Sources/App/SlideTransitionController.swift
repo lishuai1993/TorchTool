@@ -48,6 +48,9 @@ final class SlideTransitionController {
     private var backdrop: NSView?
     /// 背景图像视图（像素诊断：采样其 presentation 透明度验证淡入是否真的渐变）。
     private var backdropImageView: NSImageView?
+    /// 跟手期暂缓平铺的全屏背景图：滑动中到达的背景图先存入此槽，finishSettle 收尾
+    /// 落图，避免 2940×1912 大图纹理上传阻塞主线程丢跟手帧。teardown 时清除。
+    private var pendingBackdrop: CGImage?
     /// 当前面板窗口号（像素诊断：采样面板合成输出；teardown 置 0）。
     private var panelWindowNumber: CGWindowID = 0
     private var sourceView: NSImageView?
@@ -677,6 +680,9 @@ final class SlideTransitionController {
     /// 顶栏随面板渐显、真实目标菜单随覆盖条渐显，两者同节奏，无弹跳。
     /// 回弹无内容切换，仅面板淡出平滑收起。
     private func finishSettle(commit: Bool, onComplete: (() -> Void)?) {
+        // 跟手期暂缓的背景图在此落图：滑动动画已走完、窗口静止，大图纹理上传的
+        // 40-51ms 主线程阻塞不再丢跟手帧；落图后面板携带冻结桌面快照进入淡出。
+        flushPendingBackdrop()
         // settle 落定（token 匹配、未被链式/取消打断）：onComplete 即将激活目标，
         // 消费 pending（正常路径的激活由 onComplete 执行，cancel 不再补激活）。
         pendingActivationTarget = nil
@@ -830,10 +836,9 @@ final class SlideTransitionController {
             if let inflight,
                let image = await BackdropPreCapturer.shared.awaitImage(inflight, timeout: 0.35) {
                 guard token == self.sessionToken else { return }
-                self.applyBackdropImage(image, animate: true)
+                self.applyBackdropWhenIdle(image)
                 self.applyMenuBarContent(from: image)
-                logDebug("SLIDE: backdrop via in-flight pre-capture（淡入）excluded=\(inflight.excludedCount ?? 0)")
-                logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(image))")
+                logDebug("SLIDE: backdrop via in-flight pre-capture（跟手期暂缓落图）excluded=\(inflight.excludedCount ?? 0)")
                 return
             }
             do {
@@ -846,13 +851,11 @@ final class SlideTransitionController {
                 let result = try await BackdropPreCapturer.captureDesktop(
                     size: scr.size, excluding: excl, panelWindowNumber: panelWindowNumber)
                 guard token == self.sessionToken else { return }
-                // 方案 A：背景图以 ~100ms easeOut 淡入替换硬切。透明占位保留在底层
-                //（实时桌面），图像视图淡入覆盖其上，从「实时桌面」平滑过渡到「背景
-                // 快照」，消除「黑 → 桌面」硬切闪跳。
-                self.applyBackdropImage(result.image, animate: true)
+                // 背景图交给统一落图入口：跟手期暂存 pending（不平铺、不阻塞主线程），
+                // 收尾落图时以不透明直接平铺覆盖透明占位，从「实时桌面」过渡到「背景
+                // 快照」，teardown 揭示真实桌面无跳变。
+                self.applyBackdropWhenIdle(result.image)
                 self.applyMenuBarContent(from: result.image)
-                // 像素诊断①：SCK 背景帧内容亮度（mean≈0 → 后期返回黑帧，坐实假设①）。
-                logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(result.image))")
                 scheduleBackdropFadeSamples(token: token)
                 logDebug("SLIDE: backdrop captured \(result.image.width)x\(result.image.height)px excluded=\(result.excluded.count) fadeIn=0.1")
                 let excludedNames = result.excluded
@@ -884,6 +887,35 @@ final class SlideTransitionController {
                 imageView.animator().alphaValue = 1
             } completionHandler: {}
         }
+    }
+
+    /// 背景图到达的统一落图入口：滑动/跟手期（isActive）暂存 pending、不平铺，收尾
+    /// （finishSettle）时 flushPendingBackdrop 一次性落图——把 2940×1912 大图纹理上传
+    /// 的 40-51ms 主线程阻塞从「滑动跟手期」移到「窗口静止的收尾期」，跟手不再丢帧。
+    /// 会话未激活（isActive=false，如 begin 预捕就绪路径）则直接平铺。
+    private func applyBackdropWhenIdle(_ image: CGImage) {
+        if isActive {
+            pendingBackdrop = image
+            logDebug("SLIDE: backdrop pending → 收尾落图（跟手期不平铺）")
+        } else {
+            // 会话已非激活（用户已抬手）：窗口静止，直接平铺并补采样诊断，
+            // 不阻塞跟手期主线程。
+            logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(image))")
+            applyBackdropImage(image, animate: true)
+        }
+    }
+
+    /// 收尾落图：finishSettle 起点调用，把跟手期暂缓的背景图以不透明直接平铺。
+    /// 此时滑动动画已走完、窗口静止，主线程 40-51ms 阻塞不再丢跟手帧；落图后面板
+    /// 携带冻结桌面快照进入淡出，teardown 揭示真实桌面无跳变。
+    private func flushPendingBackdrop() {
+        guard let image = pendingBackdrop else { return }
+        pendingBackdrop = nil
+        // 像素诊断：与落图同机（finishSettle、窗口静止），把 21-31ms 主线程采样
+        // 从滑动跟手期移走；采样对象是静态 CGImage，延后结果一致。
+        logDebug("SLIDE:DIAG backdrop content \(self.sampleBrightness(image))")
+        applyBackdropImage(image, animate: false)
+        logDebug("SLIDE: backdrop flushed（跟手期延迟落图）\(image.width)x\(image.height)px")
     }
 
     /// 从全屏背景图 crop 顶部菜单栏区域 → 高斯模糊（抹掉文字）→ 作为覆盖条材质
@@ -1216,6 +1248,7 @@ final class SlideTransitionController {
         panel = nil
         backdrop = nil
         backdropImageView = nil
+        pendingBackdrop = nil
         panelWindowNumber = 0
         sourceView = nil
         extraSlideViews = []
