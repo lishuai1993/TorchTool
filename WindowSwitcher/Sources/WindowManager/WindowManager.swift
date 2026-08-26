@@ -518,15 +518,40 @@ final class WindowManager: @unchecked Sendable {
         cancelPendingScrollReorder()
     }
 
+    /// 手势开始时解析「真实源窗口」：取最新 z-order 第一个 layer==0 窗口（实际前置），
+    /// 更新 frontmostWindowID 并同步游标，恢复「currentIndex == index(of: frontmost)」
+    /// 不变量。取代陈旧缓存 frontmostWindowID——CGWindowList 新鲜快照是唯一可信源。
+    /// 注意：源必须是「实际前置窗口」（fresh z-order 第一），而非 LRU 头部（最近真实
+    /// 交互的窗口）——滑动 commit 激活目标属程序化激活、不重排 LRU，此时 frontmost ≠
+    /// LRU 头，若用 orderedIDs.first 会让连续手势永远锚定旧头窗口、导航不前进。
+    /// - Parameter keepPendingCommit: 收尾中且存在待激活提交目标（markCommitFrontmost
+    ///   已把 frontmostWindowID 提前写为待激活目标、真实窗口尚未激活）时为 true——
+    ///   此时新鲜 z-order 第一仍是旧源应用窗口，须复用 pending 值而非重锚。
+    ///   调用方（AppDelegate）持有 slideTransition，负责传 pendingActivationTarget 非空信号。
+    /// - Parameter zOrderFirst: 调用方刚执行 refreshWindows() 返回的 fresh z-order 第一
+    ///   个窗口 id（实际前置）。传 nil 时兜底用 LRU 头（仅防御性，正常调用方都传）。
+    func resolveGestureSource(keepPendingCommit: Bool, zOrderFirst: CGWindowID? = nil) -> CGWindowID? {
+        if keepPendingCommit, let pending = frontmostWindowID, windows[pending] != nil {
+            return pending
+        }
+        guard let front = zOrderFirst ?? orderingEngine.orderedIDs.first else { return nil }
+        frontmostWindowID = front
+        orderingEngine.syncCursor(toFrontmost: front)
+        return front
+    }
+
     /// 三指落地（trackingBegan）时启动双方向背景预捕。先刷新窗口列表：滑动会话
     /// begin（beginSlideSessionIfNeeded）同样先 refreshWindows 再取源/左右邻，预捕若不
     /// 刷新，两次刷新之间发生的窗口重建/增删会让预捕计划与 begin 实际不一致
     ///（正是首次滑动黑闪的根因）。刷新会同步 LRU，但本函数在会话 begin 前调用
     ///（trackingBegan，尚无滑动会话），不违反「滑动会话期间禁刷新」约束。
     /// 门控（滑动过渡开启等）由 AppDelegate 负责。
-    func beginBackdropPreCapture() {
-        _ = refreshWindows()
-        guard let sourceID = frontmostWindowID,
+    /// - Parameter keepPendingCommit: 收尾中链式接续时预捕以 pending 目标为源，
+    ///   见 resolveGestureSource。
+    func beginBackdropPreCapture(keepPendingCommit: Bool = false) {
+        let freshZOrder = refreshWindows()
+        guard let sourceID = resolveGestureSource(keepPendingCommit: keepPendingCommit,
+                                                  zOrderFirst: freshZOrder.first?.id),
               let sourceInfo = windows[sourceID],
               orderingEngine.orderedIDs.count > 1 else { return }
         // 与 beginSlideSessionIfNeeded 共用 neighbors（循环滚动开启时边界绕回对侧），
@@ -696,6 +721,12 @@ final class WindowManager: @unchecked Sendable {
         if let bid = bundleID, Constants.excludedAppBundleIDs.contains(bid) {
             return nil
         }
+
+        // 仅纳入普通窗口（layer==0）：排除菜单栏/通知中心/系统悬浮层等 layer>0 窗口，
+        // 避免它们混入 LRU 并破坏「新鲜 z-order 第一=真实前置」的源解析——通知中心
+        // 回归曾以 genuinely-new 身份被 prepend 到 LRU 头部污染排序。
+        let layer = (dict[kCGWindowLayer as String] as? Int) ?? 0
+        guard layer == 0 else { return nil }
 
         guard let x = bounds["X"] as? CGFloat,
               let y = bounds["Y"] as? CGFloat,

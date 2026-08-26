@@ -332,7 +332,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // 该手势若最终不是横滑（tap/纵向 swipe），由 gestureEnd/tap 清理预捕会话。
             if settings.slidingTransitionEnabled && settings.quickSwitchModeEnabled
                 && settings.backdropCaptureEnabled && !overlayController.isVisible {
-                windowManager.beginBackdropPreCapture()
+                // keepPendingCommit：若上一会话仍在收尾（链式/重开），预捕以 pending
+                // 提交目标为源（真实窗口尚未激活、新鲜 z-order 第一仍是旧源应用）。
+                windowManager.beginBackdropPreCapture(
+                    keepPendingCommit: slideTransition.pendingActivationTarget != nil)
             }
 
         case .threeFingerSwipeLeft:
@@ -527,7 +530,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         windowManager.noteSlideSessionBegan()
         let windows = windowManager.refreshWindows()
         guard windows.count > 1,
-              let sourceID = windowManager.frontmostWindowID,
+              let sourceID = windowManager.resolveGestureSource(
+                  keepPendingCommit: slideTransition.pendingActivationTarget != nil,
+                  zOrderFirst: windows.first?.id),
               windowManager.orderingEngine.index(of: sourceID) != nil else {
             logDebug("SLIDE: abort — need >=2 windows and a valid source (count=\(windows.count))")
             windowManager.gesturePhase = .idle

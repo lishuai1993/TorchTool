@@ -158,6 +158,9 @@ static float   lastCentroidX       = 0;
 static float   lastCentroidY       = 0;
 static float   maxPostSettleDisp   = 0;  // max displacement after settling
 static int     activeFingerCount   = 0;
+// 严格三指限定：本触摸会话期间是否出现过 >3 指（实触 fingerCount>3，或含悬停槽
+// totalContacts>3）。置位后本会话禁止进入 TRACKING，直到全部手指离板（IDLE 清零）。
+static bool    touchdownExceededThree = false;
 static bool    swipeActionFired    = false;
 static bool    isHorizontalSwipe   = false; // true for LEFT/RIGHT, false for UP/DOWN
 static int     lastFrame           = 0;   // for detecting callback interruption
@@ -457,6 +460,7 @@ int gesture_engine_start(GestureCallback callback) {
     settlingEndTime = 0;
     swipeActionFired = false;
     isHorizontalSwipe = false;
+    touchdownExceededThree = false;
     lastFrame = 0;
 
     // ── Strategy: stop device, register callback, then start device ──
@@ -715,9 +719,16 @@ static void processContactData(int deviceIndex, void *data,
         // Reset window when all fingers lift.
         if (fingerCount == 0) {
             touchdownStartTime = 0;
+            touchdownExceededThree = false;
+        }
+        // 严格三指限定：只要本触摸会话出现过 >3 指（实触 fingerCount>3，或含悬停
+        // 槽 totalContacts>3），立即标记，本次会话彻底不进入 TRACKING——系统四指
+        // 手势（四指轻扫/拇指捏合等）与三指手势在设计上明确区分，应用绝不污染它们。
+        if (fingerCount > 3 || count > 3) {
+            touchdownExceededThree = true;
         }
 
-        if (fingerCount == 3) {
+        if (fingerCount == 3 && !touchdownExceededThree) {
             // If no 0→>0 transition was observed (engine just started, or
             // touchdownStartTime was reset), treat this frame as simultaneous.
             if (touchdownStartTime == 0) {
@@ -762,6 +773,22 @@ static void processContactData(int deviceIndex, void *data,
         break;
 
     case GS_TRACKING: {
+        // 严格三指守卫：TRACKING 期第4指才落下（Pattern B——IDLE 门帧第4指仍是悬停
+        // st=3，进入 TRACKING 后 1-3 帧才转实触）。此时尚未触发滑动（swipe 需 200ms+，
+        // 第4指 10-30ms 即注册），发 GestureEnd 安全——Swift 侧 slideTransition 未激活，
+        // finishSlideSession 不会被调用，不会发生窗口切换。
+        if (fingerCount > 3) {
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (4th finger down, fingerCount=%d) GestureEnd fired\n",
+                   gestureSessionID, fingerCount);
+            gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
+            swipeActionFired = false;
+            isHorizontalSwipe = false;
+            touchdownExceededThree = true;
+            break;
+        }
+
         double elapsed = timestamp - touchStartTime;
         bool inSettling = (timestamp < settlingEndTime);
 
@@ -894,6 +921,25 @@ static void processContactData(int deviceIndex, void *data,
     }
 
     case GS_SWIPING:
+        // 严格三指守卫：滑动期第4指落下（漏网之鱼），立即发完整结束序列终止会话。
+        // 已进入 SWIPING 说明滑动动作可能已触发过，发 releaseVelocity+GestureEnd 让
+        // 上层走正常收尾判定（提交/回弹），不再继续跟手；置位 touchdownExceededThree
+        // 阻止剩余 3 指在本次触摸持续期间再次进入 TRACKING。
+        if (fingerCount > 3) {
+            ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                   gestureSessionID, sessionPeakVel, sessionMaxProgress);
+            userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+            userCallback(GestureReleaseVelocity, releaseInstVel);
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (4th finger down, fingerCount=%d) GestureEnd fired\n",
+                   gestureSessionID, fingerCount);
+            gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
+            swipeActionFired = false;
+            isHorizontalSwipe = false;
+            touchdownExceededThree = true;
+            break;
+        }
         // Detect callback interruption: if the system frame counter jumped,
         // callbacks were suspended and fingers likely lifted during the gap.
         if (frame - lastFrame > 30) {
