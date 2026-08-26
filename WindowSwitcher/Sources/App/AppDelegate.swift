@@ -16,11 +16,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let slideTransition = SlideTransitionController.shared
 
     /// 滑动会话收尾看门狗：触控板 MT 事件流停顿（手指静止/系统暂停回调）时，
-    /// C 引擎只能在下一帧到达才检测到 callback-gap，Swift 侧收不到 gestureEnd，
-    /// 面板会冻结在已过提交阈值的位移上。会话开始后 2.5s 内无任何 progress 更新
-    /// 即自动按当前 offset 收尾（提交或回弹），每次 swipeUpdate 重置。
+    /// C 引擎只能在下一帧到达才检测到 callback-gap，Swift 侧收不到 gestureEnd。
+    /// C 引擎侧帧饥饿定时器（200ms）先兜底收尾并保留甩动动量；此 Swift 看门狗作为
+    /// 二次兜底，0.8s 内无任何 progress 更新即自动按当前 offset 收尾（提交或回弹），
+    /// 每次 swipeUpdate 重置。
     private var slideWatchdogTimer: Timer?
-    private let slideWatchdogPeriod: TimeInterval = 2.5
+    private let slideWatchdogPeriod: TimeInterval = 0.8
 
 
     // MARK: - NSApplicationDelegate
@@ -609,7 +610,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         slideWatchdogTimer = Timer.scheduledTimer(withTimeInterval: slideWatchdogPeriod, repeats: false) { [weak self] _ in
             guard let self else { return }
             if self.slideTransition.isActive && !self.slideTransition.isSettling {
-                logDebug("SLIDE: watchdog fired — auto-settling stalled session")
+                // 停顿实锤标记：watchdog 触发意味着 2.5s 内无 swipeUpdate 且无 gestureEnd
+                //（正常 gestureEnd 会先 invalidateWatchdog 再 finishSlideSession）。
+                // 由此可反推 MT 回调中断 → 引擎停在 SWIPING/3 指 → 面板冻结的机制。
+                logDebug("SLIDE-WATCHDOG-STALL: fired offset=\(Int(self.slideTransition.currentOffset)) — no swipeUpdate & no gestureEnd for \(Int(self.slideWatchdogPeriod))s, engine stalled → finishSlideSession()")
                 self.finishSlideSession()
             }
         }

@@ -9,6 +9,8 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <stdatomic.h>
+#include <time.h>
+#include <dispatch/dispatch.h>
 
 // ──────────────────────────────────────────────────
 // Dual-output logging (stderr + optional log file)
@@ -195,6 +197,73 @@ static volatile int callbackErrorCount = 0;
 static int gestureSessionID = 0;  // increments each IDLE→TRACKING, for correlating C/Swift logs
 
 // ──────────────────────────────────────────────────
+// Frame-starvation watchdog
+// ──────────────────────────────────────────────────
+// MT 在三指同时抬手（3→0 直变）后可能停止投递 contact 帧，回调缺口检测（GS_SWIPING
+// 内 `frame - lastFrame > 30`）只在收到下一帧时才执行，无新帧则引擎永久停在
+// GS_SWIPING + fingerCount=3 → gestureEnd 永不触发 → Swift 侧 2.5s 看门狗才兜底，
+// 观感为「手指已离板窗口静止约 2.5s 后回退」。此定时器每 50ms 检查：引擎仍在滑动期
+// 且超过 FRAME_STARVATION_TIMEOUT 没有新帧，则复刻回调缺口结束序列（发射
+// releaseVelocity + gestureEnd），由上层 finishSlideSession 判定提交/回弹，甩动动量
+// 得以保留（这正是 C 定时器相对纯 Swift 超时的价值）。
+static dispatch_queue_t frameStarvationQueue = NULL;
+static dispatch_source_t frameStarvationTimer = NULL;
+static double lastFrameTime = 0;         // 最后收到的 MT 帧的单调钟时刻
+static const double FRAME_STARVATION_TIMEOUT = 0.2;   // 200ms 无帧即视为饿死
+static const double FRAME_STARVATION_TICK = 0.05;     // 50ms 轮询周期
+
+static double ws_monotonic_now(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
+}
+
+static void frameStarvationCheck(void *unused) {
+    (void)unused;
+    pthread_mutex_lock(&stateLock);
+    double now = ws_monotonic_now();
+    if (gState == GS_SWIPING && (now - lastFrameTime) > FRAME_STARVATION_TIMEOUT) {
+        ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+               gestureSessionID, sessionPeakVel, sessionMaxProgress);
+        userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+        userCallback(GestureReleaseVelocity, releaseInstVel);
+        userCallback(GestureEnd, 0);
+        ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (frame starvation, %.0fms no frame) GestureEnd fired\n",
+               gestureSessionID, (now - lastFrameTime) * 1000);
+        gState = GS_IDLE;
+        atomic_store(&trackingActive, false);
+        swipeActionFired = false;
+        isHorizontalSwipe = false;
+    }
+    pthread_mutex_unlock(&stateLock);
+}
+
+static void frameStarvationTimerStart(void) {
+    if (frameStarvationTimer) return;
+    frameStarvationQueue = dispatch_queue_create("com.windowswitcher.gesture.starvation", NULL);
+    frameStarvationTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                                  frameStarvationQueue);
+    dispatch_source_set_timer(frameStarvationTimer,
+                              dispatch_time(DISPATCH_TIME_NOW, FRAME_STARVATION_TICK * NSEC_PER_SEC),
+                              FRAME_STARVATION_TICK * NSEC_PER_SEC,
+                              FRAME_STARVATION_TICK * 0.2 * NSEC_PER_SEC);  // 10ms leeway
+    dispatch_source_set_event_handler_f(frameStarvationTimer, frameStarvationCheck);
+    dispatch_resume(frameStarvationTimer);
+}
+
+static void frameStarvationTimerStop(void) {
+    if (frameStarvationTimer) {
+        dispatch_source_cancel(frameStarvationTimer);
+        dispatch_release(frameStarvationTimer);
+        frameStarvationTimer = NULL;
+    }
+    if (frameStarvationQueue) {
+        dispatch_release(frameStarvationQueue);
+        frameStarvationQueue = NULL;
+    }
+}
+
+// ──────────────────────────────────────────────────
 // Helpers: read fields from raw contact data
 // ──────────────────────────────────────────────────
 
@@ -301,6 +370,7 @@ int gesture_engine_start(GestureCallback callback) {
     // If engine was already running, stop first
     if (engineRunning) {
         ws_log("[WS] stopping previous engine instance...\n");
+        frameStarvationTimerStop();
         if (mtDevice && pMTUnregisterCB5) {
             pMTUnregisterCB5(mtDevice, contactFrameCallback5);
         }
@@ -437,12 +507,16 @@ int gesture_engine_start(GestureCallback callback) {
     }
 
     engineRunning = true;
+    lastFrameTime = ws_monotonic_now();
+    frameStarvationTimerStart();
     ws_log("[WS] Gesture engine started (reg=%d, start=%d). "
             "Waiting for callbacks...\n", regResult, startResult);
     return 0;
 }
 
 void gesture_engine_stop(void) {
+    // 先停定时器再清 userCallback，避免定时器触发时 userCallback 已为 NULL。
+    frameStarvationTimerStop();
     engineRunning = false;
     userCallback = NULL;
     // Clear the tracking flag too: if stopped mid-gesture it would otherwise
@@ -566,6 +640,8 @@ static void processContactData(int deviceIndex, void *data,
     // thread can't tear it mid-restart. The state machine below re-locks.
     pthread_mutex_lock(&stateLock);
     bool streamAlive = engineRunning && (userCallback != NULL);
+    // 任何送达的帧都重置帧饥饿时钟——定时器只在长时间无帧时兜底。
+    lastFrameTime = ws_monotonic_now();
     pthread_mutex_unlock(&stateLock);
     if (!streamAlive) {
         // Rate-limited: log only once per 120 frames when stream is dead

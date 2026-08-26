@@ -62,14 +62,16 @@ test-order: $(APP_BUNDLE)
 # App bundle
 # ──────────────────────────────────────────────────
 
-$(APP_BUNDLE): $(BUILD_DIR)/$(APP_NAME) Resources/Info.plist
+$(APP_BUNDLE): $(BUILD_DIR)/$(APP_NAME) Resources/Info.plist Resources/AppIcon.icns
 	@if [ ! -d "$(APP_BUNDLE)" ]; then \
 		echo "==> Creating app bundle (first time)..."; \
 		rm -rf $(APP_BUNDLE); \
 		mkdir -p $(APP_BUNDLE)/Contents/MacOS; \
 		mkdir -p $(APP_BUNDLE)/Contents/Resources; \
-		cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist; \
 	fi
+	@echo "==> Syncing Info.plist + AppIcon into bundle..."
+	@cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist
+	@cp Resources/AppIcon.icns $(APP_BUNDLE)/Contents/Resources/AppIcon.icns
 	@echo "==> Updating binary in bundle..."
 	@cp $(BUILD_DIR)/$(APP_NAME) $(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)
 	@echo "==> Signing $(APP_BUNDLE) with identity: $(SIGN_IDENTITY)..."
