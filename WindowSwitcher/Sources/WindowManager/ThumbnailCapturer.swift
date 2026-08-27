@@ -50,10 +50,4 @@ final class ThumbnailCapturer {
     func setThumbnail(_ image: NSImage, for windowID: CGWindowID) {
         windowManager.windows[windowID]?.thumbnail = image
     }
-
-    func clearCache() {
-        for key in windowManager.windows.keys {
-            windowManager.windows[key]?.thumbnail = nil
-        }
-    }
 }

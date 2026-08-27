@@ -103,7 +103,6 @@ final class WindowManager: @unchecked Sendable {
     func setThumbnail(_ image: NSImage, for windowID: CGWindowID) {
         thumbCapturer.setThumbnail(image, for: windowID)
     }
-    func clearThumbnailCache() { thumbCapturer.clearCache() }
 
     /// Guard flag to prevent event tap / activation notification from
     /// reordering the list during programmatic window activation.

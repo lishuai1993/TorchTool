@@ -192,7 +192,7 @@ static int     lastFingerCount     = 0;
 static float   tapMaxDurationSec   = 0.350;  // 350ms from first touch
 static float   tapMaxDisplacement  = 0.04;   // 4% after settling
 static float   swipeMinDisplacement = 0.08;
-static float   swipeMinDuration    = 0.05;
+static float   swipeMinDuration    = 0.02;  // 晋升门槛=SETTLING_DURATION+swipeMinDuration=100ms，快甩在微抬(3→2)前完成晋升
 
 // Diagnostics
 static volatile int callbackCallCount = 0;
@@ -212,8 +212,10 @@ static int gestureSessionID = 0;  // increments each IDLE→TRACKING, for correl
 static dispatch_queue_t frameStarvationQueue = NULL;
 static dispatch_source_t frameStarvationTimer = NULL;
 static double lastFrameTime = 0;         // 最后收到的 MT 帧的单调钟时刻
+static double lastContactTimestamp = 0;  // 最后收到的 MT 帧的帧级时间戳（MT 时钟域，用于快甩会话期判别）
 static const double FRAME_STARVATION_TIMEOUT = 0.2;   // 200ms 无帧即视为饿死
 static const double FRAME_STARVATION_TICK = 0.05;     // 50ms 轮询周期
+static const double TRACKING_FAST_FLICK_WINDOW = 0.5; // TRACKING 兜底仅对「起手 500ms 内极快滑动停顿」生效，慢速拖拽停顿不误触
 
 static double ws_monotonic_now(void) {
     struct timespec ts;
@@ -225,18 +227,38 @@ static void frameStarvationCheck(void *unused) {
     (void)unused;
     pthread_mutex_lock(&stateLock);
     double now = ws_monotonic_now();
-    if (gState == GS_SWIPING && (now - lastFrameTime) > FRAME_STARVATION_TIMEOUT) {
-        ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
-               gestureSessionID, sessionPeakVel, sessionMaxProgress);
-        userCallback(GestureSwipePeakVelocity, sessionPeakVel);
-        userCallback(GestureReleaseVelocity, releaseInstVel);
-        userCallback(GestureEnd, 0);
-        ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (frame starvation, %.0fms no frame) GestureEnd fired\n",
-               gestureSessionID, (now - lastFrameTime) * 1000);
-        gState = GS_IDLE;
-        atomic_store(&trackingActive, false);
-        swipeActionFired = false;
-        isHorizontalSwipe = false;
+    if ((now - lastFrameTime) > FRAME_STARVATION_TIMEOUT) {
+        if (gState == GS_SWIPING) {
+            ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                   gestureSessionID, sessionPeakVel, sessionMaxProgress);
+            userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+            userCallback(GestureReleaseVelocity, releaseInstVel);
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: SWIPING -> IDLE [session=%d] (frame starvation, %.0fms no frame) GestureEnd fired\n",
+                   gestureSessionID, (now - lastFrameTime) * 1000);
+            gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
+            swipeActionFired = false;
+            isHorizontalSwipe = false;
+        } else if (gState == GS_TRACKING
+                   && sessionMaxProgress != 0
+                   && (lastContactTimestamp - touchStartTime) < TRACKING_FAST_FLICK_WINDOW) {
+            // 快甩盲区兜底：TRACKING 期已投递过 swipeUpdate（sessionMaxProgress!=0，排除点按/静置/沉降期），
+            // 但 200ms 无新帧——极快滑动中手指微抬(3→2)使 MT 停投递，晋升评估永不执行（门槛差几毫秒）。
+            // 复刻正常抬手端序（GS_TRACKING fingerCount<2 路径同款），保住甩动动量并让上层正常收尾；
+            // 500ms 判别器确保只兜极快滑动停顿，慢速弹性拖拽后静置不误触。
+            ws_log("[WS-DBG] PEAK: session=%d peak=%.3f maxProgress=%.3f\n",
+                   gestureSessionID, sessionPeakVel, sessionMaxProgress);
+            userCallback(GestureSwipePeakVelocity, sessionPeakVel);
+            userCallback(GestureReleaseVelocity, releaseInstVel);
+            userCallback(GestureEnd, 0);
+            ws_log("[WS-DBG] STATE: TRACKING -> IDLE [session=%d] (frame starvation, %.0fms no frame) GestureEnd fired\n",
+                   gestureSessionID, (now - lastFrameTime) * 1000);
+            gState = GS_IDLE;
+            atomic_store(&trackingActive, false);
+            swipeActionFired = false;
+            isHorizontalSwipe = false;
+        }
     }
     pthread_mutex_unlock(&stateLock);
 }
@@ -646,6 +668,7 @@ static void processContactData(int deviceIndex, void *data,
     bool streamAlive = engineRunning && (userCallback != NULL);
     // 任何送达的帧都重置帧饥饿时钟——定时器只在长时间无帧时兜底。
     lastFrameTime = ws_monotonic_now();
+    lastContactTimestamp = timestamp;   // MT 帧时间戳域，供 TRACKING 帧饥饿兜底的快甩会话期判别
     pthread_mutex_unlock(&stateLock);
     if (!streamAlive) {
         // Rate-limited: log only once per 120 frames when stream is dead

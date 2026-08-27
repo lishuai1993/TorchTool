@@ -58,8 +58,9 @@ final class GestureEngine: @unchecked Sendable {
         let tapMaxD = Float(settings.tapMaxDuration)
         let tapMaxDisp = settings.tapMaxDisplacement
         let swipeMinDisp = settings.swipeMinDisplacement
-        logDebug("GestureEngine: sensitivity — tapMaxDur=\(tapMaxD) tapMaxDisp=\(tapMaxDisp) swipeMinDisp=\(swipeMinDisp)")
-        gesture_engine_set_sensitivity(tapMaxD, tapMaxDisp, swipeMinDisp, 0.05)
+        let swipeMinDur = Float(0.02)  // 晋升门槛 = SETTLING_DURATION + swipeMinDur = 100ms，快甩在微抬(3→2)前完成晋升
+        logDebug("GestureEngine: sensitivity — tapMaxDur=\(tapMaxD) tapMaxDisp=\(tapMaxDisp) swipeMinDisp=\(swipeMinDisp) swipeMinDur=\(swipeMinDur)")
+        gesture_engine_set_sensitivity(tapMaxD, tapMaxDisp, swipeMinDisp, swipeMinDur)
         gesture_engine_set_touchdown_window(settings.touchdownWindow)
         logDebug("GestureEngine: sensitivity — touchdownWindow=\(String(format: "%.0f", settings.touchdownWindow * 1000))ms")
         logDebug("GestureEngine: starting C engine (MultitouchSupport)...")
